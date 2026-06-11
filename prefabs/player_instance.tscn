@@ -1,56 +1,56 @@
-[gd_scene format=4 uid="uid://5p56wqclhrhd"]
+[gd_scene format=4 uid="uid://bqb6v1anlqsj4"]
 
-[ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://scripts/player.gd" id="1_ndllh"]
-[ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://scripts/player_manager.gd" id="2_rvwnr"]
-[ext_resource type="Script" path="res://scripts/stair_stepper_component.gd" id="3_s6ax8"]
-[ext_resource type="Script" path="res://scripts/input_provider.gd" id="99_input"]
-[ext_resource type="Script" path="res://scripts/transform_smoother_component.gd" id="100_smooth"]
-[ext_resource type="Script" uid="uid://pkj3mp0qeeaw" path="res://scripts/interaction_handler.gd" id="4_l76qw"]
-[ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://scripts/camera_controller.gd" id="5_jh3t0"]
-[ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://scripts/camera_collision.gd" id="6_rr7n4"]
-[ext_resource type="Texture2D" uid="uid://btmml24gst43m" path="res://models/kasane-teto/kasane_teto_0.png" id="7_mvcx1"]
-[ext_resource type="Texture2D" uid="uid://b1d7uhsd7veqo" path="res://models/kasane-teto/kasane_teto_1.png" id="8_y8ie8"]
-[ext_resource type="Texture2D" uid="uid://cucgsg3pgphh3" path="res://models/kasane-teto/kasane_teto_14_3.png" id="9_8wnoh"]
-[ext_resource type="Texture2D" uid="uid://clhfpq8fnvriy" path="res://models/kasane-teto/kasane_teto_14.png" id="10_um6p0"]
-[ext_resource type="Texture2D" uid="uid://dfu0mlsdgxj22" path="res://models/kasane-teto/kasane_teto_15.png" id="11_u4kue"]
-[ext_resource type="Texture2D" uid="uid://cocrj1ch5y0po" path="res://models/kasane-teto/kasane_teto_16.png" id="12_tgj3y"]
-[ext_resource type="Texture2D" uid="uid://dlcvnfkarylnq" path="res://models/kasane-teto/kasane_teto_17.png" id="13_6ppa6"]
-[ext_resource type="Texture2D" uid="uid://6yl55bd53b6t" path="res://models/kasane-teto/kasane_teto_18.png" id="14_g6fq4"]
-[ext_resource type="Texture2D" uid="uid://c4y2bv8wj1ayv" path="res://models/kasane-teto/kasane_teto_19.png" id="15_0jjs4"]
-[ext_resource type="Texture2D" uid="uid://bdfvs07vfei3p" path="res://models/kasane-teto/kasane_teto_20.png" id="16_4daht"]
-[ext_resource type="Texture2D" uid="uid://bjq4sb0x3vojm" path="res://models/kasane-teto/kasane_teto_21.png" id="17_0fint"]
-[ext_resource type="Texture2D" uid="uid://b3tqxmbw01ipo" path="res://models/kasane-teto/kasane_teto_22.png" id="18_7a3xm"]
-[ext_resource type="Texture2D" uid="uid://cd0m0eusedon2" path="res://models/kasane-teto/kasane_teto_23.png" id="19_4maxj"]
-[ext_resource type="Texture2D" uid="uid://dyvqbj6r0bgyo" path="res://models/kasane-teto/kasane_teto_24.png" id="20_cnp7p"]
-[ext_resource type="Texture2D" uid="uid://cn2tewynjjp" path="res://models/kasane-teto/kasane_teto_25.png" id="21_2ib3k"]
-[ext_resource type="Texture2D" uid="uid://cai6p14jgj03p" path="res://models/kasane-teto/kasane_teto_26.png" id="22_n8t5v"]
-[ext_resource type="Texture2D" uid="uid://4qlg6fa56j5n" path="res://models/kasane-teto/kasane_teto_27.png" id="23_3qjoj"]
-[ext_resource type="Texture2D" uid="uid://d0re2rg146dvs" path="res://models/kasane-teto/kasane_teto_28.png" id="24_jpwvr"]
-[ext_resource type="Texture2D" uid="uid://cvvlu4lt5no62" path="res://models/kasane-teto/kasane_teto_29.png" id="25_1j4tl"]
-[ext_resource type="Texture2D" uid="uid://brcqts67m0f1i" path="res://models/kasane-teto/kasane_teto_30.png" id="26_yfk1j"]
-[ext_resource type="Texture2D" uid="uid://c1qoigor64yba" path="res://models/kasane-teto/kasane_teto_31.png" id="27_6xrpt"]
-[ext_resource type="Texture2D" uid="uid://yjmed66qvkl8" path="res://models/kasane-teto/kasane_teto_2.png" id="28_17bw1"]
-[ext_resource type="Texture2D" uid="uid://dyxxkot414gm" path="res://models/kasane-teto/kasane_teto_3.png" id="29_deab4"]
-[ext_resource type="Texture2D" uid="uid://boe3rinfu6j88" path="res://models/kasane-teto/kasane_teto_4.png" id="30_xit5k"]
-[ext_resource type="Texture2D" uid="uid://c1x3eww4qhhnn" path="res://models/kasane-teto/kasane_teto_5.png" id="31_ds1c4"]
-[ext_resource type="Texture2D" uid="uid://8et6xcyd1snk" path="res://models/kasane-teto/kasane_teto_6.png" id="32_0yu0t"]
-[ext_resource type="Texture2D" uid="uid://cwy64mrj6cgw7" path="res://models/kasane-teto/kasane_teto_7.png" id="33_2f78m"]
-[ext_resource type="Texture2D" uid="uid://ckotn0mimbkhc" path="res://models/kasane-teto/kasane_teto_8.png" id="34_fvge6"]
-[ext_resource type="Texture2D" uid="uid://caqdq8f08te63" path="res://models/kasane-teto/kasane_teto_9.png" id="35_rkucg"]
-[ext_resource type="Texture2D" uid="uid://cmni135ckh3ps" path="res://models/kasane-teto/kasane_teto_10.png" id="36_c7idc"]
-[ext_resource type="Texture2D" uid="uid://djruo8d6tlv4i" path="res://models/kasane-teto/kasane_teto_11_31.png" id="37_j25c5"]
-[ext_resource type="Texture2D" uid="uid://0wb3bjabixv6" path="res://models/kasane-teto/kasane_teto_11.png" id="38_thjqw"]
-[ext_resource type="Texture2D" uid="uid://nthar3lfvkdh" path="res://models/kasane-teto/kasane_teto_12.png" id="39_pj3j7"]
-[ext_resource type="Texture2D" uid="uid://lug17wmd0cbi" path="res://models/kasane-teto/kasane_teto_13.png" id="40_a2aht"]
-[ext_resource type="Animation" uid="uid://c8160oa4266ei" path="res://animations/fall.res" id="41_5c40o"]
-[ext_resource type="Animation" uid="uid://dmjjfhl5ywoxa" path="res://animations/idle.res" id="42_q7w12"]
-[ext_resource type="Animation" uid="uid://u7djiknkv1be" path="res://animations/jump.res" id="43_togv1"]
-[ext_resource type="Animation" uid="uid://dfmrovnuqyln3" path="res://animations/land.res" id="44_yqjf6"]
-[ext_resource type="Animation" uid="uid://bw0lfuqvlsnkp" path="res://animations/run.res" id="45_o0y0b"]
-[ext_resource type="Animation" uid="uid://calmp13aekh4x" path="res://animations/walk.res" id="46_o8t73"]
-[ext_resource type="Script" uid="uid://btkocaclio48m" path="res://scripts/animation_tree.gd" id="47_sbqto"]
-[ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://scripts/animation_blocker.gd" id="48_6jcox"]
-[ext_resource type="PackedScene" uid="uid://81ovlopx3w2s" path="res://scenes/ui.tscn" id="49_wfwlm"]
+[ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://scripts/player.gd" id="1_knxac"]
+[ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://scripts/player_manager.gd" id="2_dponi"]
+[ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://scripts/stair_stepper_component.gd" id="3_og0ex"]
+[ext_resource type="Script" uid="uid://pkj3mp0qeeaw" path="res://scripts/interaction_handler.gd" id="4_xmbwd"]
+[ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://scripts/camera_controller.gd" id="5_fb1y1"]
+[ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://scripts/camera_collision.gd" id="6_37imv"]
+[ext_resource type="Texture2D" uid="uid://btmml24gst43m" path="res://models/kasane-teto/kasane_teto_0.png" id="7_wi5vh"]
+[ext_resource type="Texture2D" uid="uid://b1d7uhsd7veqo" path="res://models/kasane-teto/kasane_teto_1.png" id="8_hh3fo"]
+[ext_resource type="Texture2D" uid="uid://cucgsg3pgphh3" path="res://models/kasane-teto/kasane_teto_14_3.png" id="9_7nrw3"]
+[ext_resource type="Texture2D" uid="uid://clhfpq8fnvriy" path="res://models/kasane-teto/kasane_teto_14.png" id="10_lm4s0"]
+[ext_resource type="Texture2D" uid="uid://dfu0mlsdgxj22" path="res://models/kasane-teto/kasane_teto_15.png" id="11_yar2r"]
+[ext_resource type="Texture2D" uid="uid://cocrj1ch5y0po" path="res://models/kasane-teto/kasane_teto_16.png" id="12_72kiv"]
+[ext_resource type="Texture2D" uid="uid://dlcvnfkarylnq" path="res://models/kasane-teto/kasane_teto_17.png" id="13_v3rxv"]
+[ext_resource type="Texture2D" uid="uid://6yl55bd53b6t" path="res://models/kasane-teto/kasane_teto_18.png" id="14_6xi68"]
+[ext_resource type="Texture2D" uid="uid://c4y2bv8wj1ayv" path="res://models/kasane-teto/kasane_teto_19.png" id="15_f5qgm"]
+[ext_resource type="Texture2D" uid="uid://bdfvs07vfei3p" path="res://models/kasane-teto/kasane_teto_20.png" id="16_7dxcw"]
+[ext_resource type="Texture2D" uid="uid://bjq4sb0x3vojm" path="res://models/kasane-teto/kasane_teto_21.png" id="17_87ilo"]
+[ext_resource type="Texture2D" uid="uid://b3tqxmbw01ipo" path="res://models/kasane-teto/kasane_teto_22.png" id="18_5avwu"]
+[ext_resource type="Texture2D" uid="uid://cd0m0eusedon2" path="res://models/kasane-teto/kasane_teto_23.png" id="19_tlbsl"]
+[ext_resource type="Texture2D" uid="uid://dyvqbj6r0bgyo" path="res://models/kasane-teto/kasane_teto_24.png" id="20_xkuw1"]
+[ext_resource type="Texture2D" uid="uid://cn2tewynjjp" path="res://models/kasane-teto/kasane_teto_25.png" id="21_de1v1"]
+[ext_resource type="Texture2D" uid="uid://cai6p14jgj03p" path="res://models/kasane-teto/kasane_teto_26.png" id="22_wyqnp"]
+[ext_resource type="Texture2D" uid="uid://4qlg6fa56j5n" path="res://models/kasane-teto/kasane_teto_27.png" id="23_quiua"]
+[ext_resource type="Texture2D" uid="uid://d0re2rg146dvs" path="res://models/kasane-teto/kasane_teto_28.png" id="24_w73yn"]
+[ext_resource type="Texture2D" uid="uid://cvvlu4lt5no62" path="res://models/kasane-teto/kasane_teto_29.png" id="25_b6icg"]
+[ext_resource type="Texture2D" uid="uid://brcqts67m0f1i" path="res://models/kasane-teto/kasane_teto_30.png" id="26_1unph"]
+[ext_resource type="Texture2D" uid="uid://c1qoigor64yba" path="res://models/kasane-teto/kasane_teto_31.png" id="27_5tnb5"]
+[ext_resource type="Texture2D" uid="uid://yjmed66qvkl8" path="res://models/kasane-teto/kasane_teto_2.png" id="28_q8akd"]
+[ext_resource type="Texture2D" uid="uid://dyxxkot414gm" path="res://models/kasane-teto/kasane_teto_3.png" id="29_a86he"]
+[ext_resource type="Texture2D" uid="uid://boe3rinfu6j88" path="res://models/kasane-teto/kasane_teto_4.png" id="30_o4h5p"]
+[ext_resource type="Texture2D" uid="uid://c1x3eww4qhhnn" path="res://models/kasane-teto/kasane_teto_5.png" id="31_bed33"]
+[ext_resource type="Texture2D" uid="uid://8et6xcyd1snk" path="res://models/kasane-teto/kasane_teto_6.png" id="32_em3uw"]
+[ext_resource type="Texture2D" uid="uid://cwy64mrj6cgw7" path="res://models/kasane-teto/kasane_teto_7.png" id="33_3msaf"]
+[ext_resource type="Texture2D" uid="uid://ckotn0mimbkhc" path="res://models/kasane-teto/kasane_teto_8.png" id="34_dqjj5"]
+[ext_resource type="Texture2D" uid="uid://caqdq8f08te63" path="res://models/kasane-teto/kasane_teto_9.png" id="35_eehff"]
+[ext_resource type="Texture2D" uid="uid://cmni135ckh3ps" path="res://models/kasane-teto/kasane_teto_10.png" id="36_wmhn3"]
+[ext_resource type="Texture2D" uid="uid://djruo8d6tlv4i" path="res://models/kasane-teto/kasane_teto_11_31.png" id="37_3jags"]
+[ext_resource type="Texture2D" uid="uid://0wb3bjabixv6" path="res://models/kasane-teto/kasane_teto_11.png" id="38_vsl7e"]
+[ext_resource type="Texture2D" uid="uid://nthar3lfvkdh" path="res://models/kasane-teto/kasane_teto_12.png" id="39_d56kp"]
+[ext_resource type="Texture2D" uid="uid://lug17wmd0cbi" path="res://models/kasane-teto/kasane_teto_13.png" id="40_pe28i"]
+[ext_resource type="Animation" uid="uid://c8160oa4266ei" path="res://animations/fall.res" id="41_0pwrl"]
+[ext_resource type="Animation" uid="uid://dmjjfhl5ywoxa" path="res://animations/idle.res" id="42_ulr01"]
+[ext_resource type="Animation" uid="uid://u7djiknkv1be" path="res://animations/jump.res" id="43_si6gk"]
+[ext_resource type="Animation" uid="uid://dfmrovnuqyln3" path="res://animations/land.res" id="44_affyg"]
+[ext_resource type="Animation" uid="uid://bw0lfuqvlsnkp" path="res://animations/run.res" id="45_qtmbp"]
+[ext_resource type="Animation" uid="uid://calmp13aekh4x" path="res://animations/walk.res" id="46_38pum"]
+[ext_resource type="Script" uid="uid://btkocaclio48m" path="res://scripts/animation_tree.gd" id="47_laafa"]
+[ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://scripts/animation_blocker.gd" id="48_2ggbq"]
+[ext_resource type="PackedScene" uid="uid://81ovlopx3w2s" path="res://scenes/ui.tscn" id="49_0qjdw"]
+[ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://scripts/input_provider.gd" id="50_xpqug"]
+[ext_resource type="Script" uid="uid://dwuvqlh66t1dm" path="res://scripts/transform_smoother_component.gd" id="51_q4yra"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_72ieh"]
 radius = 0.13183594
@@ -60,7 +60,7 @@ height = 1.595
 resource_name = "arm01_CH_SKIN_SD001T5H0OZ.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("7_mvcx1")
+albedo_texture = ExtResource("7_wi5vh")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -287,7 +287,7 @@ bind/64/pose = Transform3D(-0.9990283, -0.017868968, -0.04028822, -0.04057077, 0
 resource_name = "body_CH_SKIN_SD001T5H0Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("8_y8ie8")
+albedo_texture = ExtResource("8_hh3fo")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -315,12 +315,12 @@ blend_shape_mode = 0
 resource_name = "headparts_blue_CH_ITEM_SD008Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("9_8wnoh")
+albedo_texture = ExtResource("9_7nrw3")
 roughness = 0.5527864
 emission_enabled = true
 emission = Color(1, 1, 1, 1)
 emission_operator = 1
-emission_texture = ExtResource("10_um6p0")
+emission_texture = ExtResource("10_lm4s0")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_hcxpe"]
 resource_name = "kasane_teto_Mesh_010"
@@ -346,11 +346,11 @@ blend_shape_mode = 0
 resource_name = "outer_CH_CLOTH_SD006T5H0Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("11_u4kue")
+albedo_texture = ExtResource("11_yar2r")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("12_tgj3y")
+normal_texture = ExtResource("12_72kiv")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_2poi1"]
 resource_name = "kasane_teto_Mesh_011"
@@ -376,12 +376,12 @@ blend_shape_mode = 0
 resource_name = "material0002.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("13_6ppa6")
+albedo_texture = ExtResource("13_v3rxv")
 roughness = 0.5527864
 emission_enabled = true
 emission = Color(1, 1, 1, 1)
 emission_operator = 1
-emission_texture = ExtResource("14_g6fq4")
+emission_texture = ExtResource("14_6xi68")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_6hxdv"]
 resource_name = "kasane_teto_Mesh_012"
@@ -407,12 +407,12 @@ blend_shape_mode = 0
 resource_name = "material0003.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("15_0jjs4")
+albedo_texture = ExtResource("15_f5qgm")
 roughness = 0.5527864
 emission_enabled = true
 emission = Color(1, 1, 1, 1)
 emission_operator = 1
-emission_texture = ExtResource("14_g6fq4")
+emission_texture = ExtResource("14_6xi68")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_5x205"]
 resource_name = "kasane_teto_Mesh_013"
@@ -438,7 +438,7 @@ blend_shape_mode = 0
 resource_name = "material0004.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("16_4daht")
+albedo_texture = ExtResource("16_7dxcw")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -491,11 +491,11 @@ blend_shape_mode = 0
 resource_name = "skirt_CH_CLOTH_SD006T5H0Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("17_0fint")
+albedo_texture = ExtResource("17_87ilo")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("18_7a3xm")
+normal_texture = ExtResource("18_5avwu")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_jpkh0"]
 resource_name = "kasane_teto_Mesh_016"
@@ -520,11 +520,11 @@ blend_shape_mode = 0
 resource_name = "nail_CH_HAIR_SD002T5H0A1Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("19_4maxj")
+albedo_texture = ExtResource("19_tlbsl")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("20_cnp7p")
+normal_texture = ExtResource("20_xkuw1")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_snokm"]
 resource_name = "kasane_teto_Mesh_017"
@@ -550,11 +550,11 @@ blend_shape_mode = 0
 resource_name = "new_headset_CH_ITEM_SD008Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("21_2ib3k")
+albedo_texture = ExtResource("21_de1v1")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("22_n8t5v")
+normal_texture = ExtResource("22_wyqnp")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_5088v"]
 resource_name = "kasane_teto_Mesh_018"
@@ -580,7 +580,7 @@ blend_shape_mode = 0
 resource_name = "material0000.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("23_3qjoj")
+albedo_texture = ExtResource("23_quiua")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -607,11 +607,11 @@ blend_shape_mode = 0
 resource_name = "sleeve_CH_CLOTH_SD006T5H0Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("24_jpwvr")
+albedo_texture = ExtResource("24_w73yn")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("25_1j4tl")
+normal_texture = ExtResource("25_b6icg")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_lkm8i"]
 resource_name = "kasane_teto_Mesh_020"
@@ -637,11 +637,11 @@ blend_shape_mode = 0
 resource_name = "tighits_CH_CLOTH_SD006T5H0Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("26_yfk1j")
+albedo_texture = ExtResource("26_1unph")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("27_6xrpt")
+normal_texture = ExtResource("27_5tnb5")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_xghya"]
 resource_name = "kasane_teto_Mesh_021"
@@ -667,7 +667,7 @@ blend_shape_mode = 0
 resource_name = "headset_CH_ITEM_SD008Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("21_2ib3k")
+albedo_texture = ExtResource("21_de1v1")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -695,11 +695,11 @@ blend_shape_mode = 0
 resource_name = "hair_CH_HAIR_SD002T5H0A2IZ.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("28_17bw1")
+albedo_texture = ExtResource("28_q8akd")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("29_deab4")
+normal_texture = ExtResource("29_a86he")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_fo0bt"]
 resource_name = "kasane_teto_Mesh_002"
@@ -725,7 +725,7 @@ blend_shape_mode = 0
 resource_name = "hand_CH_SKIN_SD001T5H0Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("30_xit5k")
+albedo_texture = ExtResource("30_o4h5p")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -753,11 +753,11 @@ blend_shape_mode = 0
 resource_name = "hairtail_CH_HAIR_SD002T5H0A2IZ.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("31_ds1c4")
+albedo_texture = ExtResource("31_bed33")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("32_0yu0t")
+normal_texture = ExtResource("32_em3uw")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_1t288"]
 resource_name = "kasane_teto_Mesh_004"
@@ -783,11 +783,11 @@ blend_shape_mode = 0
 resource_name = "hairbase_CH_HAIR_SD002T5H0A2IZ.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("33_2f78m")
+albedo_texture = ExtResource("33_3msaf")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("34_fvge6")
+normal_texture = ExtResource("34_dqjj5")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_bw515"]
 resource_name = "kasane_teto_Mesh_005"
@@ -813,7 +813,7 @@ blend_shape_mode = 0
 resource_name = "hairalpha_CH_HAIR_SD002T5H0A2Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("35_rkucg")
+albedo_texture = ExtResource("35_eehff")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -841,7 +841,7 @@ blend_shape_mode = 0
 resource_name = "material0005.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("36_c7idc")
+albedo_texture = ExtResource("36_wmhn3")
 roughness = 0.5527864
 emission_enabled = true
 
@@ -868,12 +868,12 @@ blend_shape_mode = 0
 resource_name = "headparts_yellow_CH_ITEM_SD008Z.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("37_j25c5")
+albedo_texture = ExtResource("37_3jags")
 roughness = 0.5527864
 emission_enabled = true
 emission = Color(1, 1, 1, 1)
 emission_operator = 1
-emission_texture = ExtResource("38_thjqw")
+emission_texture = ExtResource("38_vsl7e")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_7w30n"]
 resource_name = "kasane_teto_Mesh_008"
@@ -899,11 +899,11 @@ blend_shape_mode = 0
 resource_name = "material0001.001"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("39_pj3j7")
+albedo_texture = ExtResource("39_d56kp")
 roughness = 0.5527864
 emission_enabled = true
 normal_enabled = true
-normal_texture = ExtResource("40_a2aht")
+normal_texture = ExtResource("40_pe28i")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_gljq5"]
 resource_name = "kasane_teto_Mesh_009"
@@ -927,12 +927,12 @@ blend_shape_mode = 0
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_6f4bl"]
 _data = {
-&"fall": ExtResource("41_5c40o"),
-&"idle": ExtResource("42_q7w12"),
-&"jump": ExtResource("43_togv1"),
-&"land": ExtResource("44_yqjf6"),
-&"run": ExtResource("45_o0y0b"),
-&"walk": ExtResource("46_o8t73")
+&"fall": ExtResource("41_0pwrl"),
+&"idle": ExtResource("42_ulr01"),
+&"jump": ExtResource("43_si6gk"),
+&"land": ExtResource("44_affyg"),
+&"run": ExtResource("45_qtmbp"),
+&"walk": ExtResource("46_38pum")
 }
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ipj2g"]
@@ -1048,22 +1048,22 @@ transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition
 [node name="Player" type="CharacterBody3D" unique_id=1072122291]
 axis_lock_angular_x = true
 axis_lock_angular_z = true
-script = ExtResource("1_ndllh")
+script = ExtResource("1_knxac")
 
 [node name="PlayerManager" type="Node3D" parent="." unique_id=404488332]
-script = ExtResource("2_rvwnr")
+script = ExtResource("2_dponi")
 
 [node name="StairStepperComponent" type="Node3D" parent="." unique_id=712864618]
-script = ExtResource("3_s6ax8")
+script = ExtResource("3_og0ex")
 
 [node name="InteractionHandler" type="Node3D" parent="." unique_id=1759277802 node_paths=PackedStringArray("camera_controller")]
-script = ExtResource("4_l76qw")
+script = ExtResource("4_xmbwd")
 camera_controller = NodePath("../YCameraPivot")
 interaction_distance = 10.0
 
 [node name="YCameraPivot" type="Node3D" parent="." unique_id=862009467]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4551597, 0)
-script = ExtResource("5_jh3t0")
+script = ExtResource("5_fb1y1")
 
 [node name="XCameraPivot" type="Node3D" parent="YCameraPivot" unique_id=448360055]
 
@@ -1074,7 +1074,7 @@ current = true
 [node name="AudioListener3D" type="AudioListener3D" parent="YCameraPivot/XCameraPivot/Camera3D" unique_id=1802954466]
 
 [node name="CameraCollision" type="Node3D" parent="YCameraPivot" unique_id=193705036]
-script = ExtResource("6_rr7n4")
+script = ExtResource("6_37imv")
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=1358154928]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.798, 0)
@@ -1688,19 +1688,19 @@ libraries/ = SubResource("AnimationLibrary_6f4bl")
 [node name="AnimationTree" type="AnimationTree" parent="Model" unique_id=437401852]
 tree_root = SubResource("AnimationNodeStateMachine_j32k4")
 anim_player = NodePath("../AnimationPlayer")
-script = ExtResource("47_sbqto")
+script = ExtResource("47_laafa")
 
 [node name="AnimationBlocker" type="Node3D" parent="Model" unique_id=1760694701]
-script = ExtResource("48_6jcox")
+script = ExtResource("48_2ggbq")
 
 [node name="RayShort" type="RayCast3D" parent="Model/AnimationBlocker" unique_id=2100574235]
 
 [node name="RayMedium" type="RayCast3D" parent="Model/AnimationBlocker" unique_id=1826855567]
 
-[node name="ui" parent="." unique_id=1076001554 instance=ExtResource("49_wfwlm")]
+[node name="ui" parent="." unique_id=1076001554 instance=ExtResource("49_0qjdw")]
 
 [node name="InputProvider" type="Node" parent="."]
-script = ExtResource("99_input")
+script = ExtResource("50_xpqug")
 
 [node name="TransformSmootherComponent" type="Node" parent="."]
-script = ExtResource("100_smooth")
+script = ExtResource("51_q4yra")

@@ -16,6 +16,7 @@ var peer_id: int
 
 var model_initial_rotation: Vector3 = Vector3.ZERO
 var model_initial_y: float = 0.0
+var current_speed: float = 0.0
 
 var coyote_timer: float = 0.0
 
@@ -43,6 +44,7 @@ func _ready() -> void:
 	model_initial_y        = model.position.y
 	
 	visual_smoother.teleport()
+	current_speed = movement_data.speed
 
 func _process(delta: float) -> void:
 	visual_smoother.process_smoothing(delta, global_position.y)
@@ -121,22 +123,24 @@ func _state_air(delta: float, on_floor: bool) -> void:
 
 func _handle_horizontal_movement(delta: float) -> void:
 	var is_running    := input_provider.is_running
-	var current_speed := movement_data.run_speed if is_running else movement_data.speed
+	var target_speed  := movement_data.run_speed if is_running else movement_data.speed
 	var wish_dir      := input_provider.wish_dir
-	
+
+	# Usa run_to_walk_deceleration sólo al frenar de correr a caminar (transición suave)
+	var transition_rate := movement_data.run_to_walk_deceleration \
+		if (not is_running and current_speed > movement_data.speed) \
+		else movement_data.acceleration
+	current_speed = move_toward(current_speed, target_speed, transition_rate * delta)
+
 	var h_vel := Vector3(velocity.x, 0.0, velocity.z)
 	if wish_dir != Vector3.ZERO:
-		var dot := h_vel.dot(wish_dir)
-		if dot < 0.0:
-			# Decelerate progressively instead of killing velocity instantly
+		if h_vel.dot(wish_dir) < 0.0:
 			h_vel *= 0.5
-			
-		var accel := movement_data.run_to_walk_deceleration if not is_running and h_vel.length() > movement_data.speed else movement_data.acceleration
-		h_vel = h_vel.move_toward(wish_dir * current_speed, accel * delta)
+		h_vel = h_vel.move_toward(wish_dir * current_speed, movement_data.acceleration * delta)
 	else:
-		var stop_friction := movement_data.run_to_walk_deceleration if h_vel.length() > movement_data.speed else movement_data.friction
-		h_vel = h_vel.move_toward(Vector3.ZERO, stop_friction * delta)
-		
+		# Siempre usa friction al parar (evita el deslizamiento desde carrera)
+		h_vel = h_vel.move_toward(Vector3.ZERO, movement_data.friction * delta)
+
 	velocity.x = h_vel.x
 	velocity.z = h_vel.z
 

@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://uhydmr0o4cmd"]
 
+[ext_resource type="Script" uid="uid://cb74byxvd6dpe" path="res://scripts/player_spawner.gd" id="1_sugp2"]
+[ext_resource type="PackedScene" uid="uid://bqb6v1anlqsj4" path="res://prefabs/player_instance.tscn" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://b0javxi0beudk" path="res://models/miku-mesmerizer/Mesmerizer Miku.glb" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://2jcffhuuj47j" path="res://models/house/roblox_classic_house.glb" id="4_jyhfs"]
 
@@ -380,16 +382,22 @@ points = PackedVector3Array(-4.5079365, -2.9104364, -0.102936506, 4.16, 2.642460
 
 [node name="main" type="Node3D" unique_id=215731366]
 
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1020517629]
+_spawnable_scenes = PackedStringArray("uid://bqb6v1anlqsj4")
+spawn_path = NodePath("SpawnPoint")
+
+[node name="SpawnPoint" type="Node3D" parent="MultiplayerSpawner" unique_id=750427715 node_paths=PackedStringArray("spawn_location")]
+script = ExtResource("1_sugp2")
+player_scene = ExtResource("2_jyhfs")
+spawn_location = NodePath(".")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2030654333]
 environment = SubResource("Environment_tbgi4")
 camera_attributes = SubResource("CameraAttributesPractical_tefeu")
 compositor = SubResource("Compositor_o6xl0")
 
-[node name="SpawnPoint" type="Node3D" parent="." unique_id=245571403]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.013792276, 0)
-
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1094255858]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.023740292, -0.20400608, 0.0009646416)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.023740292, -0.27102745, 0.0009646416)
 mesh = SubResource("PlaneMesh_0wfyh")
 surface_material_override/0 = SubResource("StandardMaterial3D_sugp2")
 

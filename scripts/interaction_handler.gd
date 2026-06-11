@@ -48,7 +48,7 @@ func interact():
 
 
 func interact_with(object: Node, player: Player) -> void:
-	GameBridge.request_interact(object, player.player_manager.player_id)
+	#GameBridge.request_interact(object, player.player_manager.player_id)
 	player.player_manager.play_local_sound(object.click_sound)
 
 
