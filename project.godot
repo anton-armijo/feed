@@ -15,6 +15,15 @@ run/main_scene="uid://uhydmr0o4cmd"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameManager="*uid://bts838vbwnwfd"
+GameBridge="*uid://itk7agpdbg0j"
+
+[editor_plugins]
+
+enabled=PackedStringArray()
+
 [input]
 
 click={

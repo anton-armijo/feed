@@ -2,9 +2,7 @@
 
 [ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://scripts/player.gd" id="1_ndllh"]
 [ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://scripts/player_manager.gd" id="2_rvwnr"]
-[ext_resource type="Script" path="res://scripts/stair_stepper_component.gd" id="3_s6ax8"]
-[ext_resource type="Script" path="res://scripts/input_provider.gd" id="99_input"]
-[ext_resource type="Script" path="res://scripts/transform_smoother_component.gd" id="100_smooth"]
+[ext_resource type="Script" path="res://scripts/aura_monster_module.gd" id="3_s6ax8"]
 [ext_resource type="Script" uid="uid://pkj3mp0qeeaw" path="res://scripts/interaction_handler.gd" id="4_l76qw"]
 [ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://scripts/camera_controller.gd" id="5_jh3t0"]
 [ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://scripts/camera_collision.gd" id="6_rr7n4"]
@@ -1053,7 +1051,7 @@ script = ExtResource("1_ndllh")
 [node name="PlayerManager" type="Node3D" parent="." unique_id=404488332]
 script = ExtResource("2_rvwnr")
 
-[node name="StairStepperComponent" type="Node3D" parent="." unique_id=712864618]
+[node name="AuraMonsterModule" type="Node3D" parent="." unique_id=712864618]
 script = ExtResource("3_s6ax8")
 
 [node name="InteractionHandler" type="Node3D" parent="." unique_id=1759277802 node_paths=PackedStringArray("camera_controller")]
@@ -1698,9 +1696,3 @@ script = ExtResource("48_6jcox")
 [node name="RayMedium" type="RayCast3D" parent="Model/AnimationBlocker" unique_id=1826855567]
 
 [node name="ui" parent="." unique_id=1076001554 instance=ExtResource("49_wfwlm")]
-
-[node name="InputProvider" type="Node" parent="."]
-script = ExtResource("99_input")
-
-[node name="TransformSmootherComponent" type="Node" parent="."]
-script = ExtResource("100_smooth")

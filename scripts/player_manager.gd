@@ -1,6 +1,12 @@
 extends Node3D
+class_name PlayerManager
 
 enum State { IDLE, WALKING, RUNNING, JUMPING, FALLING, LANDING }
+
+@export var body_height = 1.59
+
+var player_id = 0
+var visual_money = 0
 
 var camera_yaw := 0.0
 var shift_lock := false
@@ -12,8 +18,9 @@ var is_grounded := true
 var velocity_y := 0.0
 var has_horizontal_input := false
 var is_running := false
+var is_stepping := false
+var is_stepping_down := false
 
-# Estado lógico — ahora lo escribe el AnimationTree, no el player
 var _state: State = State.IDLE
 var state: State:
 	get: return _state
@@ -25,7 +32,7 @@ var state: State:
 var is_window_selected := true
 
 signal state_changed(new_state: State)
-signal window_focus_changed
+signal window_focus_changed # is window_slected: bool
 
 func _ready() -> void:
 	get_window().focus_exited.connect(_on_focus_lost)
@@ -40,10 +47,22 @@ func _on_focus_gained():
 	is_window_selected = true
 	window_focus_changed.emit(true)
 
-func play_sound(sound: AudioStream, sound_position: Vector3):
-	var player = AudioStreamPlayer3D.new()
+func play_sound(sound: AudioStream, sound_position: Vector3) -> AudioStreamPlayer3D:
+	var player := AudioStreamPlayer3D.new()
 	player.stream = sound
 	player.position = sound_position
-	add_child(player)
+	player.top_level = true
+	get_tree().current_scene.add_child(player)
 	player.play()
 	player.finished.connect(player.queue_free)
+	return player
+
+func play_local_sound(sound: AudioStream) -> AudioStreamPlayer:
+	var player := AudioStreamPlayer.new()
+	player.stream = sound
+	add_child(player)
+
+	player.play()
+	player.finished.connect(player.queue_free)
+
+	return player
