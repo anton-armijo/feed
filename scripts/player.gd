@@ -87,7 +87,7 @@ func _physics_process(delta: float) -> void:
 	player_manager.has_horizontal_input = input_provider.wish_dir != Vector3.ZERO
 	player_manager.is_running         = input_provider.is_running
 
-func _state_grounded(delta: float, on_floor: bool) -> void:
+func _state_grounded(_delta: float, on_floor: bool) -> void:
 	coyote_timer = movement_data.coyote_time
 	
 	if not on_floor:

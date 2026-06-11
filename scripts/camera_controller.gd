@@ -54,7 +54,7 @@ func _ready() -> void:
 
 func _set_mouse_mode(mode: int) -> void:
 	if _last_mouse_mode != mode:
-		_last_mouse_mode = mode
+		_last_mouse_mode = mode as Input.MouseMode
 		Input.set_mouse_mode(mode)
 
 func manage_shift_lock() -> void:
