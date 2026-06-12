@@ -89,10 +89,10 @@ transform = Transform3D(1, 0, 0, 0, 1, -4.2425726e-31, 0, -4.2425726e-31, 1, 0, 
 shape = SubResource("ConcavePolygonShape3D_0wfyh")
 
 [node name="Mesmerizer Miku" parent="." unique_id=1040928314 instance=ExtResource("3_jyhfs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.566906, 2.0860426, -3.232562)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.566906, 2.0583067, -4.2225723)
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1030694006]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7347589, 0, -6.220796)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7347589, 2.5927463, -6.220796)
 mesh = SubResource("BoxMesh_sugp2")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D2" unique_id=1806429100]
