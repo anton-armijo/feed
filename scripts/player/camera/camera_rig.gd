@@ -8,8 +8,6 @@
 class_name CameraRig
 extends Node3D
 
-const MODEL_LAYER := 1 << 19
-
 @export var config: CameraConfig
 
 @onready var x_pivot: Node3D = $XPivot
@@ -22,6 +20,7 @@ var collision_zoom_limit: float = INF
 
 var _bb: PlayerBlackboard
 var _body: CharacterBody3D
+var _model: Node3D
 var _initial_y := 0.0
 var _shift_toggled := false
 var _last_mouse_mode := Input.MOUSE_MODE_VISIBLE
@@ -40,6 +39,7 @@ func setup(blackboard: PlayerBlackboard, body: CharacterBody3D) -> void:
 	target_zoom = camera.position.z
 	_bb.camera_yaw = rotation.y
 	_bb.input_enabled_changed.connect(_on_input_enabled_changed)
+	_model = _body.get_node_or_null("Model")
 
 func is_first_person() -> bool:
 	return current_zoom < config.first_person_snap_distance
@@ -94,7 +94,8 @@ func _update_zoom(delta: float) -> void:
 
 	# Snap into first person.
 	if camera.position.z < config.first_person_snap_distance and not _bb.first_person:
-		camera.cull_mask &= ~MODEL_LAYER
+		if _model:
+			_model.visible = false
 		camera.position.z = 0.0
 		current_zoom = 0.0
 		_set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -106,7 +107,8 @@ func _update_zoom(delta: float) -> void:
 
 	# Leave first person (smooth zoom out instead of snapping).
 	if camera.position.z > config.first_person_snap_distance and _bb.first_person:
-		camera.cull_mask |= MODEL_LAYER
+		if _model:
+			_model.visible = true
 		target_zoom = config.first_person_snap_distance
 		_set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		_bb.first_person = false

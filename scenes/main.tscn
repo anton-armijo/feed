@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bqb6v1anlqsj4" path="res://prefabs/player_instance.tscn" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://b0javxi0beudk" path="res://models/miku-mesmerizer/Mesmerizer Miku.glb" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://2jcffhuuj47j" path="res://models/house/roblox_classic_house.glb" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="5_loading"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jyhfs"]
 
@@ -533,5 +534,7 @@ mesh = SubResource("BoxMesh_jyhfs")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/MeshInstance3D50/StaticBody3D" unique_id=242578555]
 shape = SubResource("ConcavePolygonShape3D_tbgi4")
+
+[node name="LoadingScreen" parent="." unique_id=984756123 instance=ExtResource("5_loading")]
 
 [editable path="Sketchfab_Scene"]

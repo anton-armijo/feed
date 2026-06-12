@@ -27,9 +27,14 @@ extends CharacterBody3D
 @onready var camera_rig: CameraRig = $CameraRig
 
 var peer_id: int
+var _is_local := false
 
 func _ready() -> void:
 	peer_id = get_multiplayer_authority()
+	var my_id := multiplayer.get_unique_id()
+	_is_local = peer_id == my_id or name == str(my_id)
+
+	print("[Player] _ready: name=%s, peer_id=%d, my_id=%d, authority=%d, is_local=%s" % [name, peer_id, my_id, get_multiplayer_authority(), _is_local])
 
 	floor_snap_length = 0.35
 	floor_stop_on_slope = true
@@ -52,7 +57,7 @@ func _ready() -> void:
 	model.setup(blackboard, self)
 	animation_controller.setup(blackboard)
 
-	if is_multiplayer_authority():
+	if _is_local:
 		camera_rig.setup(blackboard, self)
 		fsm.start()
 	else:
@@ -62,7 +67,7 @@ func _ready() -> void:
 	model.teleport()
 
 func _physics_process(delta: float) -> void:
-	if not is_multiplayer_authority():
+	if not _is_local:
 		return
 
 	input_collector.collect(delta)
