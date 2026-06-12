@@ -1,136 +1,136 @@
+## Standalone orbit camera system. Lives in its own scene (camera_rig.tscn),
+## is instanced inside the player prefab, and is freed for non-authority
+## peers. It observes the character (position via parenting, state via the
+## blackboard) and never participates in movement physics.
+##
+## Blackboard fields owned (written) by this rig:
+##   camera_yaw, first_person, shift_lock, shift_lock_toggle_on.
+class_name CameraRig
 extends Node3D
-class_name CameraController
 
-@export var mouse_sensitivity = 0.5
-@export var max_camera_rotation = 50
-@export var min_camera_rotation = -85
-@export var zoom_speed = 0.5
-@export var max_zoom = 10.0
-@export var first_person_snap_distance = 0.22
+const MODEL_LAYER := 1 << 19
 
-@export var player_manager: PlayerManager
-@export var visual_smoother: TransformSmootherComponent
+@export var config: CameraConfig
 
-@onready var camera = $XCameraPivot/Camera3D
-@onready var XCameraPivot = $XCameraPivot
+@onready var x_pivot: Node3D = $XPivot
+@onready var camera: Camera3D = $XPivot/Camera3D
 
-const Y_MULT = 0.4
-const MODEL_LAYER = 1 << 19
-
-var target_zoom = 0
-var shift_pressed = false
-var initial_y := 0.0
+var target_zoom := 0.0
+var current_zoom := 0.0
+## Written by the CameraCollision child; INF means unobstructed.
 var collision_zoom_limit: float = INF
 
+var _bb: PlayerBlackboard
+var _body: CharacterBody3D
+var _initial_y := 0.0
+var _shift_toggled := false
 var _last_mouse_mode := Input.MOUSE_MODE_VISIBLE
+var _smoother: YSmoother
+# First person forced by camera collision (so zoom-out can restore).
+var _fp_from_collision := false
+var _zoom_before_fp := 0.0
 
-# Distancia actual de la cámara — variable compartida para otros nodos
-var current_zoom: float = 0.0
-
-# Control de primera persona forzada por colisión
-var _fp_from_collision: bool = false
-var _zoom_before_fp: float = 0.0
+func setup(blackboard: PlayerBlackboard, body: CharacterBody3D) -> void:
+	_bb = blackboard
+	_body = body
+	if config == null:
+		config = CameraConfig.new()
+	_initial_y = position.y
+	_smoother = YSmoother.new(config.height_smooth_speed)
+	target_zoom = camera.position.z
+	_bb.camera_yaw = rotation.y
+	_bb.input_enabled_changed.connect(_on_input_enabled_changed)
 
 func is_first_person() -> bool:
-	return current_zoom < first_person_snap_distance
+	return current_zoom < config.first_person_snap_distance
 
-func _recover_mouse_check(is_on_focus: bool):
-	if player_manager.first_person and is_on_focus:
+func _on_input_enabled_changed(enabled: bool) -> void:
+	if not enabled:
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		_last_mouse_mode = Input.MOUSE_MODE_VISIBLE
+	elif _bb.first_person:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		_last_mouse_mode = Input.MOUSE_MODE_CAPTURED
 
-
-func _ready() -> void:
-	initial_y = position.y
-	
-	if not player_manager: player_manager = $"../PlayerManager"
-	if not visual_smoother: 
-		visual_smoother = TransformSmootherComponent.new()
-		visual_smoother.smooth_speed = 14.0
-		add_child(visual_smoother)
-
-	player_manager.camera_yaw = camera.rotation.x
-	target_zoom = camera.position.z
-	player_manager.window_focus_changed.connect(_recover_mouse_check)
-
-func _set_mouse_mode(mode: int) -> void:
+func _set_mouse_mode(mode: Input.MouseMode) -> void:
 	if _last_mouse_mode != mode:
-		_last_mouse_mode = mode as Input.MouseMode
+		_last_mouse_mode = mode
 		Input.set_mouse_mode(mode)
 
-func manage_shift_lock() -> void:
-	shift_pressed = !shift_pressed if Input.is_action_just_pressed("shift_lock") else shift_pressed
-	player_manager.shift_lock_toggle_on = shift_pressed
-	var right_click = Input.is_action_pressed("right_click")
-	player_manager.shift_lock = right_click or shift_pressed
-	if not player_manager.first_person and player_manager.is_window_selected:
-		if player_manager.shift_lock:
-			_set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		else:
-			_set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-
-
 func _physics_process(_delta: float) -> void:
-	player_manager.camera_yaw = rotation.y
-
+	if _bb == null:
+		return
+	# Published in physics time so input/FSM read a stable yaw.
+	_bb.camera_yaw = rotation.y
 
 func _process(delta: float) -> void:
-	manage_shift_lock()
+	if _bb == null:
+		return
+	_manage_shift_lock()
+	_follow_height(delta)
+	_update_zoom(delta)
 
-	var target_y = get_parent().global_position.y
-	if visual_smoother:
-		visual_smoother.process_smoothing(delta, target_y)
-		position.y = initial_y + visual_smoother.get_stair_offset(target_y)
-	
-	camera.position.z = lerp(
+func _manage_shift_lock() -> void:
+	if Input.is_action_just_pressed("shift_lock"):
+		_shift_toggled = not _shift_toggled
+	_bb.shift_lock_toggle_on = _shift_toggled
+	_bb.shift_lock = _shift_toggled or Input.is_action_pressed("right_click")
+	if not _bb.first_person and _bb.input_enabled:
+		_set_mouse_mode(Input.MOUSE_MODE_CAPTURED if _bb.shift_lock else Input.MOUSE_MODE_VISIBLE)
+
+func _follow_height(delta: float) -> void:
+	var target_y := _body.global_position.y
+	_smoother.process_smoothing(delta, target_y)
+	position.y = _initial_y + _smoother.get_offset(target_y)
+
+func _update_zoom(delta: float) -> void:
+	camera.position.z = lerpf(
 		camera.position.z,
-		minf(target_zoom, collision_zoom_limit), 10 * delta)
-	camera.position.z = clamp(camera.position.z, 0.0, max_zoom)
-
+		minf(target_zoom, collision_zoom_limit),
+		config.zoom_lerp_speed * delta
+	)
+	camera.position.z = clampf(camera.position.z, 0.0, config.max_zoom)
 	current_zoom = camera.position.z
 
-	if camera.position.z < first_person_snap_distance and not player_manager.first_person:
+	# Snap into first person.
+	if camera.position.z < config.first_person_snap_distance and not _bb.first_person:
 		camera.cull_mask &= ~MODEL_LAYER
 		camera.position.z = 0.0
 		current_zoom = 0.0
 		_set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		player_manager.first_person = true
-
-		if target_zoom > first_person_snap_distance:
+		_bb.first_person = true
+		if target_zoom > config.first_person_snap_distance:
 			_zoom_before_fp = target_zoom
 			_fp_from_collision = true
 			target_zoom = 0.0
 
-	if camera.position.z > first_person_snap_distance and player_manager.first_person:
+	# Leave first person (smooth zoom out instead of snapping).
+	if camera.position.z > config.first_person_snap_distance and _bb.first_person:
 		camera.cull_mask |= MODEL_LAYER
-		# Smooth zoom out instead of snapping
-		target_zoom = first_person_snap_distance
+		target_zoom = config.first_person_snap_distance
 		_set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		player_manager.first_person = false
-
+		_bb.first_person = false
 
 func _input(event: InputEvent) -> void:
-	if not player_manager.is_window_selected:
+	if _bb == null or not _bb.input_enabled:
 		return
 
-	if event is InputEventMouseMotion and (player_manager.first_person or player_manager.shift_lock):
-		var camera_rotation = deg_to_rad(-event.relative.x * mouse_sensitivity)
-		
-		rotate_y(camera_rotation)
-		
-		XCameraPivot.rotate_x(deg_to_rad(-event.relative.y * mouse_sensitivity * Y_MULT))
-		XCameraPivot.rotation_degrees.x = clamp(
-			XCameraPivot.rotation_degrees.x, min_camera_rotation, max_camera_rotation
-		)
+	if event is InputEventMouseMotion and (_bb.first_person or _bb.shift_lock):
+		rotate_y(deg_to_rad(-event.relative.x * config.mouse_sensitivity))
+		x_pivot.rotate_x(deg_to_rad(
+			-event.relative.y * config.mouse_sensitivity * config.pitch_sensitivity_multiplier))
+		x_pivot.rotation_degrees.x = clampf(
+			x_pivot.rotation_degrees.x, config.pitch_min_degrees, config.pitch_max_degrees)
 
 	if event.is_action_pressed("wheel_up"):
 		if not _fp_from_collision:
-			target_zoom -= zoom_speed
+			target_zoom -= config.zoom_speed
 
 	if event.is_action_pressed("wheel_down"):
 		if _fp_from_collision:
 			target_zoom = _zoom_before_fp
 			_fp_from_collision = false
 		else:
-			target_zoom += zoom_speed
+			target_zoom += config.zoom_speed
 
-	target_zoom = clamp(target_zoom, 0.0, max_zoom)
+	target_zoom = clampf(target_zoom, 0.0, config.max_zoom)

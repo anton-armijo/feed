@@ -1,53 +1,45 @@
+## Input layer: translates device input into an InputIntent once per physics
+## frame. This is the ONLY gameplay script allowed to read Input for movement.
+## It owns the jump buffer and the window-focus gate; it never touches
+## velocity, state or animation. Swap this node out for a network/AI driver
+## and the rest of the controller keeps working untouched.
+class_name InputCollector
 extends Node
-class_name InputProvider
 
-var move_dir := Vector2.ZERO
-var wish_dir := Vector3.ZERO
-var is_running := false
-var is_jumping := false
-var is_jumping_just_pressed := false
+var intent := InputIntent.new()
 
-var _jump_buffer_timer := 0.0
-@export var jump_buffer_time := 0.1
+var _bb: PlayerBlackboard
+var _jump_buffer_time := 0.1
 
-func update(delta: float, camera_yaw: float, can_receive_input: bool) -> void:
-	if not can_receive_input:
-		move_dir = Vector2.ZERO
-		wish_dir = Vector3.ZERO
-		is_running = false
-		is_jumping = false
-		is_jumping_just_pressed = false
-		_jump_buffer_timer = max(_jump_buffer_timer - delta, 0.0)
+func setup(blackboard: PlayerBlackboard, config: PlayerConfig) -> void:
+	_bb = blackboard
+	_jump_buffer_time = config.jump.jump_buffer_time
+	get_window().focus_exited.connect(_on_focus_changed.bind(false))
+	get_window().focus_entered.connect(_on_focus_changed.bind(true))
+
+## Called by the Player coordinator at the start of every physics frame.
+func collect(delta: float) -> void:
+	intent.tick(delta)
+
+	if not _bb.input_enabled:
+		intent.clear()
 		return
 
-	var raw_input_dir := Vector2(
+	intent.move_dir = Vector2(
 		Input.get_axis("move_left", "move_right"),
 		Input.get_axis("move_forward", "move_back")
 	)
-	
-	#if not has_pressed_first_input:
-		#if raw_input_dir != Vector2.ZERO:
-			#has_pressed_first_input = true
-			#
-	#if not has_pressed_first_input:
-		#raw_input_dir = Vector2.ZERO
-		
-	move_dir = raw_input_dir
-	
-	wish_dir = Vector3.ZERO
-	if move_dir.length_squared() > 0.001:
-		wish_dir = Vector3(move_dir.x, 0.0, move_dir.y).rotated(Vector3.UP, camera_yaw).normalized()
 
-	is_running = Input.is_action_pressed("run")
-	is_jumping = Input.is_action_pressed("jump")
-	
+	intent.wish_dir = Vector3.ZERO
+	if intent.move_dir.length_squared() > 0.001:
+		intent.wish_dir = Vector3(intent.move_dir.x, 0.0, intent.move_dir.y) \
+			.rotated(Vector3.UP, _bb.camera_yaw).normalized()
+
+	intent.run_held = Input.is_action_pressed("run")
+	intent.jump_held = Input.is_action_pressed("jump")
+
 	if Input.is_action_just_pressed("jump"):
-		_jump_buffer_timer = jump_buffer_time
-	else:
-		_jump_buffer_timer = max(_jump_buffer_timer - delta, 0.0)
-		
-	is_jumping_just_pressed = _jump_buffer_timer > 0.0
+		intent.buffer_jump(_jump_buffer_time)
 
-func consume_jump_buffer() -> void:
-	_jump_buffer_timer = 0.0
-	is_jumping_just_pressed = false
+func _on_focus_changed(focused: bool) -> void:
+	_bb.input_enabled = focused

@@ -1,38 +1,41 @@
+## Project-specific click-to-interact raycaster. Lives in the GameLayer and
+## reads the player only through the blackboard and exported references.
 extends Node3D
 
-@export var camera_controller: CameraController
+@export var blackboard: PlayerBlackboard
+@export var player_body: CharacterBody3D
+@export var audio: PlayerAudio
 @export var interaction_distance: float = 500.0
 
 const draw_debug: bool = false
 
-func _input(event):
+func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			interact()
 
-func _process(delta: float) -> void:
-	pass
-
-func interact():
-	if camera_controller.is_first_person():
+func interact() -> void:
+	if blackboard and blackboard.first_person:
 		return
-	var viewport := get_viewport()
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		return
+
 	var mouse_pos := Vector2()
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		mouse_pos = viewport.size / 2
+		mouse_pos = get_viewport().size / 2
 	else:
-		mouse_pos = viewport.get_mouse_position()
+		mouse_pos = get_viewport().get_mouse_position()
 
-	var from: Vector3 = camera_controller.camera.project_ray_origin(mouse_pos)
-	var to: Vector3 = from + camera_controller.camera.project_ray_normal(mouse_pos) * interaction_distance 
+	var from: Vector3 = camera.project_ray_origin(mouse_pos)
+	var to: Vector3 = from + camera.project_ray_normal(mouse_pos) * interaction_distance
 
 	var query := PhysicsRayQueryParameters3D.create(from, to)
 	query.collide_with_areas = true
 	query.collide_with_bodies = true
 
-	var player := get_parent()
-	if player is CollisionObject3D:
-		query.exclude = [player.get_rid()]
+	if player_body:
+		query.exclude = [player_body.get_rid()]
 
 	var result := get_world_3d().direct_space_state.intersect_ray(query)
 
@@ -41,16 +44,15 @@ func interact():
 		debug_ray_color = Color.RED
 	elif result.collider.get_parent().has_method("sv_interact"):
 		debug_ray_color = Color.REBECCA_PURPLE
-		interact_with(result.collider.get_parent(), get_parent())
-			
+		interact_with(result.collider.get_parent())
+
 	if draw_debug:
 		_draw_debug_ray(from, to, debug_ray_color)
 
-
-func interact_with(object: Node, player: Player) -> void:
-	#GameBridge.request_interact(object, player.player_manager.player_id)
-	player.player_manager.play_local_sound(object.click_sound)
-
+func interact_with(object: Node) -> void:
+	#GameBridge.request_interact(object, peer_id)
+	if audio:
+		audio.play_local_sound(object.click_sound)
 
 func _draw_debug_ray(from: Vector3, to: Vector3, color: Color, duration: float = 1.0) -> void:
 	var mesh := ImmediateMesh.new()

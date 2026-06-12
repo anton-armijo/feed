@@ -1,163 +1,97 @@
-extends CharacterBody3D
+## Composition root of the character. Owns no gameplay logic itself: it wires
+## the components together (references down), drives the fixed per-frame
+## pipeline, and publishes raw physics facts to the blackboard. Components
+## report back through signals or blackboard fields (signals up).
+##
+## Physics pipeline (authority only):
+##   1. InputCollector  -> InputIntent          (intent, never execution)
+##   2. StairStepper    -> grounded bookkeeping
+##   3. AbilityManager  -> modifiers / FSM transition requests
+##   4. LocomotionFSM   -> state logic, drives the MovementMotor
+##   5. MovementMotor   -> stair step + move_and_slide (the only physics write)
+##   6. Blackboard      -> publish state for presentation / sync layers
 class_name Player
+extends CharacterBody3D
 
-@export var movement_data: MovementData
-@export var player_manager: PlayerManager
-@export var camera_controller: CameraController
+@export var config: PlayerConfig
 
-@onready var stair_handler: StairStepperComponent = $StairStepperComponent
-@onready var model: Node3D = $Model
-@onready var input_provider: InputProvider = $InputProvider
-@onready var visual_smoother: TransformSmootherComponent = $TransformSmootherComponent
-
-@onready var ui = $ui
+@onready var blackboard: PlayerBlackboard = $Blackboard
+@onready var input_collector: InputCollector = $InputCollector
+@onready var motor: MovementMotor = $MovementMotor
+@onready var stepper: StairStepper = $MovementMotor/StairStepper
+@onready var ground_probe: GroundProbe = $GroundProbe
+@onready var fsm: LocomotionFSM = $LocomotionFSM
+@onready var ability_manager: AbilityManager = $AbilityManager
+@onready var model: ModelVisual = $Model
+@onready var animation_controller: AnimationController = $Model/AnimationTree
+@onready var camera_rig: CameraRig = $CameraRig
 
 var peer_id: int
 
-var model_initial_rotation: Vector3 = Vector3.ZERO
-var model_initial_y: float = 0.0
-var current_speed: float = 0.0
-
-var coyote_timer: float = 0.0
-
-enum PlayerState { GROUNDED, AIR }
-var current_state: PlayerState = PlayerState.GROUNDED
-
-func watch_object(object_manager: Node) -> void:
-	ui.watch(object_manager)
-
 func _ready() -> void:
 	peer_id = get_multiplayer_authority()
-	floor_snap_length    = 0.35
-	floor_stop_on_slope  = true
-	floor_block_on_wall  = false
-	
-	if not player_manager:
-		player_manager = $PlayerManager
-	if not camera_controller:
-		camera_controller = $YCameraPivot
-		
-	if not movement_data:
-		movement_data = MovementData.new()
-		
-	model_initial_rotation = model.rotation
-	model_initial_y        = model.position.y
-	
-	visual_smoother.teleport()
-	current_speed = movement_data.speed
 
-func _process(delta: float) -> void:
-	visual_smoother.process_smoothing(delta, global_position.y)
-	model.global_position.y = visual_smoother.get_smoothed_y() + model_initial_y
+	floor_snap_length = 0.35
+	floor_stop_on_slope = true
+	floor_block_on_wall = false
+
+	if config == null:
+		config = PlayerConfig.new()
+	config.ensure_defaults()
+	blackboard.body_height = config.body_height
+
+	# References down: wire every component from the single composition root.
+	stepper.setup(self)
+	motor.setup(self, stepper, config)
+	ground_probe.setup(self, config.body_height)
+	input_collector.setup(blackboard, config)
+	fsm.setup(self, motor, stepper, ground_probe, blackboard, config)
+	ability_manager.setup(AbilityContext.new(self, motor, fsm, blackboard))
+
+	# Presentation layers run on every peer (remote state arrives via sync).
+	model.setup(blackboard, self)
+	animation_controller.setup(blackboard)
+
+	if is_multiplayer_authority():
+		camera_rig.setup(blackboard, self)
+		fsm.start()
+	else:
+		# The camera is a local-only system; remote replicas never need one.
+		camera_rig.queue_free()
+
+	model.teleport()
 
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		return
-		
-	# Input reading via Provider
-	input_provider.update(delta, player_manager.camera_yaw, player_manager.is_window_selected)
-	
-	stair_handler.update_grounded(delta)
-	
-	var on_floor : bool = is_on_floor() or player_manager.is_stepping
-	
-	match current_state:
-		PlayerState.GROUNDED:
-			_state_grounded(delta, on_floor)
-		PlayerState.AIR:
-			_state_air(delta, on_floor)
-			
-	if not player_manager.is_window_selected:
-		_apply_horizontal_friction(delta)
-		move_and_slide()
+
+	input_collector.collect(delta)
+	var intent := input_collector.intent
+
+	stepper.update_grounded(delta)
+	ability_manager.physics_update(intent, delta)
+	fsm.physics_update(intent, delta)
+	motor.physics_step(delta)
+
+	_update_model_yaw(intent, delta)
+	_publish_state(intent)
+
+## Gameplay-facing yaw: faces the camera in first person / shift lock, or
+## turns toward the move direction. ModelVisual applies it visually.
+func _update_model_yaw(intent: InputIntent, delta: float) -> void:
+	if blackboard.first_person or blackboard.shift_lock_toggle_on:
+		blackboard.model_yaw = blackboard.camera_yaw
 		return
-		
-	_handle_horizontal_movement(delta)
-	_update_model_rotation(input_provider.wish_dir, delta)
-	
-	stair_handler.step_up(Vector3(velocity.x, 0.0, velocity.z) * delta)
-	move_and_slide()
-	
-	if player_manager.is_stepping:
-		apply_floor_snap()
-	else:
-		stair_handler.step_down()
-		
-	# Update Manager
-	player_manager.is_grounded        = is_on_floor() or player_manager.is_stepping or player_manager.is_stepping_down
-	player_manager.velocity_y         = velocity.y
-	player_manager.has_horizontal_input = input_provider.wish_dir != Vector3.ZERO
-	player_manager.is_running         = input_provider.is_running
-
-func _state_grounded(_delta: float, on_floor: bool) -> void:
-	coyote_timer = movement_data.coyote_time
-	
-	if not on_floor:
-		current_state = PlayerState.AIR
+	if intent.wish_dir == Vector3.ZERO:
 		return
-		
-	# Jump check
-	if input_provider.is_jumping_just_pressed and coyote_timer > 0.0:
-		velocity.y = movement_data.jump_velocity
-		input_provider.consume_jump_buffer()
-		coyote_timer = 0.0
-		current_state = PlayerState.AIR
-		
-	player_manager.is_grounded = true
-
-func _state_air(delta: float, on_floor: bool) -> void:
-	velocity.y -= movement_data.gravity * delta
-	coyote_timer = max(coyote_timer - delta, 0.0)
-	
-	if on_floor and velocity.y <= 0.0:
-		current_state = PlayerState.GROUNDED
-		return
-		
-	# Allows jumping just after falling off ledge
-	if input_provider.is_jumping_just_pressed and coyote_timer > 0.0 and velocity.y <= 0.0:
-		velocity.y = movement_data.jump_velocity
-		input_provider.consume_jump_buffer()
-		coyote_timer = 0.0
-		
-	player_manager.is_grounded = player_manager.is_stepping_down
-
-func _handle_horizontal_movement(delta: float) -> void:
-	var is_running    := input_provider.is_running
-	var target_speed  := movement_data.run_speed if is_running else movement_data.speed
-	var wish_dir      := input_provider.wish_dir
-
-	# Usa run_to_walk_deceleration sólo al frenar de correr a caminar (transición suave)
-	var transition_rate := movement_data.run_to_walk_deceleration \
-		if (not is_running and current_speed > movement_data.speed) \
-		else movement_data.acceleration
-	current_speed = move_toward(current_speed, target_speed, transition_rate * delta)
-
-	var h_vel := Vector3(velocity.x, 0.0, velocity.z)
-	if wish_dir != Vector3.ZERO:
-		if h_vel.dot(wish_dir) < 0.0:
-			h_vel *= 0.5
-		h_vel = h_vel.move_toward(wish_dir * current_speed, movement_data.acceleration * delta)
-	else:
-		# Siempre usa friction al parar (evita el deslizamiento desde carrera)
-		h_vel = h_vel.move_toward(Vector3.ZERO, movement_data.friction * delta)
-
-	velocity.x = h_vel.x
-	velocity.z = h_vel.z
-
-func _update_model_rotation(wish_dir: Vector3, delta: float) -> void:
-	if player_manager.first_person or player_manager.shift_lock_toggle_on:
-		model.rotation.y = model_initial_rotation.y + player_manager.camera_yaw
-		return
-	if wish_dir == Vector3.ZERO:
-		return
-	model.rotation.y = lerp_angle(
-		model.rotation.y,
-		model_initial_rotation.y + atan2(-wish_dir.x, -wish_dir.z),
-		movement_data.model_turn_speed * delta
+	blackboard.model_yaw = lerp_angle(
+		blackboard.model_yaw,
+		atan2(-intent.wish_dir.x, -intent.wish_dir.z),
+		config.locomotion.model_turn_speed * delta
 	)
 
-func _apply_horizontal_friction(delta: float) -> void:
-	var h_vel := Vector3(velocity.x, 0.0, velocity.z)
-	h_vel      = h_vel.move_toward(Vector3.ZERO, movement_data.friction * delta)
-	velocity.x = h_vel.x
-	velocity.z = h_vel.z
+func _publish_state(intent: InputIntent) -> void:
+	blackboard.is_grounded = motor.is_grounded_visual()
+	blackboard.velocity_y = velocity.y
+	blackboard.horizontal_speed = Vector2(velocity.x, velocity.z).length()
+	blackboard.has_move_input = intent.wish_dir != Vector3.ZERO

@@ -1,11 +1,11 @@
 [gd_scene format=4 uid="uid://bqb6v1anlqsj4"]
 
-[ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://scripts/player.gd" id="1_knxac"]
-[ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://scripts/player_manager.gd" id="2_dponi"]
-[ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://scripts/stair_stepper_component.gd" id="3_og0ex"]
-[ext_resource type="Script" uid="uid://pkj3mp0qeeaw" path="res://scripts/interaction_handler.gd" id="4_xmbwd"]
-[ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://scripts/camera_controller.gd" id="5_fb1y1"]
-[ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://scripts/camera_collision.gd" id="6_37imv"]
+[ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://scripts/player/player.gd" id="1_knxac"]
+[ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://scripts/player/blackboard.gd" id="2_dponi"]
+[ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://scripts/player/motor/stair_stepper.gd" id="3_og0ex"]
+[ext_resource type="Script" uid="uid://pkj3mp0qeeaw" path="res://scripts/game/interaction_handler.gd" id="4_xmbwd"]
+[ext_resource type="PackedScene" path="res://prefabs/camera_rig.tscn" id="5_camrig"]
+[ext_resource type="Resource" path="res://resources/player/default_player.tres" id="6_pcfg"]
 [ext_resource type="Texture2D" uid="uid://btmml24gst43m" path="res://models/kasane-teto/kasane_teto_0.png" id="7_wi5vh"]
 [ext_resource type="Texture2D" uid="uid://b1d7uhsd7veqo" path="res://models/kasane-teto/kasane_teto_1.png" id="8_hh3fo"]
 [ext_resource type="Texture2D" uid="uid://cucgsg3pgphh3" path="res://models/kasane-teto/kasane_teto_14_3.png" id="9_7nrw3"]
@@ -46,11 +46,22 @@
 [ext_resource type="Animation" uid="uid://dfmrovnuqyln3" path="res://animations/land.res" id="44_affyg"]
 [ext_resource type="Animation" uid="uid://bw0lfuqvlsnkp" path="res://animations/run.res" id="45_qtmbp"]
 [ext_resource type="Animation" uid="uid://calmp13aekh4x" path="res://animations/walk.res" id="46_38pum"]
-[ext_resource type="Script" uid="uid://btkocaclio48m" path="res://scripts/animation_tree.gd" id="47_laafa"]
-[ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://scripts/animation_blocker.gd" id="48_2ggbq"]
+[ext_resource type="Script" uid="uid://btkocaclio48m" path="res://scripts/player/animation/animation_controller.gd" id="47_laafa"]
+[ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://scripts/player/motor/ground_probe.gd" id="48_2ggbq"]
 [ext_resource type="PackedScene" uid="uid://81ovlopx3w2s" path="res://scenes/ui.tscn" id="49_0qjdw"]
-[ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://scripts/input_provider.gd" id="50_xpqug"]
-[ext_resource type="Script" uid="uid://dwuvqlh66t1dm" path="res://scripts/transform_smoother_component.gd" id="51_q4yra"]
+[ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://scripts/player/input/input_collector.gd" id="50_xpqug"]
+[ext_resource type="Script" path="res://scripts/player/animation/model_visual.gd" id="51_model"]
+[ext_resource type="Script" path="res://scripts/player/motor/movement_motor.gd" id="52_motor"]
+[ext_resource type="Script" path="res://scripts/player/fsm/locomotion_fsm.gd" id="53_fsm"]
+[ext_resource type="Script" path="res://scripts/player/fsm/states/idle_state.gd" id="54_idle"]
+[ext_resource type="Script" path="res://scripts/player/fsm/states/walk_state.gd" id="55_walk"]
+[ext_resource type="Script" path="res://scripts/player/fsm/states/run_state.gd" id="56_run"]
+[ext_resource type="Script" path="res://scripts/player/fsm/states/jump_state.gd" id="57_jump"]
+[ext_resource type="Script" path="res://scripts/player/fsm/states/fall_state.gd" id="58_fall"]
+[ext_resource type="Script" path="res://scripts/player/fsm/states/land_state.gd" id="59_land"]
+[ext_resource type="Script" path="res://scripts/player/abilities/ability_manager.gd" id="60_abil"]
+[ext_resource type="Script" path="res://scripts/game/game_layer.gd" id="61_game"]
+[ext_resource type="Script" path="res://scripts/game/player_audio.gd" id="62_audio"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_72ieh"]
 radius = 0.13183594
@@ -1049,47 +1060,74 @@ transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath("Model:rotation")
+properties/1/path = NodePath("Blackboard:model_yaw")
 properties/1/spawn = true
 properties/1/replication_mode = 2
+properties/2/path = NodePath("Blackboard:locomotion_state")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("Blackboard:anim_state")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Blackboard:is_sprinting")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D" unique_id=1072122291]
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 script = ExtResource("1_knxac")
+config = ExtResource("6_pcfg")
 
-[node name="PlayerManager" type="Node3D" parent="." unique_id=404488332]
+[node name="Blackboard" type="Node" parent="." unique_id=404488332]
 script = ExtResource("2_dponi")
 
-[node name="StairStepperComponent" type="Node3D" parent="." unique_id=712864618]
+[node name="InputCollector" type="Node" parent="." unique_id=692711088]
+script = ExtResource("50_xpqug")
+
+[node name="MovementMotor" type="Node" parent="."]
+script = ExtResource("52_motor")
+
+[node name="StairStepper" type="Node" parent="MovementMotor" unique_id=712864618]
 script = ExtResource("3_og0ex")
 
-[node name="InteractionHandler" type="Node3D" parent="." unique_id=1759277802 node_paths=PackedStringArray("camera_controller")]
-script = ExtResource("4_xmbwd")
-camera_controller = NodePath("../YCameraPivot")
-interaction_distance = 10.0
+[node name="GroundProbe" type="Node3D" parent="." unique_id=1760694701]
+script = ExtResource("48_2ggbq")
 
-[node name="YCameraPivot" type="Node3D" parent="." unique_id=862009467]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4551597, 0)
-script = ExtResource("5_fb1y1")
+[node name="LocomotionFSM" type="Node" parent="."]
+script = ExtResource("53_fsm")
 
-[node name="XCameraPivot" type="Node3D" parent="YCameraPivot" unique_id=448360055]
+[node name="Idle" type="Node" parent="LocomotionFSM"]
+script = ExtResource("54_idle")
 
-[node name="Camera3D" type="Camera3D" parent="YCameraPivot/XCameraPivot" unique_id=423185085]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
-current = true
+[node name="Walk" type="Node" parent="LocomotionFSM"]
+script = ExtResource("55_walk")
 
-[node name="AudioListener3D" type="AudioListener3D" parent="YCameraPivot/XCameraPivot/Camera3D" unique_id=1802954466]
+[node name="Run" type="Node" parent="LocomotionFSM"]
+script = ExtResource("56_run")
 
-[node name="CameraCollision" type="Node3D" parent="YCameraPivot" unique_id=193705036]
-script = ExtResource("6_37imv")
+[node name="Jump" type="Node" parent="LocomotionFSM"]
+script = ExtResource("57_jump")
+
+[node name="Fall" type="Node" parent="LocomotionFSM"]
+script = ExtResource("58_fall")
+
+[node name="Land" type="Node" parent="LocomotionFSM"]
+script = ExtResource("59_land")
+
+[node name="AbilityManager" type="Node" parent="."]
+script = ExtResource("60_abil")
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=1358154928]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.798, 0)
 shape = SubResource("CapsuleShape3D_72ieh")
 
+[node name="CameraRig" parent="." unique_id=862009467 instance=ExtResource("5_camrig")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4551597, 0)
+
 [node name="Model" type="Node3D" parent="." unique_id=180612048]
 transform = Transform3D(-0.55, 0, 4.8082526e-08, 0, 0.55, 0, -4.8082526e-08, 0, -0.55, 0, 0, -0.04)
+script = ExtResource("51_model")
 
 [node name="Armature" type="Node3D" parent="Model" unique_id=1471387010]
 
@@ -1698,20 +1736,20 @@ tree_root = SubResource("AnimationNodeStateMachine_j32k4")
 anim_player = NodePath("../AnimationPlayer")
 script = ExtResource("47_laafa")
 
-[node name="AnimationBlocker" type="Node3D" parent="Model" unique_id=1760694701]
-script = ExtResource("48_2ggbq")
+[node name="GameLayer" type="Node" parent="."]
+script = ExtResource("61_game")
 
-[node name="RayShort" type="RayCast3D" parent="Model/AnimationBlocker" unique_id=2100574235]
+[node name="InteractionHandler" type="Node3D" parent="GameLayer" unique_id=1759277802 node_paths=PackedStringArray("blackboard", "player_body", "audio")]
+script = ExtResource("4_xmbwd")
+blackboard = NodePath("../../Blackboard")
+player_body = NodePath("../..")
+audio = NodePath("../PlayerAudio")
+interaction_distance = 10.0
 
-[node name="RayMedium" type="RayCast3D" parent="Model/AnimationBlocker" unique_id=1826855567]
+[node name="PlayerAudio" type="Node" parent="GameLayer"]
+script = ExtResource("62_audio")
 
-[node name="ui" parent="." unique_id=1076001554 instance=ExtResource("49_0qjdw")]
-
-[node name="InputProvider" type="Node" parent="." unique_id=692711088]
-script = ExtResource("50_xpqug")
-
-[node name="TransformSmootherComponent" type="Node" parent="." unique_id=930286911]
-script = ExtResource("51_q4yra")
+[node name="ui" parent="GameLayer" unique_id=1076001554 instance=ExtResource("49_0qjdw")]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1323378995]
 replication_config = SubResource("SceneReplicationConfig_knxac")

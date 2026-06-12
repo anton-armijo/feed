@@ -1,68 +1,95 @@
-extends Node3D
-class_name PlayerManager
+## The "vanilla state" of the character: the single public read surface.
+##
+## Ownership rules (write access):
+##   - Player / LocomotionFSM / states -> gameplay fields (locomotion_state,
+##     anim_state, is_grounded, velocity_y, model_yaw, ...).
+##   - InputCollector  -> input_enabled.
+##   - CameraRig       -> camera_yaw, first_person, shift_lock fields.
+##   - Abilities       -> only whitelisted flags via AbilityContext.
+## Everyone else reads, or connects to the change signals below.
+##
+## All flat/synced properties live on this single node so a
+## MultiplayerSynchronizer can replicate them with simple NodePaths.
+## On remote peers the synchronizer writes these properties directly, the
+## setters fire the same signals, and presentation layers react identically.
+class_name PlayerBlackboard
+extends Node
 
-enum State { IDLE, WALKING, RUNNING, JUMPING, FALLING, LANDING }
+signal state_changed(previous: StringName, next: StringName)
+signal anim_state_changed(anim: StringName)
+signal grounded_changed(grounded: bool)
+signal landed(fall_distance: float)
+signal jumped
+signal input_enabled_changed(enabled: bool)
+signal first_person_changed(enabled: bool)
 
-@export var body_height = 1.59
+# --- Synced gameplay state (referenced by the MultiplayerSynchronizer) -------
 
-var player_id = 0
-var visual_money = 0
+## Current locomotion FSM state id (node name of the state, e.g. &"Idle").
+var locomotion_state: StringName = &"Idle":
+	set(value):
+		if locomotion_state == value:
+			return
+		var previous := locomotion_state
+		locomotion_state = value
+		state_changed.emit(previous, value)
+
+## Current presentation state (AnimationTree state machine node name).
+var anim_state: StringName = &"idle":
+	set(value):
+		if anim_state == value:
+			return
+		anim_state = value
+		anim_state_changed.emit(value)
+
+## Gameplay yaw of the visual model (radians, without the model's authoring
+## rotation offset). Applied locally by ModelVisual on every peer.
+var model_yaw := 0.0
+
+## Reserved for the Sprint ability (kept here so it is sync-ready).
+var is_sprinting := false
+
+# --- Local gameplay state (read-only for observers) --------------------------
+
+var is_grounded := true:
+	set(value):
+		if is_grounded == value:
+			return
+		is_grounded = value
+		grounded_changed.emit(value)
+
+var velocity_y := 0.0
+var horizontal_speed := 0.0
+var has_move_input := false
+var last_fall_distance := 0.0
+var body_height := 1.59
+
+# --- Camera-owned state -------------------------------------------------------
 
 var camera_yaw := 0.0
+var first_person := false:
+	set(value):
+		if first_person == value:
+			return
+		first_person = value
+		first_person_changed.emit(value)
 var shift_lock := false
 var shift_lock_toggle_on := false
-var first_person := false
 
-# Datos crudos expuestos por el player
-var is_grounded := true
-var velocity_y := 0.0
-var has_horizontal_input := false
-var is_running := false
-var is_stepping := false
-var is_stepping_down := false
+# --- Input-layer-owned state --------------------------------------------------
 
-var _state: State = State.IDLE
-var state: State:
-	get: return _state
+var input_enabled := true:
 	set(value):
-		if _state == value: return
-		_state = value
-		state_changed.emit(_state)
+		if input_enabled == value:
+			return
+		input_enabled = value
+		input_enabled_changed.emit(value)
 
-var is_window_selected := true
+# --- Notification helpers (gameplay writers only) -----------------------------
 
-signal state_changed(new_state: State)
-signal window_focus_changed # is window_slected: bool
+func notify_jumped() -> void:
+	jumped.emit()
 
-func _ready() -> void:
-	get_window().focus_exited.connect(_on_focus_lost)
-	get_window().focus_entered.connect(_on_focus_gained)
-
-func _on_focus_lost():
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	is_window_selected = false
-	window_focus_changed.emit(false)
-
-func _on_focus_gained():
-	is_window_selected = true
-	window_focus_changed.emit(true)
-
-func play_sound(sound: AudioStream, sound_position: Vector3) -> AudioStreamPlayer3D:
-	var player := AudioStreamPlayer3D.new()
-	player.stream = sound
-	player.position = sound_position
-	player.top_level = true
-	get_tree().current_scene.add_child(player)
-	player.play()
-	player.finished.connect(player.queue_free)
-	return player
-
-func play_local_sound(sound: AudioStream) -> AudioStreamPlayer:
-	var player := AudioStreamPlayer.new()
-	player.stream = sound
-	add_child(player)
-
-	player.play()
-	player.finished.connect(player.queue_free)
-
-	return player
+func notify_landed(fall_distance: float) -> void:
+	last_fall_distance = fall_distance
+	landed.emit(fall_distance)

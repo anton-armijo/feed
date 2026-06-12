@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="LocomotionConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/data/locomotion_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+walk_speed = 4.5
+run_speed = 7.5
+acceleration = 25.0
+friction = 30.0
+run_to_walk_deceleration = 40.0
+reverse_velocity_damp = 0.5
+air_control = 1.0
+model_turn_speed = 12.0
