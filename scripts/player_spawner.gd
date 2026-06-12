@@ -1,4 +1,4 @@
-extends Node3D
+extends MultiplayerSpawner
 
 @export var player_scene: PackedScene = load("res://prefabs/player_instance.tscn")
 @export var spawn_location: Node3D
