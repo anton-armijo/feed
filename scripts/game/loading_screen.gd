@@ -4,6 +4,10 @@ extends CanvasLayer
 @export var fade_duration := 0.5
 
 func _ready() -> void:
+	if NetworkManager.is_dedicated_server:
+		queue_free()
+		return
+
 	var timer := get_tree().create_timer(delay)
 	timer.timeout.connect(_fade_out)
 
