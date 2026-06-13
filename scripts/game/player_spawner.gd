@@ -15,6 +15,7 @@ func spawn_player(peer_id: int) -> void:
 	print("[PlayerSpawner] Jugador spawneado: peer_id=%d" % peer_id)
 
 func _ready() -> void:
+	add_to_group("player_spawner")
 	spawn_function = _custom_spawn
 
 	if not multiplayer.peer_connected.is_connected(_on_peer_connected):
@@ -25,7 +26,7 @@ func _ready() -> void:
 		multiplayer.server_disconnected.connect(_on_server_disconnected)
 
 	var loading_screen := get_node("../LoadingScreen") as CanvasLayer
-	NetworkManager._on_main_scene_loaded(loading_screen)
+	NetworkManager._on_game_scene_loaded(loading_screen)
 
 	if not multiplayer.multiplayer_peer:
 		return

@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://ku1ctynsegq7"]
+
+[ext_resource type="Script" uid="uid://cb74byxvd6dpe" path="res://scripts/game/player_spawner.gd" id="1_spawner"]
+[ext_resource type="PackedScene" uid="uid://d1j1r44dijkc1" path="res://prefabs/player_instance.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="3_loading"]
+[ext_resource type="Script" path="res://scripts/game/world_boundary.gd" id="4_boundary"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_base"]
+
+[sub_resource type="Sky" id="Sky_base"]
+sky_material = SubResource("ProceduralSkyMaterial_base")
+
+[sub_resource type="Environment" id="Environment_base"]
+background_mode = 2
+sky = SubResource("Sky_base")
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_base"]
+
+[sub_resource type="Compositor" id="Compositor_base"]
+
+[sub_resource type="BoxShape3D" id="BoundaryShape_base"]
+size = Vector3(500, 0.1, 500)
+
+[node name="GameBase" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_base")
+camera_attributes = SubResource("CameraAttributesPractical_base")
+compositor = SubResource("Compositor_base")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." node_paths=PackedStringArray("spawn_location")]
+_spawnable_scenes = PackedStringArray("uid://d1j1r44dijkc1")
+spawn_path = NodePath("SpawnPoint")
+script = ExtResource("1_spawner")
+player_scene = ExtResource("2_player")
+spawn_location = NodePath("SpawnPoint")
+
+[node name="SpawnPoint" type="Node3D" parent="MultiplayerSpawner"]
+
+[node name="LoadingScreen" parent="." instance=ExtResource("3_loading")]
+
+[node name="WorldBoundary" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
+script = ExtResource("4_boundary")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldBoundary"]
+shape = SubResource("BoundaryShape_base")

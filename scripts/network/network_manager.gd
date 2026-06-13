@@ -30,7 +30,7 @@ func _load_menu() -> void:
 func _load_main() -> void:
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
 
-func _on_main_scene_loaded(loading_screen: Node) -> void:
+func _on_game_scene_loaded(loading_screen: Node) -> void:
 	if connect_ip != "":
 		var ip := connect_ip
 		connect_ip = ""
