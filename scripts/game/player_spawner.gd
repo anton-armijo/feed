@@ -21,11 +21,17 @@ func _ready() -> void:
 		multiplayer.peer_connected.connect(_on_peer_connected)
 	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
 		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	if not multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+		multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+	var loading_screen := get_node("../LoadingScreen") as CanvasLayer
+	NetworkManager._on_main_scene_loaded(loading_screen)
+
+	if not multiplayer.multiplayer_peer:
+		return
 
 	if multiplayer.is_server() and not NetworkManager.is_dedicated_server:
 		spawn_player(multiplayer.get_unique_id())
-	elif multiplayer.is_server():
-		print("[PlayerSpawner] Servidor dedicado — no se spawnea jugador propio")
 
 func _on_peer_connected(id: int) -> void:
 	if not multiplayer.is_server():
@@ -39,3 +45,10 @@ func _on_peer_disconnected(id: int) -> void:
 	if player_node:
 		player_node.queue_free()
 		print("[PlayerSpawner] Jugador eliminado: peer_id=%d" % id)
+
+func _on_server_disconnected() -> void:
+	if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+		multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+	NetworkManager.last_error = "Desconectado del servidor"
+	NetworkManager.cleanup_peer()
+	get_tree().change_scene_to_file("res://scenes/menu.tscn")

@@ -5,12 +5,12 @@ const TRANSPARENCY_ALPHA_DEPTH_PRE_PASS := 4
 
 @export_category("Toon")
 @export var toon_offset: float = 0.4
-@export var toon_smoothness: float = 0.2
-@export var min_light: float = 0.35
+@export var toon_smoothness: float = 0.7
+@export var min_light: float = 0.25
 
 @export_category("Rim")
 @export var rim_power: float = 3.0
-@export var rim_brightness: float = 0.2
+@export var rim_brightness: float = 0.4
 
 var _shader: Shader
 

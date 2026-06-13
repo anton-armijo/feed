@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="feed_your_teto"
-run/main_scene="uid://uhydmr0o4cmd"
+run/main_scene="uid://ba8dpuhykc2ud"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

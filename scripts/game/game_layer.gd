@@ -4,12 +4,6 @@
 class_name GameLayer
 extends Node
 
-@onready var ui: Control = $ui
-
 func _ready() -> void:
 	if not is_multiplayer_authority():
 		queue_free()
-
-## Hook for game systems that want the local UI to observe an object manager.
-func watch_object(object_manager: Node) -> void:
-	ui.watch(object_manager)

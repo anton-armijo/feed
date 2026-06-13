@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://uhydmr0o4cmd"]
 
 [ext_resource type="Script" uid="uid://cb74byxvd6dpe" path="res://scripts/game/player_spawner.gd" id="1_sugp2"]
-[ext_resource type="PackedScene" uid="uid://bqb6v1anlqsj4" path="res://prefabs/player_instance.tscn" id="2_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://d1j1r44dijkc1" path="res://prefabs/player_instance.tscn" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://b0javxi0beudk" path="res://models/miku-mesmerizer/Mesmerizer Miku.glb" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://2jcffhuuj47j" path="res://models/house/roblox_classic_house.glb" id="4_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="5_loading"]
-[ext_resource type="Script" path="res://scripts/player/toon_applier.gd" id="6_ttoon"]
+[ext_resource type="Script" uid="uid://c8lduny4ovh06" path="res://scripts/player/toon_applier.gd" id="6_ttoon"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jyhfs"]
 
@@ -52,7 +52,7 @@ data = PackedVector3Array(-0.195, 0.055, 2.715, 0.195, 0.055, 2.715, -0.195, -0.
 [node name="main" type="Node3D" unique_id=215731366]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1020517629 node_paths=PackedStringArray("spawn_location")]
-_spawnable_scenes = PackedStringArray("uid://bqb6v1anlqsj4")
+_spawnable_scenes = PackedStringArray("uid://d1j1r44dijkc1")
 spawn_path = NodePath("SpawnPoint")
 script = ExtResource("1_sugp2")
 player_scene = ExtResource("2_jyhfs")
@@ -82,7 +82,7 @@ transform = Transform3D(1, 0, 0, 0, 0.10381679, 0.9945964, 0, -0.9945964, 0.1038
 transform = Transform3D(-9.316184e-09, 0, -0.21312945, 0, 0.21312945, 0, 0.21312945, 0, -9.316184e-09, -18.218987, -0.5972495, 0.002098918)
 
 [node name="Object_2" parent="Sketchfab_Scene/Sketchfab_model/17268555753_obj_cleaner_materialmerger_gles" parent_id_path=PackedInt32Array(1728512921, 794623037) index="0" unique_id=1696503934]
-transform = Transform3D(1, -7.1054274e-15, 1.5777218e-30, 7.1054274e-15, 1, -4.242574e-31, -1.5777218e-30, -4.242574e-31, 1, 0.008702027, -1.4996841, 1.2021637)
+transform = Transform3D(1, -1.0658141e-14, 2.3665827e-30, 1.0658141e-14, 1, -4.2425735e-31, -2.3665827e-30, -4.2425735e-31, 1, 0.004245301, -1.5082779, 0.801509)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Sketchfab_Scene/Sketchfab_model/17268555753_obj_cleaner_materialmerger_gles/Object_2" index="0" unique_id=363656380]
 

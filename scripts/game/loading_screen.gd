@@ -3,13 +3,25 @@ extends CanvasLayer
 @export var delay := 1.5
 @export var fade_duration := 0.5
 
+var _label: Label = null
+var _fade_timer: SceneTreeTimer = null
+
 func _ready() -> void:
 	if NetworkManager.is_dedicated_server:
 		queue_free()
 		return
 
-	var timer := get_tree().create_timer(delay)
-	timer.timeout.connect(_fade_out)
+	_label = $ColorRect/Label
+
+func set_status(text: String) -> void:
+	if _label:
+		_label.text = text
+
+func start_fade_out() -> void:
+	if _fade_timer:
+		return
+	_fade_timer = get_tree().create_timer(delay)
+	_fade_timer.timeout.connect(_fade_out)
 
 func _fade_out() -> void:
 	var rect: ColorRect = $ColorRect
