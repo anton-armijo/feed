@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://b0javxi0beudk" path="res://models/miku-mesmerizer/Mesmerizer Miku.glb" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://2jcffhuuj47j" path="res://models/house/roblox_classic_house.glb" id="4_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="5_loading"]
+[ext_resource type="Script" path="res://scripts/player/toon_applier.gd" id="6_ttoon"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jyhfs"]
 
@@ -91,6 +92,9 @@ shape = SubResource("ConcavePolygonShape3D_0wfyh")
 
 [node name="Mesmerizer Miku" parent="." unique_id=1040928314 instance=ExtResource("3_jyhfs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.566906, 2.0583067, -4.2225723)
+
+[node name="ToonApplier" type="Node" parent="Mesmerizer Miku" unique_id=875421963]
+script = ExtResource("6_ttoon")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1030694006]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7347589, 2.5927463, -6.220796)
