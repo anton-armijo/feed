@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ku1ctynsegq7"]
 
 [ext_resource type="Script" uid="uid://cb74byxvd6dpe" path="res://scripts/network/player_spawner.gd" id="1_spawner"]
-[ext_resource type="PackedScene" uid="uid://d1j1r44dijkc1" path="res://prefabs/player_instance.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="3_loading"]
 [ext_resource type="Script" uid="uid://ecasm5m30h5q" path="res://scripts/game/world_boundary.gd" id="4_boundary"]
 

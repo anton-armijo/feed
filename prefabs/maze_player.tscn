@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://6edaaalo36s7"]
+
+[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="1_pu4cg"]
+[ext_resource type="Resource" uid="uid://qqvc5vv2vnjs" path="res://scripts/maze_camera.tres" id="2_pgx0g"]
+
+[node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_pu4cg")]
+
+[node name="CameraRig" parent="." index="7" unique_id=862009467]
+config = ExtResource("2_pgx0g")
