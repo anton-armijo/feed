@@ -5,8 +5,9 @@
 [ext_resource type="Material" uid="uid://cgkl6vkva43lt" path="res://materials/red_brick_4k.blend/bricks.tres" id="3_ooxgq"]
 [ext_resource type="Material" uid="uid://c2qw7bf7e1g45" path="res://materials/park_dirt_2k.blend/dirt.tres" id="4_dirt"]
 [ext_resource type="Script" uid="uid://mejc8geost2j" path="res://scripts/game/maze_size_picker.gd" id="5_picker"]
+[ext_resource type="PackedScene" uid="uid://6gnljty6h1gj" path="res://prefabs/teto_plush_base.tscn" id="6_a34t1"]
 
-[node name="GameBase" unique_id=275465502 instance=ExtResource("1_8mwgk")]
+[node name="Laberynth" unique_id=275465502 instance=ExtResource("1_8mwgk")]
 
 [node name="SizePicker" type="VBoxContainer" parent="LoadingScreen/ColorRect" index="1" unique_id=1848633470]
 layout_mode = 1
@@ -44,5 +45,6 @@ disabled = true
 script = ExtResource("2_mazegen")
 floor_material = ExtResource("4_dirt")
 wall_material = ExtResource("3_ooxgq")
+exit_object = ExtResource("6_a34t1")
 
 [editable path="LoadingScreen"]

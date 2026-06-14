@@ -10,6 +10,11 @@ static var last_error: String = ""
 static var scene_to_load = "res://scenes/laberynth.tscn"
 static var menu_scene = "res://scenes/menu.tscn"
 static var maze_configured: bool = false
+static var maze_width: int = 20
+static var maze_height: int = 20
+static var maze_seed: int = 0
+
+signal maze_params_received(width: int, height: int, seed: int)
 
 var _connecting := false
 var _connect_ip: String = ""
@@ -91,10 +96,16 @@ func cleanup_peer() -> void:
 	_cleanup_peer()
 
 @rpc("any_peer", "call_remote", "reliable")
-func rpc_maze_configured() -> void:
+func rpc_maze_configured(width: int, height: int, mseed: int) -> void:
 	maze_configured = true
+	maze_width = width
+	maze_height = height
+	maze_seed = mseed
+
 	if multiplayer.is_server():
-		rpc_maze_configured.rpc()
+		rpc_maze_configured.rpc(width, height, mseed)
+	else:
+		maze_params_received.emit(width, height, mseed)
 
 func host_game() -> void:
 	maze_configured = false
