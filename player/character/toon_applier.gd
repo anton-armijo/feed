@@ -19,7 +19,7 @@ const TRANSPARENCY_ALPHA_DEPTH_PRE_PASS := 4
 var _shader: Shader
 
 func _ready() -> void:
-	_shader = load("res://shaders/toon_shader.gdshader")
+	_shader = load("uid://ehnotxo15ybn")
 	_apply_toon()
 
 func _apply_toon() -> void:

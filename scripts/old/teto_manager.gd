@@ -6,9 +6,9 @@ extends Node3D
 @export var progress_scale_bonus: float = 1.3
 @export var size_per_percentage: float = 3.0
 
-signal state_updated(state: LevelData)
-func get_state() -> LevelData:
-	return LevelData.new(level, progress, required_points, percentage, total_points)
+#signal state_updated(state: LevelData)
+#func get_state() -> LevelData:
+	#return LevelData.new(level, progress, required_points, percentage, total_points)
 
 var owner_id: int
 
@@ -57,7 +57,7 @@ func set_level(new_level: int):
 	level = new_level
 	progress = 0
 	print_factor = true
-	state_updated.emit(get_state())
+	#state_updated.emit(get_state())
 
 	print("Level set to: ", level)
 
@@ -92,4 +92,4 @@ func _validate_interact(_player_id: int) -> bool:
 func _cl_sync_state(new_level: int, new_progress: int) -> void:
 	level = new_level
 	progress = new_progress
-	state_updated.emit(get_state())
+	#state_updated.emit(get_state())

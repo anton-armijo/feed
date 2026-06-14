@@ -1,6 +1,6 @@
 extends MultiplayerSpawner
 
-@export var player_scene: PackedScene = load("res://prefabs/player_instance.tscn")
+@export var player_scene: PackedScene = load("uid://dxtje6oorvk5e")
 @export var spawn_location: Node3D
 
 func _custom_spawn(data: Variant) -> Node:

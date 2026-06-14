@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://b43f2ir3fc4vo"]
+
+[ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://player/scripts/camera/camera_rig.gd" id="1"]
+[ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://player/scripts/camera/camera_collision.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_wnob3"]
+metadata/__load_path__ = "res://resources/player/default_camera.tres"
+
+[node name="CameraRig" type="Node3D" unique_id=1117416754]
+script = ExtResource("1")
+config = SubResource("Resource_wnob3")
+
+[node name="XPivot" type="Node3D" parent="." unique_id=1736788788]
+
+[node name="Camera3D" type="Camera3D" parent="XPivot" unique_id=24250761]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+current = true
+
+[node name="AudioListener3D" type="AudioListener3D" parent="XPivot/Camera3D" unique_id=693141586]
+
+[node name="CameraCollision" type="Node" parent="." unique_id=330822495]
+script = ExtResource("2")
