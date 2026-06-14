@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d1j1r44dijkc1"]
 
-[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://prefabs/player_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://c1cm8bbtk6gcv" path="res://scripts/game/game_layer.gd" id="2_game"]
 [ext_resource type="Script" uid="uid://pkj3mp0qeeaw" path="res://scripts/game/interaction_handler.gd" id="3_inter"]
 [ext_resource type="Script" uid="uid://c8f22sc16dru2" path="res://scripts/game/player_audio.gd" id="4_audio"]

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="LocomotionConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="LocomotionConfig" format=3]
 
-[ext_resource type="Script" path="res://scripts/player/data/locomotion_config.gd" id="1"]
+[ext_resource type="Script" uid="uid://x8w680p2xdo1" path="res://player/scripts/data/locomotion_config.gd" id="1"]
 
 [resource]
 script = ExtResource("1")

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="PlayerConfig" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PlayerConfig" format=3]
 
-[ext_resource type="Script" path="res://scripts/player/data/player_config.gd" id="1"]
+[ext_resource type="Script" uid="uid://ccmgs38roty0x" path="res://player/scripts/data/player_config.gd" id="1"]
 [ext_resource type="Resource" path="res://resources/player/default_locomotion.tres" id="2"]
 [ext_resource type="Resource" path="res://resources/player/default_jump.tres" id="3"]
 [ext_resource type="Resource" path="res://resources/player/default_camera.tres" id="4"]

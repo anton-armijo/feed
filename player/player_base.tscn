@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://dxtje6oorvk5e"]
+
+[ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://player/scripts/player.gd" id="1_knxac"]
+[ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://player/scripts/blackboard.gd" id="2_dponi"]
+[ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://player/scripts/motor/stair_stepper.gd" id="3_og0ex"]
+[ext_resource type="PackedScene" path="res://prefabs/camera_rig.tscn" id="5_camrig"]
+[ext_resource type="Resource" path="res://resources/player/default_player.tres" id="6_pcfg"]
+[ext_resource type="PackedScene" uid="uid://6178wwf8ahrb" path="res://player/character/character_scene.tscn" id="18_8ds6q"]
+[ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://player/scripts/motor/ground_probe.gd" id="48_2ggbq"]
+[ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://player/scripts/input/input_collector.gd" id="50_xpqug"]
+[ext_resource type="Script" uid="uid://bt2exgm8pg6v3" path="res://player/scripts/animation/model_visual.gd" id="51_model"]
+[ext_resource type="Script" uid="uid://ca58jsdiqjpvl" path="res://player/scripts/motor/movement_motor.gd" id="52_motor"]
+[ext_resource type="Script" uid="uid://bq5bqio43p3cr" path="res://player/scripts/fsm/locomotion_fsm.gd" id="53_fsm"]
+[ext_resource type="Script" uid="uid://bi1kwexivh8t3" path="res://player/scripts/fsm/states/idle_state.gd" id="54_idle"]
+[ext_resource type="Script" uid="uid://dw46audmv13eq" path="res://player/scripts/fsm/states/walk_state.gd" id="55_walk"]
+[ext_resource type="Script" uid="uid://dwyh7keiwgrcn" path="res://player/scripts/fsm/states/run_state.gd" id="56_run"]
+[ext_resource type="Script" uid="uid://hvvbd6edk2ey" path="res://player/scripts/fsm/states/jump_state.gd" id="57_jump"]
+[ext_resource type="Script" uid="uid://0bsl70dmlrkb" path="res://player/scripts/fsm/states/fall_state.gd" id="58_fall"]
+[ext_resource type="Script" uid="uid://de7lirbujl8vh" path="res://player/scripts/fsm/states/land_state.gd" id="59_land"]
+[ext_resource type="Script" uid="uid://cq55qc1thycli" path="res://player/scripts/abilities/ability_manager.gd" id="60_abil"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_72ieh"]
+radius = 0.13183594
+height = 1.595
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_knxac"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("Blackboard:model_yaw")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("Blackboard:locomotion_state")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("Blackboard:anim_state")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Blackboard:is_sprinting")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[node name="Player" type="CharacterBody3D" unique_id=1072122291]
+collision_layer = 2
+collision_mask = 3
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+script = ExtResource("1_knxac")
+config = ExtResource("6_pcfg")
+
+[node name="Blackboard" type="Node" parent="." unique_id=404488332]
+script = ExtResource("2_dponi")
+
+[node name="InputCollector" type="Node" parent="." unique_id=692711088]
+script = ExtResource("50_xpqug")
+
+[node name="MovementMotor" type="Node" parent="." unique_id=748585279]
+script = ExtResource("52_motor")
+
+[node name="StairStepper" type="Node" parent="MovementMotor" unique_id=712864618]
+script = ExtResource("3_og0ex")
+
+[node name="GroundProbe" type="Node3D" parent="." unique_id=1760694701]
+script = ExtResource("48_2ggbq")
+
+[node name="LocomotionFSM" type="Node" parent="." unique_id=478463479]
+script = ExtResource("53_fsm")
+
+[node name="Idle" type="Node" parent="LocomotionFSM" unique_id=1977514528]
+script = ExtResource("54_idle")
+
+[node name="Walk" type="Node" parent="LocomotionFSM" unique_id=479890962]
+script = ExtResource("55_walk")
+
+[node name="Run" type="Node" parent="LocomotionFSM" unique_id=890036200]
+script = ExtResource("56_run")
+
+[node name="Jump" type="Node" parent="LocomotionFSM" unique_id=1558419536]
+script = ExtResource("57_jump")
+
+[node name="Fall" type="Node" parent="LocomotionFSM" unique_id=1934001558]
+script = ExtResource("58_fall")
+
+[node name="Land" type="Node" parent="LocomotionFSM" unique_id=1410096589]
+script = ExtResource("59_land")
+
+[node name="AbilityManager" type="Node" parent="." unique_id=486227424]
+script = ExtResource("60_abil")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=1358154928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.798, 0)
+shape = SubResource("CapsuleShape3D_72ieh")
+
+[node name="CameraRig" parent="." unique_id=862009467 instance=ExtResource("5_camrig")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4551597, 0)
+
+[node name="Model" type="Node3D" parent="." unique_id=180612048]
+transform = Transform3D(-0.55, 0, 4.8082526e-08, 0, 0.55, 0, -4.8082526e-08, 0, -0.55, -4.145016e-09, 0, 0.007413458)
+script = ExtResource("51_model")
+
+[node name="CharacterScene" parent="Model" unique_id=1354003246 instance=ExtResource("18_8ds6q")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1323378995]
+replication_config = SubResource("SceneReplicationConfig_knxac")

@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/player/camera/camera_rig.gd" id="1"]
-[ext_resource type="Script" path="res://scripts/player/camera/camera_collision.gd" id="2"]
+[ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://player/scripts/camera/camera_rig.gd" id="1"]
+[ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://player/scripts/camera/camera_collision.gd" id="2"]
 [ext_resource type="Resource" path="res://resources/player/default_camera.tres" id="3"]
 
 [node name="CameraRig" type="Node3D"]

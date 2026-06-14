@@ -23,7 +23,7 @@ extends CharacterBody3D
 @onready var fsm: LocomotionFSM = $LocomotionFSM
 @onready var ability_manager: AbilityManager = $AbilityManager
 @onready var model: ModelVisual = $Model
-@onready var animation_controller: AnimationController = $Model/AnimationTree
+@onready var animation_controller: AnimationController = $Model/CharacterScene/AnimationTree
 @onready var camera_rig: CameraRig = $CameraRig
 
 var peer_id: int

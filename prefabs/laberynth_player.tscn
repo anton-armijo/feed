@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://btks7t6nr3kq5"]
 
-[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://prefabs/player_base.tscn" id="1_84di5"]
+[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="1_84di5"]
 
 [node name="LaberynthPlayer" unique_id=1072122291 instance=ExtResource("1_84di5")]
 

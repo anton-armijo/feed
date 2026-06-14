@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://ku1ctynsegq7" path="res://scenes/game_base.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://b0javxi0beudk" path="res://models/miku-mesmerizer/Mesmerizer Miku.glb" id="2_miku"]
 [ext_resource type="PackedScene" uid="uid://2jcffhuuj47j" path="res://models/house/roblox_classic_house.glb" id="3_house"]
-[ext_resource type="Script" uid="uid://c8lduny4ovh06" path="res://scripts/player/toon_applier.gd" id="4_toon"]
+[ext_resource type="Script" uid="uid://c8lduny4ovh06" path="res://player/character/toon_applier.gd" id="4_toon"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(20, 20)
