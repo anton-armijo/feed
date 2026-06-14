@@ -11,6 +11,7 @@ const draw_debug: bool = false
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		NetworkManager.last_error = ""
 		NetworkManager.cleanup_peer()
 		get_tree().change_scene_to_file("res://scenes/menu.tscn")

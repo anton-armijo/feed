@@ -119,7 +119,7 @@ func _generate_maze() -> void:
 				grid[c1r * grid_width + c1c] = 0
 				_add_candidates(c1r, c1c, candidates)
 
-	grid[1] = 0   # entrada: celda (0, 1)
+	grid[1] = 1   # entrada cerrada
 
 ## Añade los muros entre (r,c) y sus vecinos a distancia 2.
 ## Solo añade el muro si todavía es 1 (evita duplicados innecesarios).

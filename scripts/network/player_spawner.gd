@@ -54,4 +54,5 @@ func _on_server_disconnected() -> void:
 		multiplayer.server_disconnected.disconnect(_on_server_disconnected)
 	NetworkManager.last_error = "Desconectado del servidor"
 	NetworkManager.cleanup_peer()
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().change_scene_to_file("res://scenes/menu.tscn")
