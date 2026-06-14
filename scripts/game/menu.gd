@@ -24,12 +24,10 @@ func _on_connect() -> void:
 	connect_button.disabled = true
 	host_button.disabled = true
 
-	NetworkManager.connect_ip = ip
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	NetworkManager.join_game(ip)
 
 func _on_host() -> void:
 	connect_button.disabled = true
 	host_button.disabled = true
 
-	NetworkManager.pending_host = true
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	NetworkManager.host_game()

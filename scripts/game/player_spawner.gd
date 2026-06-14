@@ -38,6 +38,8 @@ func _on_peer_connected(id: int) -> void:
 	if not multiplayer.is_server():
 		return
 	spawn_player(id)
+	if NetworkManager.maze_configured:
+		NetworkManager.rpc_maze_configured.rpc_id(id)
 
 func _on_peer_disconnected(id: int) -> void:
 	if not multiplayer.is_server():

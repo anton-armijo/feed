@@ -8,6 +8,10 @@ const TRANSPARENCY_ALPHA_DEPTH_PRE_PASS := 4
 @export var toon_smoothness: float = 0.7
 @export var min_light: float = 0.25
 
+@export_category("Specular")
+@export var specular_strength: float = 0.3
+@export var specular_size: float = 64.0
+
 @export_category("Rim")
 @export var rim_power: float = 3.0
 @export var rim_brightness: float = 0.4
@@ -56,12 +60,20 @@ func _make_toon(old_mat: Material) -> ShaderMaterial:
 		if std_mat.emission_enabled and std_mat.emission_texture:
 			new_mat.set_shader_parameter("custom_emission", std_mat.emission_texture)
 			new_mat.set_shader_parameter("use_emission_map", true)
+
+		if std_mat.roughness_texture:
+			new_mat.set_shader_parameter("roughness_texture", std_mat.roughness_texture)
+			new_mat.set_shader_parameter("use_roughness_map", true)
+		else:
+			new_mat.set_shader_parameter("roughness_value", std_mat.roughness)
 	elif old_mat.has("albedo_texture"):
 		new_mat.set_shader_parameter("albedo_texture", old_mat.get("albedo_texture"))
 
 	new_mat.set_shader_parameter("toon_offset", toon_offset)
 	new_mat.set_shader_parameter("toon_smoothness", toon_smoothness)
 	new_mat.set_shader_parameter("min_light", min_light)
+	new_mat.set_shader_parameter("specular_strength", specular_strength)
+	new_mat.set_shader_parameter("specular_size", specular_size)
 	new_mat.set_shader_parameter("rim_power", rim_power)
 	new_mat.set_shader_parameter("rim_brightness", rim_brightness)
 

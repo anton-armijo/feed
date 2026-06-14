@@ -1,10 +1,14 @@
 extends CanvasLayer
 
+signal pre_fade
+
 @export var delay := 1.5
 @export var fade_duration := 0.5
 
 var _label: Label = null
 var _fade_timer: SceneTreeTimer = null
+var _hold_count: int = 0
+var _fade_pending: bool = false
 
 func _ready() -> void:
 	if NetworkManager.is_dedicated_server:
@@ -17,7 +21,25 @@ func set_status(text: String) -> void:
 	if _label:
 		_label.text = text
 
+func hold() -> void:
+	_hold_count += 1
+
+func release() -> void:
+	_hold_count -= 1
+	if _hold_count <= 0:
+		_hold_count = 0
+		if _fade_pending:
+			_fade_pending = false
+			_start_fade_timer()
+
 func start_fade_out() -> void:
+	pre_fade.emit()
+	if _hold_count > 0:
+		_fade_pending = true
+		return
+	_start_fade_timer()
+
+func _start_fade_timer() -> void:
 	if _fade_timer:
 		return
 	_fade_timer = get_tree().create_timer(delay)

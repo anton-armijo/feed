@@ -7,6 +7,9 @@ static var is_dedicated_server := false
 static var connect_ip: String = ""
 static var pending_host: bool = false
 static var last_error: String = ""
+static var scene_to_load = "res://scenes/laberynth.tscn"
+static var menu_scene = "res://scenes/menu.tscn"
+static var maze_configured: bool = false
 
 var _connecting := false
 var _connect_ip: String = ""
@@ -25,10 +28,10 @@ func _ready() -> void:
 		return
 
 func _load_menu() -> void:
-	get_tree().change_scene_to_file("res://scenes/menu.tscn")
+	get_tree().change_scene_to_file(menu_scene)
 
 func _load_main() -> void:
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file(scene_to_load)
 
 func _on_game_scene_loaded(loading_screen: Node) -> void:
 	if connect_ip != "":
@@ -86,6 +89,21 @@ func _cleanup_peer() -> void:
 
 func cleanup_peer() -> void:
 	_cleanup_peer()
+
+@rpc("any_peer", "call_remote", "reliable")
+func rpc_maze_configured() -> void:
+	maze_configured = true
+	if multiplayer.is_server():
+		rpc_maze_configured.rpc()
+
+func host_game() -> void:
+	maze_configured = false
+	pending_host = true
+	get_tree().change_scene_to_file(scene_to_load)
+
+func join_game(ip: String) -> void:
+	connect_ip = ip
+	get_tree().change_scene_to_file(scene_to_load)
 
 func start_as_host() -> bool:
 	is_dedicated_server = false
