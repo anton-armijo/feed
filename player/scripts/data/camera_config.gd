@@ -9,6 +9,9 @@ extends Resource
 ## Vertical sensitivity multiplier relative to horizontal.
 @export var pitch_sensitivity_multiplier := 0.4
 
+@export_group("View")
+@export var force_first_person := false
+
 @export_group("Zoom")
 @export var zoom_speed := 0.5
 @export var max_zoom := 10.0

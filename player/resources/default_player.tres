@@ -1,13 +1,12 @@
-[gd_resource type="Resource" script_class="PlayerConfig" format=3]
+[gd_resource type="Resource" script_class="PlayerConfig" format=3 uid="uid://bbxxhvkvw080n"]
 
 [ext_resource type="Script" uid="uid://ccmgs38roty0x" path="res://player/scripts/data/player_config.gd" id="1"]
-[ext_resource type="Resource" path="res://player/resources/default_locomotion.tres" id="2"]
-[ext_resource type="Resource" path="res://player/resources/default_jump.tres" id="3"]
+[ext_resource type="Resource" uid="uid://6homywwyjmrw" path="res://player/resources/default_locomotion.tres" id="2"]
+[ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="3"]
 [ext_resource type="Resource" uid="uid://dtht0tgw8nrjv" path="res://player/resources/default_camera.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
-body_height = 1.59
 locomotion = ExtResource("2")
 jump = ExtResource("3")
 camera = ExtResource("4")

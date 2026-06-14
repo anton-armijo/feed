@@ -29,22 +29,22 @@ func _on_text_submitted(_text: String) -> void:
 
 func _on_confirm() -> void:
 	var raw := _size_input.text.strip_edges()
-	var size := raw.to_int()
-	if size < 5:
-		size = 5
-	if size > 200:
-		size = 200
+	var _size := raw.to_int()
+	if _size < 5:
+		_size = 5
+	if _size > 200:
+		_size = 200
 
 	var maze_gen := $"../../../MazeGenerator"
 	var mseed := randi()
 	if maze_gen and maze_gen.has_method("regenerate"):
-		maze_gen.regenerate(size, size, mseed)
+		maze_gen.regenerate(_size, _size, mseed)
 
 	NetworkManager.maze_configured = true
-	NetworkManager.maze_width = size
-	NetworkManager.maze_height = size
+	NetworkManager.maze_width = _size
+	NetworkManager.maze_height = _size
 	NetworkManager.maze_seed = mseed
-	NetworkManager.rpc_maze_configured.rpc(size, size, mseed)
+	NetworkManager.rpc_maze_configured.rpc(_size, _size, mseed)
 
 	visible = false
 	_label.visible = true

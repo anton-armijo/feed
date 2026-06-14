@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 NetworkManager="*res://scripts/network/network_manager.gd"
-SceneManager="*res://scripts/network/scene_manager.gd"
 
 [editor_plugins]
 

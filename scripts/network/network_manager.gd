@@ -24,13 +24,19 @@ func _ready() -> void:
 	if args.is_empty():
 		args = OS.get_cmdline_args()
 
-	print("[NetworkManager] Args recibidos: ", args)
-
 	if args.has("--server"):
 		is_dedicated_server = true
 		_start_server()
 		call_deferred("_load_main")
 		return
+
+func _input(event: InputEvent) -> void:
+	if is_dedicated_server:
+		return
+	if event.is_action_pressed("ui_cancel") and multiplayer.multiplayer_peer:
+		last_error = ""
+		_cleanup_peer()
+		_load_menu()
 
 func _load_menu() -> void:
 	get_tree().change_scene_to_file(menu_scene)

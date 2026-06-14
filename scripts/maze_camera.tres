@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1_x1pjo")
-max_zoom = -0.04
+force_first_person = true
+max_zoom = 0.0
 first_person_snap_distance = 17.295

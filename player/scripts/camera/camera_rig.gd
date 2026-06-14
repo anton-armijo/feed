@@ -75,7 +75,7 @@ func _manage_shift_lock() -> void:
 		_shift_toggled = not _shift_toggled
 	_bb.shift_lock_toggle_on = _shift_toggled
 	_bb.shift_lock = _shift_toggled or Input.is_action_pressed("right_click")
-	if not _bb.first_person and _bb.input_enabled:
+	if not _bb.first_person and _bb.input_enabled and not config.force_first_person:
 		_set_mouse_mode(Input.MOUSE_MODE_CAPTURED if _bb.shift_lock else Input.MOUSE_MODE_VISIBLE)
 
 func _follow_height(delta: float) -> void:
@@ -84,6 +84,17 @@ func _follow_height(delta: float) -> void:
 	position.y = _initial_y + _smoother.get_offset(target_y)
 
 func _update_zoom(delta: float) -> void:
+	if config.force_first_person:
+		if _model:
+			_model.visible = false
+		camera.position.z = 0.0
+		current_zoom = 0.0
+		target_zoom = 0.0
+		if not _bb.first_person:
+			_set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			_bb.first_person = true
+		return
+
 	camera.position.z = lerpf(
 		camera.position.z,
 		minf(target_zoom, collision_zoom_limit),
@@ -123,6 +134,9 @@ func _input(event: InputEvent) -> void:
 			-event.relative.y * config.mouse_sensitivity * config.pitch_sensitivity_multiplier))
 		x_pivot.rotation_degrees.x = clampf(
 			x_pivot.rotation_degrees.x, config.pitch_min_degrees, config.pitch_max_degrees)
+
+	if config.force_first_person:
+		return
 
 	if event.is_action_pressed("wheel_up"):
 		if not _fp_from_collision:
