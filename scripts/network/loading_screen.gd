@@ -1,3 +1,7 @@
+## Loading overlay: a self-driven observer of the session. It reacts to NetState
+## (status text + fade-out when the session goes live) instead of being poked by
+## the network code. The hold/release API lets a sibling (the maze size picker)
+## delay the fade until the host has chosen the maze size.
 extends CanvasLayer
 
 signal pre_fade
@@ -11,11 +15,22 @@ var _hold_count: int = 0
 var _fade_pending: bool = false
 
 func _ready() -> void:
-	if NetworkManager.is_dedicated_server:
+	if NetSession.state.is_dedicated():
 		queue_free()
 		return
 
 	_label = $ColorRect/Label
+
+	NetSession.state.status_changed.connect(_on_status_changed)
+	NetSession.state.session_started.connect(start_fade_out)
+	_on_status_changed(NetSession.state.status)
+
+func _on_status_changed(status: NetState.Status) -> void:
+	match status:
+		NetState.Status.CONNECTING:
+			set_status("Estableciendo conexion...")
+		NetState.Status.CONNECTED:
+			set_status("Conectado")
 
 func set_status(text: String) -> void:
 	if _label:

@@ -10,14 +10,14 @@ config_version=5
 
 [application]
 
-config/name="feed_your_teto"
+config/name="teto_maze"
 run/main_scene="uid://ba8dpuhykc2ud"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-NetworkManager="*res://scripts/network/network_manager.gd"
+NetSession="*res://net/net_session.tscn"
 
 [editor_plugins]
 
@@ -93,6 +93,7 @@ run={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+renderer/rendering_method="mobile"
 
 [shader_globals]
 

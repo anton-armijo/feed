@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://ku1ctynsegq7"]
 
-[ext_resource type="Script" uid="uid://cb74byxvd6dpe" path="res://scripts/network/player_spawner.gd" id="1_spawner"]
+[ext_resource type="Script" path="res://net/scripts/player_spawn_service.gd" id="1_spawner"]
 [ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="3_loading"]
+[ext_resource type="Script" path="res://net/scripts/session_bootstrap.gd" id="5_bootstrap"]
 [ext_resource type="Script" uid="uid://ecasm5m30h5q" path="res://scripts/game/world_boundary.gd" id="4_boundary"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_base"]
@@ -29,7 +30,7 @@ camera_attributes = SubResource("CameraAttributesPractical_base")
 compositor = SubResource("Compositor_base")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." node_paths=PackedStringArray("spawn_location")]
-_spawnable_scenes = PackedStringArray("uid://d1j1r44dijkc1")
+_spawnable_scenes = PackedStringArray()
 spawn_path = NodePath("SpawnPoint")
 script = ExtResource("1_spawner")
 player_scene = ExtResource("2_player")
@@ -45,3 +46,6 @@ script = ExtResource("4_boundary")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WorldBoundary"]
 shape = SubResource("BoundaryShape_base")
+
+[node name="SessionBootstrap" type="Node" parent="."]
+script = ExtResource("5_bootstrap")

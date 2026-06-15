@@ -28,9 +28,9 @@ first_person_snap_distance = 17.295
 [node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_pu4cg")]
 config = SubResource("Resource_4wr1m")
 
-[node name="WalkSounds" type="Node" parent="." index="4" unique_id=1825451012 node_paths=PackedStringArray("fsm", "audio_player")]
+[node name="WalkSounds" type="Node" parent="." index="4" unique_id=1825451012 node_paths=PackedStringArray("blackboard", "audio_player")]
 script = ExtResource("6_ke34l")
-fsm = NodePath("../LocomotionFSM")
+blackboard = NodePath("../Blackboard")
 audio_player = NodePath("AudioStreamPlayer3D")
 footstep_sounds = Array[AudioStream]([ExtResource("7_kqwtp"), ExtResource("8_5dacx"), ExtResource("9_3mj8u"), ExtResource("10_gd644"), ExtResource("11_y2g1y")])
 walk_interval = 0.6

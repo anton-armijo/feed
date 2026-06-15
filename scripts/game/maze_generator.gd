@@ -16,14 +16,21 @@ extends Node3D
 var grid: PackedByteArray
 
 # ─────────────────────────────────────────────────────────────────────────
-func _ready() -> void:
-	NetworkManager.maze_params_received.connect(_on_maze_params_received)
+## The maze params arrive through the game-specific MazeNetSync node (the host
+## configures them, the server replicates them to clients). This generator just
+## reacts: it builds whatever config is available now and rebuilds when a new
+## one is received.
+@onready var _net_sync: MazeNetSync = get_tree().get_first_node_in_group("maze_net_sync")
 
-	if NetworkManager.maze_configured:
-		grid_width = NetworkManager.maze_width
-		grid_height = NetworkManager.maze_height
+func _ready() -> void:
+	if _net_sync:
+		_net_sync.maze_received.connect(_on_maze_received)
+
+	if _net_sync and _net_sync.configured:
+		grid_width = _net_sync.width
+		grid_height = _net_sync.height
 		_make_dimensions_odd()
-		seed(NetworkManager.maze_seed)
+		seed(_net_sync.maze_seed)
 	else:
 		_make_dimensions_odd()
 		if seed_value != 0:
@@ -33,7 +40,7 @@ func _ready() -> void:
 	_generate_maze()
 	_build_maze()
 
-func _on_maze_params_received(w: int, h: int, s: int) -> void:
+func _on_maze_received(w: int, h: int, s: int) -> void:
 	regenerate(w, h, s)
 
 func regenerate(new_width: int, new_height: int, using_seed: int = 0) -> void:

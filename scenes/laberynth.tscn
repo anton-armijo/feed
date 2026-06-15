@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://mejc8geost2j" path="res://scripts/game/maze_size_picker.gd" id="5_picker"]
 [ext_resource type="PackedScene" uid="uid://6gnljty6h1gj" path="res://prefabs/teto_plush.tscn" id="6_a34t1"]
 [ext_resource type="AudioStream" uid="uid://ctrmylxmplaqg" path="res://sounds/ambient/ambient_night.mp3" id="8_7nnd3"]
+[ext_resource type="Script" uid="uid://i66228ntc0lq" path="res://scripts/game/maze_net_sync.gd" id="9_mazesync"]
+[ext_resource type="Script" uid="uid://bj3obxobas3fr" path="res://scripts/game/change_text_ui.gd" id="10_jsjlo"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_base"]
 
@@ -31,7 +33,6 @@ font_color = Color(1, 1, 1, 0.49411765)
 environment = SubResource("Environment_e8nfc")
 
 [node name="MultiplayerSpawner" parent="." index="1"]
-_spawnable_scenes = PackedStringArray()
 player_scene = ExtResource("2_e8nfc")
 
 [node name="SizePicker" type="VBoxContainer" parent="LoadingScreen/ColorRect" index="1" unique_id=1848633470]
@@ -66,26 +67,30 @@ text = "Generar"
 [node name="CollisionShape3D" parent="WorldBoundary" index="0"]
 disabled = true
 
-[node name="MazeGenerator" type="Node3D" parent="." index="4" unique_id=240556200]
+[node name="MazeNetSync" type="Node" parent="." index="5" unique_id=240556201]
+script = ExtResource("9_mazesync")
+
+[node name="MazeGenerator" type="Node3D" parent="." index="6" unique_id=240556200]
 script = ExtResource("2_mazegen")
 floor_material = ExtResource("4_dirt")
 wall_material = ExtResource("3_ooxgq")
 exit_object = ExtResource("6_a34t1")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="5" unique_id=1860339629]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="7" unique_id=1860339629]
 stream = ExtResource("8_7nnd3")
 volume_db = -7.0
 autoplay = true
 mix_target = 1
 parameters/looping = true
 
-[node name="UI" type="Control" parent="." index="6" unique_id=107684248]
+[node name="UI" type="Control" parent="." index="8" unique_id=107684248]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("10_jsjlo")
 
 [node name="Label" type="Label" parent="UI" index="0" unique_id=1879542817]
 layout_mode = 1
@@ -101,7 +106,7 @@ offset_bottom = -23.0
 grow_horizontal = 2
 grow_vertical = 0
 pivot_offset = Vector2(25, 3)
-text = "Find the Teto"
+text = "Find the Teto • Press Shift to run. Esc to exit"
 label_settings = SubResource("LabelSettings_7nnd3")
 
 [editable path="LoadingScreen"]

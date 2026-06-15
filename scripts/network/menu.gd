@@ -1,3 +1,6 @@
+## Main menu: a pure observer of the networking session. It never touches the
+## transport directly; it calls the NetSession action facade and reads/clears
+## the last error from the NetState blackboard.
 extends Control
 
 @onready var ip_input: LineEdit = $VBoxContainer/IPInput
@@ -6,28 +9,25 @@ extends Control
 @onready var status_label: Label = $VBoxContainer/StatusLabel
 
 func _ready() -> void:
-	if NetworkManager.is_dedicated_server:
+	if NetSession.state.is_dedicated():
 		return
 
 	connect_button.pressed.connect(_on_connect)
 	host_button.pressed.connect(_on_host)
 
-	if NetworkManager.last_error != "":
-		status_label.text = NetworkManager.last_error
-		NetworkManager.last_error = ""
+	if NetSession.state.last_error != "":
+		status_label.text = NetSession.state.last_error
+		NetSession.state.last_error = ""
 
 func _on_connect() -> void:
 	var ip := ip_input.text.strip_edges()
-	if ip.is_empty():
-		ip = "127.0.0.1"
-
-	connect_button.disabled = true
-	host_button.disabled = true
-
-	NetworkManager.join_game(ip)
+	_lock_buttons()
+	NetSession.join_game(ip)
 
 func _on_host() -> void:
+	_lock_buttons()
+	NetSession.host_game()
+
+func _lock_buttons() -> void:
 	connect_button.disabled = true
 	host_button.disabled = true
-
-	NetworkManager.host_game()

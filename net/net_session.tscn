@@ -1,0 +1,32 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://net/scripts/net_session.gd" id="1"]
+[ext_resource type="Script" path="res://net/scripts/net_state.gd" id="2"]
+[ext_resource type="Script" path="res://net/scripts/net_transport.gd" id="3"]
+[ext_resource type="Script" path="res://net/scripts/scene_flow.gd" id="4"]
+[ext_resource type="Script" path="res://net/scripts/session_controller.gd" id="5"]
+[ext_resource type="Script" path="res://net/scripts/cmdline_bootstrap.gd" id="6"]
+[ext_resource type="Script" path="res://net/scripts/leave_input.gd" id="7"]
+[ext_resource type="Resource" path="res://net/resources/default_net.tres" id="8"]
+
+[node name="NetSession" type="Node"]
+script = ExtResource("1")
+config = ExtResource("8")
+
+[node name="NetState" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="NetTransport" type="Node" parent="."]
+script = ExtResource("3")
+
+[node name="SceneFlow" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="SessionController" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="CmdlineBootstrap" type="Node" parent="."]
+script = ExtResource("6")
+
+[node name="LeaveInput" type="Node" parent="."]
+script = ExtResource("7")

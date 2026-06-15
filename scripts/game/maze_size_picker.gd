@@ -8,7 +8,9 @@ extends VBoxContainer
 var _is_server: bool = false
 
 func _enter_tree() -> void:
-	_is_server = NetworkManager.pending_host
+	# Only the host configures the maze. The intent is known before the peer
+	# exists, so we read the pending role rather than the (not yet set) role.
+	_is_server = NetSession.state.pending_role == NetState.Role.HOST
 	_loading_screen = get_parent().get_parent() as CanvasLayer
 	if _is_server:
 		_loading_screen.hold()
@@ -35,16 +37,12 @@ func _on_confirm() -> void:
 	if _size > 200:
 		_size = 200
 
-	var maze_gen := $"../../../MazeGenerator"
+	# MazeNetSync applies the config locally (its maze_received signal makes the
+	# generator rebuild) and replicates it to every connected peer.
 	var mseed := randi()
-	if maze_gen and maze_gen.has_method("regenerate"):
-		maze_gen.regenerate(_size, _size, mseed)
-
-	NetworkManager.maze_configured = true
-	NetworkManager.maze_width = _size
-	NetworkManager.maze_height = _size
-	NetworkManager.maze_seed = mseed
-	NetworkManager.rpc_maze_configured.rpc(_size, _size, mseed)
+	var maze_sync := get_tree().get_first_node_in_group("maze_net_sync") as MazeNetSync
+	if maze_sync:
+		maze_sync.configure(_size, _size, mseed)
 
 	visible = false
 	_label.visible = true

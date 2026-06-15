@@ -1,6 +1,9 @@
 extends Node
 
-@export var fsm: LocomotionFSM
+## Reads the replicated locomotion state from the blackboard (not the FSM
+## directly): the FSM only runs on the local peer, but the blackboard is synced
+## to every peer, so footsteps play correctly for remote players too.
+@export var blackboard: PlayerBlackboard
 @export var audio_player: AudioStreamPlayer
 
 @export var footstep_sounds: Array[AudioStream]
@@ -16,9 +19,11 @@ var _was_active: bool = false
 var _next_interval: float = 0.0
 
 func _process(delta: float) -> void:
-	var state := fsm.current.name
-	var is_walking := state == "Walk"
-	var is_running  := state == "Run"
+	if blackboard == null:
+		return
+	var state := blackboard.locomotion_state
+	var is_walking := state == &"Walk"
+	var is_running  := state == &"Run"
 	var is_active   := is_walking or is_running
 	var multiplier  := run_multiplier if is_running else 1.0
 

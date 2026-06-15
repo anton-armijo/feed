@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="NetConfig" format=3]
+
+[ext_resource type="Script" path="res://net/scripts/data/net_config.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://ba8dpuhykc2ud" path="res://scenes/menu.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://cyp1sf4mffrj8" path="res://scenes/laberynth.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+port = 4242
+default_ip = "127.0.0.1"
+connect_timeout = 5.0
+max_clients = 32
+menu_scene = ExtResource("2")
+game_scene = ExtResource("3")
+dedicated_server_arg = "--server"
