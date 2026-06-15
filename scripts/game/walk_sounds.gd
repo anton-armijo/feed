@@ -4,7 +4,7 @@ extends Node
 ## directly): the FSM only runs on the local peer, but the blackboard is synced
 ## to every peer, so footsteps play correctly for remote players too.
 @export var blackboard: PlayerBlackboard
-@export var audio_player: AudioStreamPlayer
+@export var audio_player: AudioStreamPlayer3D
 
 @export var footstep_sounds: Array[AudioStream]
 @export var walk_interval: float = 0.5

@@ -31,12 +31,12 @@ config = SubResource("Resource_4wr1m")
 [node name="WalkSounds" type="Node" parent="." index="4" unique_id=1825451012 node_paths=PackedStringArray("blackboard", "audio_player")]
 script = ExtResource("6_ke34l")
 blackboard = NodePath("../Blackboard")
-audio_player = NodePath("AudioStreamPlayer3D")
+audio_player = NodePath("")
 footstep_sounds = Array[AudioStream]([ExtResource("7_kqwtp"), ExtResource("8_5dacx"), ExtResource("9_3mj8u"), ExtResource("10_gd644"), ExtResource("11_y2g1y")])
 walk_interval = 0.6
 run_multiplier = 1.3
 
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer" parent="WalkSounds" index="0" unique_id=962242004]
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="WalkSounds" index="0" unique_id=744906608]
 
 [node name="CameraRig" parent="." index="8" unique_id=862009467]
 config = SubResource("Resource_ke34l")

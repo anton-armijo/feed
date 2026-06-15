@@ -77,13 +77,13 @@ floor_material = ExtResource("4_dirt")
 wall_material = ExtResource("3_ooxgq")
 exit_object = ExtResource("6_a34t1")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="7" unique_id=1860339629]
+[node name="Ambientsound" type="AudioStreamPlayer" parent="." index="7" unique_id=1860339629]
 stream = ExtResource("8_7nnd3")
 volume_db = -7.0
-autoplay = true
 mix_target = 1
 parameters/looping = true
 script = ExtResource("11_mute")
+fade_out_duration = 0.7
 
 [node name="UI" type="Control" parent="." index="8" unique_id=107684248]
 layout_mode = 3

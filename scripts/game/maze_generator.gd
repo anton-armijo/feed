@@ -73,87 +73,91 @@ func _move_spawn_point() -> void:
 		sp.position = Vector3(1.5 * cell_size, 0.0, 1.5 * cell_size)
 
 # ─────────────────────────────────────────────────────────────────────────
-## OPTIMIZACIÓN 1: grid plano (PackedByteArray) + candidatos como enteros
-## (PackedInt32Array).
+## Growing Tree algorithm.
 ##
 ## Cada celda se codifica como un único int32: r * grid_width + c.
 ## Elimina el overhead de Vector2i (objeto heap), reduce presión en el GC,
 ## y permite operaciones de lectura/escritura sobre un buffer contiguo.
+##
+## cell_selection controla la estrategia de elección de celda activa:
+##   0 = Random       (similar a Prim's)
+##   1 = Newest       (recursive backtracker — pasillos muy largos)
+##   2 = Oldest       (BFS — pasillos cortos y ramificados)
+##   3 = Mix (defecto) (elige al azar del 60% más reciente)
+@export var cell_selection: int = 3
+
 func _generate_maze() -> void:
 	grid = PackedByteArray()
 	grid.resize(grid_width * grid_height)
-	grid.fill(1)                       # todo muros
-	grid[grid_width + 1] = 0           # celda inicial (1, 1)
+	grid.fill(1)
+	grid[grid_width + 1] = 0
 
-	var candidates := PackedInt32Array()
-	_add_candidates(1, 1, candidates)
+	var active := PackedInt32Array()
+	active.append(grid_width + 1)
 
-	while candidates.size() > 0:
-		# Extracción aleatoria O(1): swap-con-último + resize.
-		# Evita desplazar los elementos del array (lo cual sería O(n)).
-		var pick    := randi() % candidates.size()
-		var encoded := candidates[pick]
-		candidates[pick] = candidates[candidates.size() - 1]
-		candidates.resize(candidates.size() - 1)
+	while active.size() > 0:
+		var idx: int
+		match cell_selection:
+			0: # Random
+				idx = randi() % active.size()
+			1: # Newest — recursive backtracker
+				idx = active.size() - 1
+			2: # Oldest — BFS
+				idx = 0
+			_: # Mix — random entre el 60% más reciente
+				var thresh := maxi(1, int(ceil(active.size() * 0.4)))
+				if active.size() == 1 or thresh >= active.size():
+					idx = randi() % active.size()
+				else:
+					idx = thresh + (randi() % (active.size() - thresh))
 
-		if grid[encoded] == 0:   # duplicado ya abierto → descartar
-			continue
+		var encoded := active[idx]
+		var r := encoded / grid_width
+		var c := encoded % grid_width
 
-		var wr := encoded / grid_width
-		var wc := encoded % grid_width
+		var neighbors := _get_unvisited_neighbors(r, c)
+		if neighbors.is_empty():
+			active[idx] = active[active.size() - 1]
+			active.resize(active.size() - 1)
+		else:
+			var chosen := neighbors[randi() % neighbors.size()]
+			var nr := chosen / grid_width
+			var nc := chosen % grid_width
 
-		# Las dos celdas que este muro separa
-		var c1r: int; var c1c: int
-		var c2r: int; var c2c: int
-		if wr % 2 == 0:              # muro entre filas
-			c1r = wr - 1; c1c = wc
-			c2r = wr + 1; c2c = wc
-		else:                         # muro entre columnas
-			c1r = wr; c1c = wc - 1
-			c2r = wr; c2c = wc + 1
+			var wr := (r + nr) / 2
+			var wc := (c + nc) / 2
+			grid[wr * grid_width + wc] = 0
+			grid[chosen] = 0
+			active.append(chosen)
 
-		var c1_open := c1r >= 0 and c1r < grid_height and c1c >= 0 and c1c < grid_width \
-					   and grid[c1r * grid_width + c1c] == 0
-		var c2_open := c2r >= 0 and c2r < grid_height and c2c >= 0 and c2c < grid_width \
-					   and grid[c2r * grid_width + c2c] == 0
+	grid[1] = 1
 
-		if c1_open != c2_open:
-			grid[encoded] = 0
-			if not c2_open:
-				grid[c2r * grid_width + c2c] = 0
-				_add_candidates(c2r, c2c, candidates)
-			else:
-				grid[c1r * grid_width + c1c] = 0
-				_add_candidates(c1r, c1c, candidates)
+## Devuelve los vecinos no visitados a distancia 2 de (r,c).
+## Un vecino está "no visitado" si está en posición de pasillo y aún es muro (1).
+func _get_unvisited_neighbors(r: int, c: int) -> PackedInt32Array:
+	var result := PackedInt32Array()
 
-	grid[1] = 1   # entrada cerrada
-
-## Añade los muros entre (r,c) y sus vecinos a distancia 2.
-## Solo añade el muro si todavía es 1 (evita duplicados innecesarios).
-func _add_candidates(r: int, c: int, candidates: PackedInt32Array) -> void:
-	# Izquierda — vecino (r, c-2), muro (r, c-1)
 	if c - 2 > 0 and r > 0 and r < grid_height - 1:
-		var wi := r * grid_width + (c - 1)
-		if grid[wi] == 1:
-			candidates.append(wi)
+		var ni := r * grid_width + (c - 2)
+		if grid[ni] == 1:
+			result.append(ni)
 
-	# Derecha — vecino (r, c+2), muro (r, c+1)
 	if c + 2 < grid_width - 1 and r > 0 and r < grid_height - 1:
-		var wi := r * grid_width + (c + 1)
-		if grid[wi] == 1:
-			candidates.append(wi)
+		var ni := r * grid_width + (c + 2)
+		if grid[ni] == 1:
+			result.append(ni)
 
-	# Arriba — vecino (r-2, c), muro (r-1, c)
 	if r - 2 > 0 and c > 0 and c < grid_width - 1:
-		var wi := (r - 1) * grid_width + c
-		if grid[wi] == 1:
-			candidates.append(wi)
+		var ni := (r - 2) * grid_width + c
+		if grid[ni] == 1:
+			result.append(ni)
 
-	# Abajo — vecino (r+2, c), muro (r+1, c)
 	if r + 2 < grid_height - 1 and c > 0 and c < grid_width - 1:
-		var wi := (r + 1) * grid_width + c
-		if grid[wi] == 1:
-			candidates.append(wi)
+		var ni := (r + 2) * grid_width + c
+		if grid[ni] == 1:
+			result.append(ni)
+
+	return result
 
 # ─────────────────────────────────────────────────────────────────────────
 func _build_maze() -> void:

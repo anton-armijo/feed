@@ -19,3 +19,5 @@ mono_crash.*.json
 export/
 materials/
 sounds/
+models/
+player/character/model/
