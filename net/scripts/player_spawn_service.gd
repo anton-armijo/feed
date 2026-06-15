@@ -26,7 +26,7 @@ func _ready() -> void:
 
 	# If the host's session is already live (e.g. re-entering), spawn its local
 	# player right away. Dedicated servers have no local player.
-	if multiplayer.is_server() and not state.is_dedicated() and state.is_online():
+	if multiplayer.multiplayer_peer and multiplayer.is_server() and not state.is_dedicated() and state.is_online():
 		_spawn(multiplayer.get_unique_id())
 
 func _custom_spawn(data: Variant) -> Node:

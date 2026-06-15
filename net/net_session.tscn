@@ -1,32 +1,32 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://2no7krysekig"]
 
-[ext_resource type="Script" path="res://net/scripts/net_session.gd" id="1"]
-[ext_resource type="Script" path="res://net/scripts/net_state.gd" id="2"]
-[ext_resource type="Script" path="res://net/scripts/net_transport.gd" id="3"]
-[ext_resource type="Script" path="res://net/scripts/scene_flow.gd" id="4"]
-[ext_resource type="Script" path="res://net/scripts/session_controller.gd" id="5"]
-[ext_resource type="Script" path="res://net/scripts/cmdline_bootstrap.gd" id="6"]
-[ext_resource type="Script" path="res://net/scripts/leave_input.gd" id="7"]
+[ext_resource type="Script" uid="uid://tqx2ycbg4a26" path="res://net/scripts/net_session.gd" id="1"]
+[ext_resource type="Script" uid="uid://ctxx3lf1larhe" path="res://net/scripts/net_state.gd" id="2"]
+[ext_resource type="Script" uid="uid://ciisll0rifx6x" path="res://net/scripts/net_transport.gd" id="3"]
+[ext_resource type="Script" uid="uid://bqjjrknkh7pwd" path="res://net/scripts/scene_flow.gd" id="4"]
+[ext_resource type="Script" uid="uid://bvvt2hf5i4w50" path="res://net/scripts/session_controller.gd" id="5"]
+[ext_resource type="Script" uid="uid://c7qwuxvwdwbg8" path="res://net/scripts/cmdline_bootstrap.gd" id="6"]
+[ext_resource type="Script" uid="uid://wxulyqwln5t5" path="res://net/scripts/leave_input.gd" id="7"]
 [ext_resource type="Resource" path="res://net/resources/default_net.tres" id="8"]
 
-[node name="NetSession" type="Node"]
+[node name="NetSession" type="Node" unique_id=701561239]
 script = ExtResource("1")
 config = ExtResource("8")
 
-[node name="NetState" type="Node" parent="."]
+[node name="NetState" type="Node" parent="." unique_id=781912279]
 script = ExtResource("2")
 
-[node name="NetTransport" type="Node" parent="."]
+[node name="NetTransport" type="Node" parent="." unique_id=1760919203]
 script = ExtResource("3")
 
-[node name="SceneFlow" type="Node" parent="."]
+[node name="SceneFlow" type="Node" parent="." unique_id=397003580]
 script = ExtResource("4")
 
-[node name="SessionController" type="Node" parent="."]
+[node name="SessionController" type="Node" parent="." unique_id=218929133]
 script = ExtResource("5")
 
-[node name="CmdlineBootstrap" type="Node" parent="."]
+[node name="CmdlineBootstrap" type="Node" parent="." unique_id=2052396308]
 script = ExtResource("6")
 
-[node name="LeaveInput" type="Node" parent="."]
+[node name="LeaveInput" type="Node" parent="." unique_id=1849589151]
 script = ExtResource("7")

@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://ctrmylxmplaqg" path="res://sounds/ambient/ambient_night.mp3" id="8_7nnd3"]
 [ext_resource type="Script" uid="uid://i66228ntc0lq" path="res://scripts/game/maze_net_sync.gd" id="9_mazesync"]
 [ext_resource type="Script" uid="uid://bj3obxobas3fr" path="res://scripts/game/change_text_ui.gd" id="10_jsjlo"]
+[ext_resource type="Script" uid="uid://c3xv638f7j52s" path="res://scripts/game/mute_on_focus_lost.gd" id="11_mute"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_base"]
 
@@ -82,6 +83,7 @@ volume_db = -7.0
 autoplay = true
 mix_target = 1
 parameters/looping = true
+script = ExtResource("11_mute")
 
 [node name="UI" type="Control" parent="." index="8" unique_id=107684248]
 layout_mode = 3
@@ -91,6 +93,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("10_jsjlo")
+seconds_to_change = 4
 
 [node name="Label" type="Label" parent="UI" index="0" unique_id=1879542817]
 layout_mode = 1

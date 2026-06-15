@@ -8,6 +8,11 @@
 class_name CameraRig
 extends Node3D
 
+## Static flag that any system can set to prevent the camera from capturing
+## the mouse (e.g. loading screen, UI). When cleared the rig waits for a
+## click before recapturing.
+static var block_mouse_capture := false
+
 @export var config: CameraConfig
 
 @onready var x_pivot: Node3D = $XPivot
@@ -28,6 +33,9 @@ var _smoother: YSmoother
 # First person forced by camera collision (so zoom-out can restore).
 var _fp_from_collision := false
 var _zoom_before_fp := 0.0
+## True after regaining focus; camera stays frozen until a click is received.
+var _awaiting_recapture := false
+var _prev_blocked := false
 
 func setup(blackboard: PlayerBlackboard, body: CharacterBody3D) -> void:
 	_bb = blackboard
@@ -48,11 +56,13 @@ func _on_input_enabled_changed(enabled: bool) -> void:
 	if not enabled:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		_last_mouse_mode = Input.MOUSE_MODE_VISIBLE
+		_awaiting_recapture = false
 	elif _bb.first_person:
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		_last_mouse_mode = Input.MOUSE_MODE_CAPTURED
+		_awaiting_recapture = true
 
 func _set_mouse_mode(mode: Input.MouseMode) -> void:
+	if block_mouse_capture and mode == Input.MOUSE_MODE_CAPTURED:
+		return
 	if _last_mouse_mode != mode:
 		_last_mouse_mode = mode
 		Input.set_mouse_mode(mode)
@@ -66,9 +76,21 @@ func _physics_process(_delta: float) -> void:
 func _process(delta: float) -> void:
 	if _bb == null:
 		return
+	_check_block_transition()
 	_manage_shift_lock()
 	_follow_height(delta)
 	_update_zoom(delta)
+
+func _check_block_transition() -> void:
+	if block_mouse_capture and not _prev_blocked:
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		_last_mouse_mode = Input.MOUSE_MODE_VISIBLE
+		_awaiting_recapture = false
+		_prev_blocked = true
+	elif not block_mouse_capture and _prev_blocked:
+		_prev_blocked = false
+		if _bb.first_person:
+			_set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _manage_shift_lock() -> void:
 	if Input.is_action_just_pressed("shift_lock"):
@@ -126,6 +148,16 @@ func _update_zoom(delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if _bb == null or not _bb.input_enabled:
+		return
+
+	if block_mouse_capture:
+		return
+
+	if _awaiting_recapture:
+		if event is InputEventMouseButton and event.pressed:
+			if event.button_index == MOUSE_BUTTON_LEFT or event.button_index == MOUSE_BUTTON_RIGHT:
+				_set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+				_awaiting_recapture = false
 		return
 
 	if event is InputEventMouseMotion and (_bb.first_person or _bb.shift_lock):
