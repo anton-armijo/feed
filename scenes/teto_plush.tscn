@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://eddwwk6pl3lk"]
 
-[ext_resource type="Script" uid="uid://dfth5d3s82ue" path="res://scripts/old/teto_manager.gd" id="1_3p65t"]
+[ext_resource type="Script" path="res://scripts/old/teto_manager.gd" id="1_3p65t"]
 [ext_resource type="Texture2D" uid="uid://dhp26m3hpknp0" path="res://models/teto-plush/source/kasane teto/poly_2_ucuLYer4.jpg" id="2_d6r44"]
 [ext_resource type="ArrayMesh" uid="uid://csjh8h4rhwy17" path="res://models/teto-plush/source/kasane teto/kasane teto.obj" id="3_hqcfc"]
-[ext_resource type="Script" uid="uid://doe05o3h3bka4" path="res://scripts/old/click_reciver.gd" id="4_tc534"]
+[ext_resource type="Script" uid="uid://doe05o3h3bka4" path="res://scripts/game/click_reciver.gd" id="4_tc534"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tipki"]
 albedo_texture = ExtResource("2_d6r44")

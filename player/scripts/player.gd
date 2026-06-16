@@ -33,6 +33,7 @@ func _ready() -> void:
 	peer_id = get_multiplayer_authority()
 	var my_id := multiplayer.get_unique_id()
 	_is_local = peer_id == my_id or name == str(my_id)
+	add_to_group("players")
 
 	print("[Player] _ready: name=%s, peer_id=%d, my_id=%d, authority=%d, is_local=%s" % [name, peer_id, my_id, get_multiplayer_authority(), _is_local])
 

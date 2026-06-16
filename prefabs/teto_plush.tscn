@@ -1,14 +1,35 @@
 [gd_scene format=3 uid="uid://6gnljty6h1gj"]
 
+[ext_resource type="Script" uid="uid://bvgqsql0c3lpf" path="res://scripts/game/interact_sound_broadcast.gd" id="1_27mtj"]
 [ext_resource type="Texture2D" uid="uid://dhp26m3hpknp0" path="res://models/teto-plush/source/kasane teto/poly_2_ucuLYer4.jpg" id="1_slwia"]
 [ext_resource type="ArrayMesh" uid="uid://csjh8h4rhwy17" path="res://models/teto-plush/source/kasane teto/kasane teto.obj" id="2_8n3qy"]
+[ext_resource type="AudioStream" uid="uid://bwpgh7qfdi38e" path="res://sounds/teto.mp3" id="2_mhkt1"]
+[ext_resource type="Script" uid="uid://dgvjnlf6xpcye" path="res://scripts/game/click_reciver.gd" id="5_qeuxp"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4t6mq"]
 albedo_texture = ExtResource("1_slwia")
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_27mtj"]
+radius = 1.2524414
+height = 3.3730469
+
 [node name="TetoPlushBase" type="Node3D" unique_id=659598367]
+script = ExtResource("1_27mtj")
+sound = ExtResource("2_mhkt1")
+click_receiver_path = NodePath("Area3D")
 
 [node name="KasaneTeto" type="MeshInstance3D" parent="." unique_id=58019993]
 transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_4t6mq")
 mesh = ExtResource("2_8n3qy")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=245588105]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0.3344876, 0)
+script = ExtResource("5_qeuxp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=534386638]
+transform = Transform3D(0.99999976, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, 0, -0.017089963, 0)
+shape = SubResource("CapsuleShape3D_27mtj")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=906963555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06821105, 0)
