@@ -21,6 +21,7 @@ signal anim_state_changed(anim: StringName)
 signal grounded_changed(grounded: bool)
 signal landed(fall_distance: float)
 signal jumped
+signal footstep(marker: StringName)
 signal input_enabled_changed(enabled: bool)
 signal first_person_changed(enabled: bool)
 
@@ -99,3 +100,6 @@ func notify_jumped() -> void:
 func notify_landed(fall_distance: float) -> void:
 	last_fall_distance = fall_distance
 	landed.emit(fall_distance)
+
+func notify_footstep(marker: StringName) -> void:
+	footstep.emit(marker)

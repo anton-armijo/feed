@@ -5,13 +5,7 @@
 [ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="3_ke34l"]
 [ext_resource type="Resource" uid="uid://6homywwyjmrw" path="res://player/resources/default_locomotion.tres" id="4_w4tcv"]
 [ext_resource type="Script" uid="uid://ccmgs38roty0x" path="res://player/scripts/data/player_config.gd" id="5_8dutu"]
-[ext_resource type="Script" uid="uid://dfvwpuqfqf7jx" path="res://scripts/game/walk_sounds.gd" id="6_ke34l"]
 [ext_resource type="Script" uid="uid://dcg46n8vr3xbd" path="res://player/scripts/data/camera_config.gd" id="6_tvvk7"]
-[ext_resource type="AudioStream" uid="uid://cdnm7iw1pvl0u" path="res://sounds/sound_effects/walk/walk_1.wav" id="7_kqwtp"]
-[ext_resource type="AudioStream" uid="uid://0dsdltpqm2vj" path="res://sounds/sound_effects/walk/walk_2.wav" id="8_5dacx"]
-[ext_resource type="AudioStream" uid="uid://dowmmldmd5shg" path="res://sounds/sound_effects/walk/walk_3.wav" id="9_3mj8u"]
-[ext_resource type="AudioStream" uid="uid://cvq5bfqd2pdpy" path="res://sounds/sound_effects/walk/walk_4.wav" id="10_gd644"]
-[ext_resource type="AudioStream" uid="uid://dmny33l41ocei" path="res://sounds/sound_effects/walk/walk_5.wav" id="11_y2g1y"]
 [ext_resource type="Script" uid="uid://c1cm8bbtk6gcv" path="res://scripts/game/game_layer.gd" id="13_5dacx"]
 [ext_resource type="Script" uid="uid://bu36ewmgo8xfd" path="res://scripts/game/interaction_handler.gd" id="14_3mj8u"]
 
@@ -29,24 +23,6 @@ first_person_snap_distance = 17.295
 
 [node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_pu4cg")]
 config = SubResource("Resource_4wr1m")
-
-[node name="WalkSounds" type="Node" parent="." index="4" unique_id=1825451012 node_paths=PackedStringArray("blackboard", "audio_player_2d", "audio_player_3d")]
-script = ExtResource("6_ke34l")
-blackboard = NodePath("../Blackboard")
-audio_player_2d = NodePath("AudioStreamPlayer")
-audio_player_3d = NodePath("AudioStreamPlayer3D")
-footstep_sounds = Array[AudioStream]([ExtResource("7_kqwtp"), ExtResource("8_5dacx"), ExtResource("9_3mj8u"), ExtResource("10_gd644"), ExtResource("11_y2g1y")])
-walk_interval = 0.6
-run_multiplier = 1.3
-volume_variance_db = 0.4
-
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="WalkSounds" index="0" unique_id=744906608]
-max_db = 0.0
-max_distance = 10.0
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="WalkSounds" index="1" unique_id=863950099]
-volume_db = -3.0
-mix_target = 1
 
 [node name="CameraRig" parent="." index="8" unique_id=862009467]
 config = SubResource("Resource_ke34l")

@@ -42,6 +42,7 @@
 [ext_resource type="Animation" uid="uid://calmp13aekh4x" path="res://player/character/animations/walk.res" id="40_47gyw"]
 [ext_resource type="Script" uid="uid://btkocaclio48m" path="res://player/scripts/animation/animation_controller.gd" id="41_rjgs7"]
 [ext_resource type="Script" uid="uid://c8lduny4ovh06" path="res://player/character/toon_applier.gd" id="42_4gq62"]
+[ext_resource type="Script" path="res://player/scripts/animation/animation_notifier.gd" id="43_anmnt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xrrdd"]
 resource_name = "arm01_CH_SKIN_SD001T5H0OZ.001"
@@ -1640,6 +1641,10 @@ libraries/ = SubResource("AnimationLibrary_1jqda")
 tree_root = SubResource("AnimationNodeStateMachine_hedij")
 anim_player = NodePath("../AnimationPlayer")
 script = ExtResource("41_rjgs7")
+
+[node name="AnimationNotifier" type="Node" parent="." unique_id=555000001 node_paths=PackedStringArray("animation_tree")]
+script = ExtResource("43_anmnt")
+animation_tree = NodePath("../AnimationTree")
 
 [node name="ToonApplier" type="Node" parent="." unique_id=32305066]
 script = ExtResource("42_4gq62")

@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://player/scripts/blackboard.gd" id="2_dponi"]
 [ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://player/scripts/motor/stair_stepper.gd" id="3_og0ex"]
 [ext_resource type="PackedScene" uid="uid://b43f2ir3fc4vo" path="res://player/camera_rig.tscn" id="5_camrig"]
-[ext_resource type="Resource" path="res://player/resources/default_player.tres" id="6_pcfg"]
+[ext_resource type="Resource" uid="uid://bbxxhvkvw080n" path="res://player/resources/default_player.tres" id="6_pcfg"]
 [ext_resource type="PackedScene" uid="uid://6178wwf8ahrb" path="res://player/character/character_scene.tscn" id="18_8ds6q"]
 [ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://player/scripts/motor/ground_probe.gd" id="48_2ggbq"]
 [ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://player/scripts/input/input_collector.gd" id="50_xpqug"]
@@ -18,10 +18,29 @@
 [ext_resource type="Script" uid="uid://0bsl70dmlrkb" path="res://player/scripts/fsm/states/fall_state.gd" id="58_fall"]
 [ext_resource type="Script" uid="uid://de7lirbujl8vh" path="res://player/scripts/fsm/states/land_state.gd" id="59_land"]
 [ext_resource type="Script" uid="uid://cq55qc1thycli" path="res://player/scripts/abilities/ability_manager.gd" id="60_abil"]
+[ext_resource type="Script" uid="uid://dfvwpuqfqf7jx" path="res://player/scripts/sounds/walk_sounds.gd" id="61_wlk"]
+[ext_resource type="Script" uid="uid://m4562dsq4a4w" path="res://player/scripts/data/footstep_state_config.gd" id="62_fscfg"]
+[ext_resource type="Script" uid="uid://ddvtjlwkxuip" path="res://player/scripts/data/footstep_surface.gd" id="63_fsurf"]
+[ext_resource type="AudioStream" uid="uid://cdnm7iw1pvl0u" path="res://sounds/sound_effects/walk/walk_1.wav" id="64_w1"]
+[ext_resource type="AudioStream" uid="uid://0dsdltpqm2vj" path="res://sounds/sound_effects/walk/walk_2.wav" id="65_w2"]
+[ext_resource type="AudioStream" uid="uid://dowmmldmd5shg" path="res://sounds/sound_effects/walk/walk_3.wav" id="66_w3"]
+[ext_resource type="AudioStream" uid="uid://cvq5bfqd2pdpy" path="res://sounds/sound_effects/walk/walk_4.wav" id="67_w4"]
+[ext_resource type="AudioStream" uid="uid://dmny33l41ocei" path="res://sounds/sound_effects/walk/walk_5.wav" id="68_w5"]
+[ext_resource type="Resource" uid="uid://dxp8gf3qrct3l" path="res://player/resources/default_footsteps_walk.tres" id="69_fswlk"]
+[ext_resource type="Resource" path="res://player/resources/default_footsteps_run.tres" id="70_fsrun"]
+[ext_resource type="Resource" path="res://player/resources/default_footsteps_land.tres" id="71_fsland"]
+[ext_resource type="Resource" path="res://player/resources/default_footsteps_jump.tres" id="72_fsjump"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_72ieh"]
 radius = 0.13183594
 height = 1.595
+
+[sub_resource type="Resource" id="FootstepSurface_default"]
+script = ExtResource("63_fsurf")
+sound_pool = Array[AudioStream]([ExtResource("64_w1"), ExtResource("65_w2"), ExtResource("66_w3"), ExtResource("67_w4"), ExtResource("68_w5")])
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_fsnoise"]
+noise_type = 2
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_knxac"]
 properties/0/path = NodePath(".:position")
@@ -99,6 +118,23 @@ transform = Transform3D(-0.55, 0, 4.8082526e-08, 0, 0.55, 0, -4.8082526e-08, 0, 
 script = ExtResource("51_model")
 
 [node name="CharacterScene" parent="Model" unique_id=1354003246 instance=ExtResource("18_8ds6q")]
+
+[node name="WalkSounds" type="Node" parent="." unique_id=1825451012 node_paths=PackedStringArray("blackboard", "audio_player_2d", "audio_player_3d")]
+script = ExtResource("61_wlk")
+blackboard = NodePath("../Blackboard")
+audio_player_2d = NodePath("AudioStreamPlayer")
+audio_player_3d = NodePath("AudioStreamPlayer3D")
+state_configs = Array[ExtResource("62_fscfg")]([ExtResource("69_fswlk"), ExtResource("70_fsrun"), ExtResource("71_fsland"), ExtResource("72_fsjump")])
+default_surface = SubResource("FootstepSurface_default")
+noise = SubResource("FastNoiseLite_fsnoise")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="WalkSounds" unique_id=744906608]
+max_db = 0.0
+max_distance = 10.0
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="WalkSounds" unique_id=863950099]
+volume_db = -3.0
+mix_target = 1
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1323378995]
 replication_config = SubResource("SceneReplicationConfig_knxac")
