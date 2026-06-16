@@ -4,7 +4,8 @@ extends Node
 ## directly): the FSM only runs on the local peer, but the blackboard is synced
 ## to every peer, so footsteps play correctly for remote players too.
 @export var blackboard: PlayerBlackboard
-@export var audio_player: AudioStreamPlayer3D
+@export var audio_player_2d: AudioStreamPlayer
+@export var audio_player_3d: AudioStreamPlayer3D
 
 @export var footstep_sounds: Array[AudioStream]
 @export var walk_interval: float = 0.5
@@ -17,6 +18,17 @@ var _delay_timer: float = 0.0
 var _waiting_start: bool = false
 var _was_active: bool = false
 var _next_interval: float = 0.0
+var _is_local := false
+
+func _ready() -> void:
+	var player := get_parent()
+	var owner_id := player.get_multiplayer_authority()
+	_is_local = owner_id == multiplayer.get_unique_id() or player.name == str(multiplayer.get_unique_id())
+
+	if _is_local:
+		audio_player_3d.queue_free()
+	else:
+		audio_player_2d.queue_free()
 
 func _process(delta: float) -> void:
 	if blackboard == null:
@@ -50,9 +62,10 @@ func _process(delta: float) -> void:
 func _play_step(multiplier: float) -> void:
 	var snd = footstep_sounds[randi() % footstep_sounds.size()] if not footstep_sounds.is_empty() else null
 	if snd:
-		audio_player.stream = snd
-		audio_player.pitch_scale = _vary(multiplier)
-		audio_player.play()
+		var player: AudioStreamPlayer = audio_player_2d if _is_local else audio_player_3d
+		player.stream = snd
+		player.pitch_scale = _vary(multiplier)
+		player.play()
 	_next_interval = _vary(walk_interval / multiplier)
 	_step_timer = 0.0
 

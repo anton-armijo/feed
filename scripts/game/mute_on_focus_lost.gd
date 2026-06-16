@@ -18,6 +18,10 @@ func _ready() -> void:
 	play()
 	_fade_in()
 
+	if NetSession and NetSession.leave_input:
+		NetSession.leave_input.leave_intent_started.connect(_fade_out)
+		NetSession.leave_input.leave_intent_cancelled.connect(_fade_in)
+
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_WM_WINDOW_FOCUS_OUT:

@@ -5,6 +5,9 @@
 class_name LeaveInput
 extends Node
 
+signal leave_intent_started
+signal leave_intent_cancelled
+
 var _session: SessionController
 var _state: NetState
 var _escape_pressed := false
@@ -29,6 +32,7 @@ func _input(event: InputEvent) -> void:
 				and (event.button_index == MOUSE_BUTTON_LEFT or event.button_index == MOUSE_BUTTON_RIGHT):
 			CameraRig.block_mouse_capture = false
 			_escape_pressed = false
+			leave_intent_cancelled.emit()
 		return
 
 	if event.is_action_pressed("ui_cancel"):
@@ -36,5 +40,6 @@ func _input(event: InputEvent) -> void:
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			CameraRig.block_mouse_capture = true
 			_escape_pressed = true
+			leave_intent_started.emit()
 		else:
 			_session.leave()
