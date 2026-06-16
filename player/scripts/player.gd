@@ -101,3 +101,6 @@ func _publish_state(intent: InputIntent) -> void:
 	blackboard.velocity_y = velocity.y
 	blackboard.horizontal_speed = Vector2(velocity.x, velocity.z).length()
 	blackboard.has_move_input = intent.wish_dir != Vector3.ZERO
+	blackboard.wish_direction = intent.wish_dir
+	blackboard.velocity = velocity
+	blackboard.move_speed_multiplier = motor.speed_multiplier()

@@ -8,10 +8,12 @@ func enter(_from: StringName) -> void:
 	motor.launch_vertical(config.jump.jump_velocity)
 	bb.anim_state = &"jump"
 	bb.notify_jumped()
+	bb.air_time = 0.0
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	motor.apply_gravity(delta)
 	motor.move_air(intent.wish_dir, _air_target_speed(intent), delta)
+	bb.air_time += delta
 
 	if body.velocity.y <= 0.0:
 		return &"Fall"

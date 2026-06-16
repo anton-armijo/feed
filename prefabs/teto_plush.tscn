@@ -17,6 +17,7 @@ height = 3.3730469
 script = ExtResource("1_27mtj")
 sound = ExtResource("2_mhkt1")
 click_receiver_path = NodePath("Area3D")
+sound_delay = 0.67
 
 [node name="KasaneTeto" type="MeshInstance3D" parent="." unique_id=58019993]
 transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
@@ -33,3 +34,4 @@ shape = SubResource("CapsuleShape3D_27mtj")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=906963555]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06821105, 0)
+volume_db = -5.0

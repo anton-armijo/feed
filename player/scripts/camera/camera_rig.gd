@@ -69,6 +69,7 @@ func _physics_process(_delta: float) -> void:
 		return
 	# Published in physics time so input/FSM read a stable yaw.
 	_bb.camera_yaw = rotation.y
+	_bb.camera_pitch = x_pivot.rotation.x
 
 func _process(delta: float) -> void:
 	if _bb == null:

@@ -4,6 +4,7 @@ extends Node
 @export var click_receiver_path: NodePath
 @export var sound_delay: float = 0.5
 
+var _last_sound_time: float = -999.0
 var _receiver: Node
 
 func _ready() -> void:
@@ -20,7 +21,13 @@ func _find_receiver() -> Node:
 			return child
 	return null
 
+
 func _on_interacted(_player_id: int) -> void:
+	var current_time := Time.get_ticks_msec() / 1000.0
+	if current_time - _last_sound_time < sound_delay:
+		return
+	_last_sound_time = current_time
+
 	_play_sound()
 	if multiplayer.multiplayer_peer != null:
 		_rpc_play_sound.rpc()

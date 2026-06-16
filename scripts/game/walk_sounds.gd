@@ -12,6 +12,7 @@ extends Node
 @export var start_delay: float = 0.3
 @export var run_multiplier: float = 1.6
 @export_range(0.0, 0.5, 0.01) var variance: float = 0.1
+@export_range(0.0, 3.0, 0.1) var volume_variance_db := 0.7
 
 var _step_timer: float = 0.0
 var _delay_timer: float = 0.0
@@ -19,11 +20,15 @@ var _waiting_start: bool = false
 var _was_active: bool = false
 var _next_interval: float = 0.0
 var _is_local := false
+var _step_index: int = 0
+var _max_distance := 0.0
 
 func _ready() -> void:
 	var player := get_parent()
 	var owner_id := player.get_multiplayer_authority()
 	_is_local = owner_id == multiplayer.get_unique_id() or player.name == str(multiplayer.get_unique_id())
+	
+	_max_distance = audio_player_3d.max_distance
 
 	if _is_local:
 		audio_player_3d.queue_free()
@@ -56,18 +61,38 @@ func _process(delta: float) -> void:
 	else:
 		_waiting_start = false
 		_step_timer = 0.0
+		_step_index = 0
 
 	_was_active = is_active
 
 func _play_step(multiplier: float) -> void:
-	var snd = footstep_sounds[randi() % footstep_sounds.size()] if not footstep_sounds.is_empty() else null
-	if snd:
-		var player = audio_player_2d if _is_local else audio_player_3d
-		player.stream = snd
-		player.pitch_scale = _vary(multiplier)
-		player.play()
+	var snd = footstep_sounds.pick_random()
+	if snd == null:
+		return
+
+	if _is_local:
+		audio_player_2d.stream = snd
+		audio_player_2d.pitch_scale = _vary(1.0)
+		audio_player_2d.volume_db = _vary_volume(multiplier)
+		audio_player_2d.play()
+	else:
+		audio_player_3d.stream = snd
+		audio_player_3d.pitch_scale = _vary(1.0)
+		audio_player_3d.volume_db = _vary_volume(multiplier)
+		audio_player_3d.max_distance = _max_distance * multiplier
+
+		audio_player_3d.play()
+
 	_next_interval = _vary(walk_interval / multiplier)
 	_step_timer = 0.0
 
-func _vary(value: float) -> float:
-	return value * (1.0 + randf_range(-variance, variance))
+func _vary(multiplier: float) -> float:
+	var r := (randf() + randf()) * 0.5
+	return multiplier * (1.0 + lerpf(-variance, variance, r))
+
+func _vary_volume(multiplier: float) -> float:
+	_step_index += 1
+	var r := (randf() + randf()) * 0.5
+	var offset := lerpf(-volume_variance_db, volume_variance_db, r)
+	var foot_bias := volume_variance_db * 0.12 if _step_index & 1 == 0 else -volume_variance_db * 0.12
+	return (multiplier - 1.0) * 3.0 + offset + foot_bias

@@ -17,6 +17,8 @@ var _from_jump := false
 func enter(from: StringName) -> void:
 	_fall_distance = 0.0
 	_from_jump = from == &"Jump"
+	if not _from_jump:
+		bb.air_time = 0.0
 	# Coyote only applies when walking off ground, never after a jump.
 	_coyote = config.jump.coyote_time if from in _GROUND_STATES else 0.0
 
@@ -25,12 +27,14 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 	motor.move_air(intent.wish_dir, _air_target_speed(intent), delta)
 
 	_coyote = maxf(_coyote - delta, 0.0)
+	bb.air_time += delta
 	if body.velocity.y < 0.0:
 		_fall_distance += -body.velocity.y * delta
 
 	# Landing: FSM decides whether the Land state is worth entering.
 	if motor.is_grounded() and body.velocity.y <= 0.0:
 		bb.notify_landed(_fall_distance)
+		bb.air_time = 0.0
 		if _fall_distance >= config.jump.land_anim_min_fall:
 			return &"Land"
 		return ground_state(intent)  # trivial fall: skip Land entirely

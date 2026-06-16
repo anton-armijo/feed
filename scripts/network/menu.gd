@@ -19,6 +19,10 @@ func _ready() -> void:
 		status_label.text = NetSession.state.last_error
 		NetSession.state.last_error = ""
 
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):
+		get_tree().quit()
+
 func _on_connect() -> void:
 	var ip := ip_input.text.strip_edges()
 	_lock_buttons()

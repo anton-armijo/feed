@@ -2,9 +2,10 @@
 ##
 ## Ownership rules (write access):
 ##   - Player / LocomotionFSM / states -> gameplay fields (locomotion_state,
-##     anim_state, is_grounded, velocity_y, model_yaw, ...).
+##     anim_state, is_grounded, velocity_y, model_yaw, wish_direction,
+##     velocity, air_time, move_speed_multiplier, ...).
 ##   - InputCollector  -> input_enabled.
-##   - CameraRig       -> camera_yaw, first_person, shift_lock fields.
+##   - CameraRig       -> camera_yaw, camera_pitch, first_person, shift_lock fields.
 ##   - Abilities       -> only whitelisted flags via AbilityContext.
 ## Everyone else reads, or connects to the change signals below.
 ##
@@ -63,10 +64,15 @@ var horizontal_speed := 0.0
 var has_move_input := false
 var last_fall_distance := 0.0
 var body_height := 1.59
+var wish_direction := Vector3.ZERO
+var velocity := Vector3.ZERO
+var air_time := 0.0
+var move_speed_multiplier := 1.0
 
 # --- Camera-owned state -------------------------------------------------------
 
 var camera_yaw := 0.0
+var camera_pitch := 0.0
 var first_person := false:
 	set(value):
 		if first_person == value:
