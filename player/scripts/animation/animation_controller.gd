@@ -11,6 +11,9 @@ var _bb: PlayerBlackboard
 func setup(blackboard: PlayerBlackboard) -> void:
 	_bb = blackboard
 	_playback = get("parameters/playback")
+	assert(_playback != null, \
+		"AnimationTree '%s' has no 'parameters/playback'. " % name + \
+		"Ensure its root is an AnimationNodeStateMachine.")
 	active = true
 	_playback.start(_bb.anim_state)
 	_bb.anim_state_changed.connect(_on_anim_state_changed)

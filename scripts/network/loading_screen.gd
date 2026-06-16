@@ -20,7 +20,7 @@ func _ready() -> void:
 		queue_free()
 		return
 
-	CameraRig.block_mouse_capture = true
+	NetSession.state.mouse_capture_blocked = true
 
 	_label = $ColorRect/Label
 
@@ -64,7 +64,7 @@ func _start_fade_timer() -> void:
 	_fade_timer.timeout.connect(_fade_out)
 
 func _fade_out() -> void:
-	CameraRig.block_mouse_capture = false
+	NetSession.state.mouse_capture_blocked = false
 	var rect: ColorRect = $ColorRect
 	var tween := create_tween()
 	tween.tween_property(rect, "color:a", 0.0, fade_duration)

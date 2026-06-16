@@ -17,6 +17,7 @@ signal peer_joined(peer_id: int)
 signal peer_left(peer_id: int)
 signal session_started
 signal session_ended
+signal mouse_capture_blocked_changed(blocked: bool)
 
 ## What this process is doing in the session.
 enum Role { OFFLINE, HOST, CLIENT, DEDICATED }
@@ -50,6 +51,18 @@ var last_error := "":
 			return
 		last_error = value
 		error_changed.emit(value)
+
+## Cross-cutting UI flag: when true, systems that capture the mouse (camera
+## rig, loading screen) must release it and not recapture until cleared.
+## Written by LeaveInput and the loading screen; read by CameraRig and any
+## other mouse-capturing system. The dependency direction is correct: player
+## depends on net, never the reverse.
+var mouse_capture_blocked := false:
+	set(value):
+		if mouse_capture_blocked == value:
+			return
+		mouse_capture_blocked = value
+		mouse_capture_blocked_changed.emit(value)
 
 ## Multiplayer unique id of this process (0 while offline).
 var local_peer_id := 0
@@ -87,6 +100,7 @@ func remove_peer(peer_id: int) -> void:
 func reset() -> void:
 	peers = PackedInt32Array()
 	local_peer_id = 0
+	mouse_capture_blocked = false
 	pending_role = Role.OFFLINE
 	role = Role.OFFLINE
 	status = Status.OFFLINE

@@ -59,7 +59,7 @@ func _ready() -> void:
 	animation_controller.setup(blackboard)
 
 	if _is_local:
-		camera_rig.setup(blackboard, self)
+		camera_rig.setup(blackboard, self, model)
 		fsm.start()
 	else:
 		# The camera is a local-only system; remote replicas never need one.

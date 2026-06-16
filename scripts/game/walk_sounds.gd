@@ -62,7 +62,7 @@ func _process(delta: float) -> void:
 func _play_step(multiplier: float) -> void:
 	var snd = footstep_sounds[randi() % footstep_sounds.size()] if not footstep_sounds.is_empty() else null
 	if snd:
-		var player: AudioStreamPlayer = audio_player_2d if _is_local else audio_player_3d
+		var player = audio_player_2d if _is_local else audio_player_3d
 		player.stream = snd
 		player.pitch_scale = _vary(multiplier)
 		player.play()

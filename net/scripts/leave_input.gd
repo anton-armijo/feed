@@ -25,12 +25,12 @@ func _input(event: InputEvent) -> void:
 	if _escape_pressed:
 		if event.is_action_pressed("ui_cancel"):
 			get_viewport().set_input_as_handled()
-			CameraRig.block_mouse_capture = false
+			_state.mouse_capture_blocked = false
 			_escape_pressed = false
 			_session.leave()
 		elif event is InputEventMouseButton and event.pressed \
 				and (event.button_index == MOUSE_BUTTON_LEFT or event.button_index == MOUSE_BUTTON_RIGHT):
-			CameraRig.block_mouse_capture = false
+			_state.mouse_capture_blocked = false
 			_escape_pressed = false
 			leave_intent_cancelled.emit()
 		return
@@ -38,7 +38,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			CameraRig.block_mouse_capture = true
+			_state.mouse_capture_blocked = true
 			_escape_pressed = true
 			leave_intent_started.emit()
 		else:
