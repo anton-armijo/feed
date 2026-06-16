@@ -24,7 +24,7 @@ extends CharacterBody3D
 @onready var ability_manager: AbilityManager = $AbilityManager
 @onready var model: ModelVisual = $Model
 @onready var animation_controller: AnimationController = $Model/CharacterScene/AnimationTree
-@onready var animation_notifier: AnimationNotifier = $Model/CharacterScene/AnimationNotifier
+@onready var animation_driver: AnimationDriver = $Model/CharacterScene/AnimationDriver
 @onready var camera_rig: CameraRig = $CameraRig
 
 var peer_id: int
@@ -58,7 +58,7 @@ func _ready() -> void:
 	# Presentation layers run on every peer (remote state arrives via sync).
 	model.setup(blackboard, self)
 	animation_controller.setup(blackboard)
-	animation_notifier.blackboard = blackboard
+	animation_driver.setup(blackboard, config.locomotion)
 
 	if _is_local:
 		camera_rig.setup(blackboard, self, model)

@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://bvvt2hf5i4w50" path="res://net/scripts/session_controller.gd" id="5"]
 [ext_resource type="Script" uid="uid://c7qwuxvwdwbg8" path="res://net/scripts/cmdline_bootstrap.gd" id="6"]
 [ext_resource type="Script" uid="uid://wxulyqwln5t5" path="res://net/scripts/leave_input.gd" id="7"]
-[ext_resource type="Resource" path="res://net/resources/default_net.tres" id="8"]
+[ext_resource type="Resource" uid="uid://7ne7o6ol2hmp" path="res://net/resources/default_net.tres" id="8"]
 
 [node name="NetSession" type="Node" unique_id=701561239]
 script = ExtResource("1")

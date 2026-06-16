@@ -52,7 +52,7 @@ transform = Transform3D(1, 0, 0, 0, 0.10381679, 0.9945964, 0, -0.9945964, 0.1038
 [node name="Sketchfab_Scene" parent="." index="6" unique_id=1383967356 instance=ExtResource("3_house")]
 transform = Transform3D(-9.316184e-09, 0, -0.21312945, 0, 0.21312945, 0, 0.21312945, 0, -9.316184e-09, -18.218987, -0.5972495, 0.002098918)
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Sketchfab_Scene/Sketchfab_model/17268555753_obj_cleaner_materialmerger_gles/Object_2" parent_id_path=PackedInt32Array(1383967356, 1696503934) index="0" unique_id=1705869064]
+[node name="StaticBody3D" type="StaticBody3D" parent="Sketchfab_Scene/Sketchfab_model/17268555753_obj_cleaner_materialmerger_gles/Object_2" parent_id_path=PackedInt32Array(1383967356, 1846238198) index="0" unique_id=1705869064]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Sketchfab_Scene/Sketchfab_model/17268555753_obj_cleaner_materialmerger_gles/Object_2/StaticBody3D" index="0" unique_id=1442007354]
 shape = SubResource("ConcavePolygonShape3D_jyhfs")

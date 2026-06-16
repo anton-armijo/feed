@@ -24,7 +24,7 @@ first_person_snap_distance = 17.295
 [node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_pu4cg")]
 config = SubResource("Resource_4wr1m")
 
-[node name="CameraRig" parent="." index="8" unique_id=862009467]
+[node name="CameraRig" parent="." index="7" unique_id=862009467]
 config = SubResource("Resource_ke34l")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="CameraRig" index="2" unique_id=1341269380]
@@ -32,7 +32,7 @@ transform = Transform3D(1, 0, 7.1054274e-15, 0, 1, 0, -7.1054274e-15, 0, 1, -8.8
 light_energy = 0.67
 spot_angle = 53.50989
 
-[node name="GameLayer" type="Node" parent="." index="11" unique_id=1916536680]
+[node name="GameLayer" type="Node" parent="." index="10" unique_id=1916536680]
 script = ExtResource("13_5dacx")
 metadata/_custom_type_script = "uid://c1cm8bbtk6gcv"
 

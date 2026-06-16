@@ -58,6 +58,12 @@ properties/3/replication_mode = 2
 properties/4/path = NodePath("Blackboard:is_sprinting")
 properties/4/spawn = true
 properties/4/replication_mode = 2
+properties/5/path = NodePath("Blackboard:horizontal_speed")
+properties/5/spawn = false
+properties/5/replication_mode = 2
+properties/6/path = NodePath("Blackboard:move_speed_multiplier")
+properties/6/spawn = false
+properties/6/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D" unique_id=1072122291]
 collision_layer = 2
@@ -129,11 +135,9 @@ default_surface = SubResource("FootstepSurface_default")
 noise = SubResource("FastNoiseLite_fsnoise")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="WalkSounds" unique_id=744906608]
-max_db = 0.0
 max_distance = 10.0
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="WalkSounds" unique_id=863950099]
-volume_db = -3.0
 mix_target = 1
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1323378995]

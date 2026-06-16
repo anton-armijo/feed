@@ -21,3 +21,12 @@ extends Resource
 @export_group("Visuals")
 ## How fast the model rotates toward the move direction (rad-lerp factor).
 @export var model_turn_speed := 12.0
+
+@export_group("Animation Speed")
+## Speed scale lower bound: animation never freezes.
+@export_range(0.1, 1.0, 0.05) var min_animation_speed := 0.4
+## Speed scale upper bound: prevents absurd animation speed.
+@export_range(1.0, 3.0, 0.1) var max_animation_speed := 1.8
+## Global multiplier applied on top of the computed speed scale.
+## < 1.0 slows all speed-driven animations down, > 1.0 speeds them up.
+@export_range(0.1, 2.0, 0.05) var animation_speed_multiplier := 1.0
