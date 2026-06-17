@@ -35,12 +35,13 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if motor.is_grounded() and body.velocity.y <= 0.0:
 		bb.notify_landed(_fall_distance)
 		bb.air_time = 0.0
-		if _fall_distance >= config.jump.land_anim_min_fall:
+		if _fall_distance >= config.jump.land_anim_min_fall and fsm.has_state(&"Land"):
 			return &"Land"
 		return ground_state(intent)  # trivial fall: skip Land entirely
 
 	# Coyote jump: intent only signals; the FSM validates the window here.
-	if intent.has_buffered_jump() and _coyote > 0.0 and body.velocity.y <= 0.0:
+	if intent.has_buffered_jump() and _coyote > 0.0 and body.velocity.y <= 0.0 \
+		and fsm.has_state(&"Jump"):
 		intent.consume_jump()
 		return &"Jump"
 
@@ -54,7 +55,7 @@ func _air_target_speed(intent: InputIntent) -> float:
 ## micro-falls (stairs, slopes) and blends back to a ground pose right before
 ## touchdown, matching the previous controller's feel.
 func _update_anim(intent: InputIntent) -> void:
-	if stepper.is_stepping or stepper.is_stepping_down:
+	if stepper != null and (stepper.is_stepping or stepper.is_stepping_down):
 		return  # stair adjustment, keep current visuals
 	if body.velocity.y > 0.1:
 		bb.anim_state = &"jump"  # ascending (external impulse)

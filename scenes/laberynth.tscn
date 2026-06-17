@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cyp1sf4mffrj8"]
 
 [ext_resource type="PackedScene" uid="uid://ku1ctynsegq7" path="res://scenes/game_base.tscn" id="1_8mwgk"]
-[ext_resource type="PackedScene" uid="uid://6edaaalo36s7" path="res://prefabs/maze_player.tscn" id="2_e8nfc"]
+[ext_resource type="PackedScene" uid="uid://bqbn3d1im8urp" path="res://prefabs/maze_player.tscn" id="2_e5t0b"]
 [ext_resource type="Script" uid="uid://bc4cqj14m0sqg" path="res://scripts/game/maze_generator.gd" id="2_mazegen"]
 [ext_resource type="Material" uid="uid://cgkl6vkva43lt" path="res://materials/red_brick_4k.blend/bricks.tres" id="3_ooxgq"]
 [ext_resource type="Material" uid="uid://c2qw7bf7e1g45" path="res://materials/park_dirt_2k.blend/dirt.tres" id="4_dirt"]
@@ -30,13 +30,13 @@ font_color = Color(1, 1, 1, 0.49411765)
 
 [node name="Laberynth" unique_id=275465502 instance=ExtResource("1_8mwgk")]
 
-[node name="WorldEnvironment" parent="." index="0"]
+[node name="WorldEnvironment" parent="." index="0" unique_id=769386829]
 environment = SubResource("Environment_e8nfc")
 
-[node name="MultiplayerSpawner" parent="." index="1"]
-player_scene = ExtResource("2_e8nfc")
+[node name="MultiplayerSpawner" parent="." index="1" unique_id=2133862722]
+player_scene = ExtResource("2_e5t0b")
 
-[node name="SizePicker" type="VBoxContainer" parent="LoadingScreen/ColorRect" index="1" unique_id=1848633470]
+[node name="SizePicker" type="VBoxContainer" parent="LoadingScreen/ColorRect" parent_id_path=PackedInt32Array(1901983097, 390869118) index="1" unique_id=1848633470]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -65,7 +65,7 @@ placeholder_text = "Ancho y alto"
 layout_mode = 2
 text = "Generar"
 
-[node name="CollisionShape3D" parent="WorldBoundary" index="0"]
+[node name="CollisionShape3D" parent="WorldBoundary" parent_id_path=PackedInt32Array(1048081399) index="0" unique_id=1161797308]
 disabled = true
 
 [node name="MazeNetSync" type="Node" parent="." index="5" unique_id=240556201]

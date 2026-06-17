@@ -4,5 +4,4 @@
 
 [resource]
 script = ExtResource("1")
-walk_speed = 3.5
 run_speed = 6.0

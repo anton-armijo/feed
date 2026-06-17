@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://cckpjswdrrl03"]
+
+[ext_resource type="PackedScene" uid="uid://ct08bnh686yw7" path="res://player/minimal_player.tscn" id="1_crbit"]
+[ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://player/scripts/input/input_collector.gd" id="2_gg5i6"]
+[ext_resource type="Script" uid="uid://cq55qc1thycli" path="res://player/scripts/abilities/ability_manager.gd" id="3_5w6lr"]
+[ext_resource type="PackedScene" uid="uid://b43f2ir3fc4vo" path="res://player/camera_rig.tscn" id="4_2e2ag"]
+[ext_resource type="Script" uid="uid://bt2exgm8pg6v3" path="res://player/scripts/animation/model_visual.gd" id="5_86sgf"]
+[ext_resource type="PackedScene" uid="uid://6178wwf8ahrb" path="res://player/character/character_scene.tscn" id="6_xit0w"]
+[ext_resource type="Script" uid="uid://dfvwpuqfqf7jx" path="res://player/scripts/sounds/walk_sounds.gd" id="7_qrwaw"]
+[ext_resource type="Script" uid="uid://m4562dsq4a4w" path="res://player/scripts/data/footstep_state_config.gd" id="8_ywjl4"]
+[ext_resource type="Resource" uid="uid://dxp8gf3qrct3l" path="res://player/resources/default_footsteps_walk.tres" id="9_eruow"]
+[ext_resource type="Resource" path="res://player/resources/default_footsteps_run.tres" id="10_mvppv"]
+[ext_resource type="Resource" path="res://player/resources/default_footsteps_land.tres" id="11_nfrn4"]
+[ext_resource type="Resource" path="res://player/resources/default_footsteps_jump.tres" id="12_xgyl0"]
+[ext_resource type="Script" uid="uid://ddvtjlwkxuip" path="res://player/scripts/data/footstep_surface.gd" id="13_fphyj"]
+[ext_resource type="AudioStream" uid="uid://cdnm7iw1pvl0u" path="res://sounds/sound_effects/walk/walk_1.wav" id="14_cjuxb"]
+[ext_resource type="AudioStream" uid="uid://0dsdltpqm2vj" path="res://sounds/sound_effects/walk/walk_2.wav" id="15_jkkg1"]
+[ext_resource type="AudioStream" uid="uid://dowmmldmd5shg" path="res://sounds/sound_effects/walk/walk_3.wav" id="16_5mijv"]
+[ext_resource type="AudioStream" uid="uid://cvq5bfqd2pdpy" path="res://sounds/sound_effects/walk/walk_4.wav" id="17_fb78d"]
+[ext_resource type="AudioStream" uid="uid://dmny33l41ocei" path="res://sounds/sound_effects/walk/walk_5.wav" id="18_q3vbh"]
+
+[sub_resource type="Resource" id="Resource_5xss4"]
+script = ExtResource("13_fphyj")
+sound_pool = Array[AudioStream]([ExtResource("14_cjuxb"), ExtResource("15_jkkg1"), ExtResource("16_5mijv"), ExtResource("17_fb78d"), ExtResource("18_q3vbh")])
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_na54m"]
+noise_type = 2
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_dugmo"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("Blackboard:model_yaw")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("Blackboard:locomotion_state")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("Blackboard:anim_state")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Blackboard:is_sprinting")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("Blackboard:horizontal_speed")
+properties/5/spawn = false
+properties/5/replication_mode = 2
+properties/6/path = NodePath("Blackboard:move_speed_multiplier")
+properties/6/spawn = false
+properties/6/replication_mode = 2
+
+[node name="BasePlayer" unique_id=1093356318 instance=ExtResource("1_crbit")]
+
+[node name="InputCollector" type="Node" parent="." index="2" unique_id=145453252]
+script = ExtResource("2_gg5i6")
+
+[node name="AbilityManager" type="Node" parent="." index="6" unique_id=984026411]
+script = ExtResource("3_5w6lr")
+
+[node name="CameraRig" parent="." index="8" unique_id=1117416754 instance=ExtResource("4_2e2ag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4551597, 0)
+
+[node name="Model" type="Node3D" parent="." index="9" unique_id=1268270015]
+transform = Transform3D(-0.55, 0, 4.8082526e-08, 0, 0.55, 0, -4.8082526e-08, 0, -0.55, -4.145016e-09, 0, 0.007413458)
+script = ExtResource("5_86sgf")
+
+[node name="CharacterScene" parent="Model" index="0" unique_id=1354003246 instance=ExtResource("6_xit0w")]
+
+[node name="WalkSounds" type="Node" parent="." index="10" unique_id=620034065 node_paths=PackedStringArray("blackboard", "audio_player_2d", "audio_player_3d")]
+script = ExtResource("7_qrwaw")
+blackboard = NodePath("../Blackboard")
+audio_player_2d = NodePath("AudioStreamPlayer")
+audio_player_3d = NodePath("AudioStreamPlayer3D")
+state_configs = Array[ExtResource("8_ywjl4")]([ExtResource("9_eruow"), ExtResource("10_mvppv"), ExtResource("11_nfrn4"), ExtResource("12_xgyl0")])
+default_surface = SubResource("Resource_5xss4")
+noise = SubResource("FastNoiseLite_na54m")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="WalkSounds" index="0" unique_id=371003606]
+max_distance = 10.0
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="WalkSounds" index="1" unique_id=878739569]
+mix_target = 1
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." index="11" unique_id=1136112946]
+replication_config = SubResource("SceneReplicationConfig_dugmo")

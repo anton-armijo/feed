@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://ct08bnh686yw7"]
+
+[ext_resource type="Script" uid="uid://vmpjmyj6dp23" path="res://player/scripts/player.gd" id="1_2uysw"]
+[ext_resource type="Resource" uid="uid://bbxxhvkvw080n" path="res://player/resources/default_player.tres" id="2_7onbh"]
+[ext_resource type="Script" uid="uid://bpqm0qtfdxg3l" path="res://player/scripts/player_assembler.gd" id="3_dpu5m"]
+[ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://player/scripts/blackboard.gd" id="4_0pbuu"]
+[ext_resource type="Script" uid="uid://ca58jsdiqjpvl" path="res://player/scripts/motor/movement_motor.gd" id="5_skiww"]
+[ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://player/scripts/motor/stair_stepper.gd" id="6_dv734"]
+[ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://player/scripts/motor/ground_probe.gd" id="7_fw4r0"]
+[ext_resource type="Script" uid="uid://bq5bqio43p3cr" path="res://player/scripts/fsm/locomotion_fsm.gd" id="8_xwjmj"]
+[ext_resource type="Script" uid="uid://bi1kwexivh8t3" path="res://player/scripts/fsm/states/idle_state.gd" id="9_xwfch"]
+[ext_resource type="Script" uid="uid://dw46audmv13eq" path="res://player/scripts/fsm/states/walk_state.gd" id="10_4geos"]
+[ext_resource type="Script" uid="uid://dwyh7keiwgrcn" path="res://player/scripts/fsm/states/run_state.gd" id="11_pkamx"]
+[ext_resource type="Script" uid="uid://hvvbd6edk2ey" path="res://player/scripts/fsm/states/jump_state.gd" id="12_y7g4v"]
+[ext_resource type="Script" uid="uid://0bsl70dmlrkb" path="res://player/scripts/fsm/states/fall_state.gd" id="13_ro04r"]
+[ext_resource type="Script" uid="uid://de7lirbujl8vh" path="res://player/scripts/fsm/states/land_state.gd" id="14_s6jo1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1kwk0"]
+radius = 0.13183594
+height = 1.595
+
+[node name="MinimalPlayer" type="CharacterBody3D" unique_id=1093356318]
+collision_layer = 2
+collision_mask = 3
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+script = ExtResource("1_2uysw")
+config = ExtResource("2_7onbh")
+
+[node name="PlayerAssembler" type="Node" parent="." unique_id=1315163189]
+script = ExtResource("3_dpu5m")
+
+[node name="Blackboard" type="Node" parent="." unique_id=987221185]
+script = ExtResource("4_0pbuu")
+
+[node name="MovementMotor" type="Node" parent="." unique_id=775458657]
+script = ExtResource("5_skiww")
+
+[node name="StairStepper" type="Node" parent="MovementMotor" unique_id=770615228]
+script = ExtResource("6_dv734")
+
+[node name="GroundProbe" type="Node3D" parent="." unique_id=1396958697]
+script = ExtResource("7_fw4r0")
+
+[node name="LocomotionFSM" type="Node" parent="." unique_id=314090140]
+script = ExtResource("8_xwjmj")
+
+[node name="Idle" type="Node" parent="LocomotionFSM" unique_id=918077442]
+script = ExtResource("9_xwfch")
+
+[node name="Walk" type="Node" parent="LocomotionFSM" unique_id=680030932]
+script = ExtResource("10_4geos")
+
+[node name="Run" type="Node" parent="LocomotionFSM" unique_id=365279478]
+script = ExtResource("11_pkamx")
+
+[node name="Jump" type="Node" parent="LocomotionFSM" unique_id=964134318]
+script = ExtResource("12_y7g4v")
+
+[node name="Fall" type="Node" parent="LocomotionFSM" unique_id=57810573]
+script = ExtResource("13_ro04r")
+
+[node name="Land" type="Node" parent="LocomotionFSM" unique_id=1562011234]
+script = ExtResource("14_s6jo1")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=1921161258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.798, 0)
+shape = SubResource("CapsuleShape3D_1kwk0")

@@ -7,15 +7,16 @@ func enter(_from: StringName) -> void:
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if not motor.is_grounded():
-		return &"Fall"
+		return &"Fall" if fsm.has_state(&"Fall") else &""
 
-	# FSM validates the jump: we are grounded here, so a buffered press is valid.
-	if intent.has_buffered_jump():
+	if intent.has_buffered_jump() and fsm.has_state(&"Jump"):
 		intent.consume_jump()
 		return &"Jump"
 
 	motor.apply_friction(delta)
 
 	if intent.wish_dir != Vector3.ZERO:
-		return &"Run" if intent.run_held else &"Walk"
+		if intent.run_held and fsm.has_state(&"Run"):
+			return &"Run"
+		return &"Walk"
 	return &""

@@ -59,7 +59,6 @@ func setup(p_blackboard: PlayerBlackboard, p_locomotion_config: LocomotionConfig
 	_current_anim = blackboard.anim_state
 	blackboard.anim_state_changed.connect(_on_anim_state_changed)
 
-func _ready() -> void:
 	set_process(true)
 	if animation_tree != null:
 		animation_tree.process_callback = AnimationTree.ANIMATION_PROCESS_MANUAL

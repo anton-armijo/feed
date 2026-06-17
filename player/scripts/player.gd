@@ -10,11 +10,15 @@
 ##   4. LocomotionFSM   -> state logic, drives the MovementMotor
 ##   5. MovementMotor   -> stair step + move_and_slide (the only physics write)
 ##   6. Blackboard      -> publish state for presentation / sync layers
+##
+## PlayerAssembler gates all optional components at startup (from
+## PlayerComponentsConfig) and at runtime (set_enabled / toggle).
 class_name Player
 extends CharacterBody3D
 
 @export var config: PlayerConfig
 
+@onready var assembler: PlayerAssembler = $PlayerAssembler
 @onready var blackboard: PlayerBlackboard = $Blackboard
 @onready var input_collector: InputCollector = $InputCollector
 @onready var motor: MovementMotor = $MovementMotor
@@ -25,6 +29,7 @@ extends CharacterBody3D
 @onready var model: ModelVisual = $Model
 @onready var animation_controller: AnimationController = $Model/CharacterScene/AnimationTree
 @onready var animation_driver: AnimationDriver = $Model/CharacterScene/AnimationDriver
+@onready var walk_sounds: WalkSounds = $WalkSounds
 @onready var camera_rig: CameraRig = $CameraRig
 
 var peer_id: int
@@ -47,37 +52,56 @@ func _ready() -> void:
 	config.ensure_defaults()
 	blackboard.body_height = config.body_height
 
-	# References down: wire every component from the single composition root.
-	stepper.setup(self)
+	# Core — always present and wired.
 	motor.setup(self, stepper, config)
 	ground_probe.setup(self, config.body_height)
-	input_collector.setup(blackboard, config)
 	fsm.setup(self, motor, stepper, ground_probe, blackboard, config)
-	ability_manager.setup(AbilityContext.new(self, motor, fsm, blackboard))
+	assembler.apply_initial_state()
+
+	# Semi-core — gated by assembler.
+	if assembler.is_enabled("StairStepper") and stepper != null:
+		stepper.setup(self)
+	if assembler.is_enabled("InputCollector") and input_collector != null:
+		input_collector.setup(blackboard, config)
+
+	if assembler.is_enabled("AbilityManager") and ability_manager != null:
+		ability_manager.setup(AbilityContext.new(self, motor, fsm, blackboard))
 
 	# Presentation layers run on every peer (remote state arrives via sync).
-	model.setup(blackboard, self)
-	animation_controller.setup(blackboard)
-	animation_driver.setup(blackboard, config.locomotion)
+	if assembler.is_enabled("Model"):
+		model.setup(blackboard, self)
+		animation_controller.setup(blackboard)
+		animation_driver.setup(blackboard, config.locomotion)
+
+	if assembler.is_enabled("WalkSounds"):
+		walk_sounds.setup(blackboard, config.locomotion, _is_local)
 
 	if _is_local:
-		camera_rig.setup(blackboard, self, model)
+		if assembler.is_enabled("CameraRig"):
+			camera_rig.setup(blackboard, self, model)
 		fsm.start()
 	else:
-		# The camera is a local-only system; remote replicas never need one.
-		camera_rig.queue_free()
+		if assembler.is_enabled("CameraRig"):
+			camera_rig.queue_free()
 
-	model.teleport()
+	if assembler.is_enabled("Model"):
+		model.teleport()
 
 func _physics_process(delta: float) -> void:
 	if not _is_local:
 		return
 
-	input_collector.collect(delta)
-	var intent := input_collector.intent
+	var intent: InputIntent = null
+	if assembler.is_enabled("InputCollector") and input_collector != null:
+		input_collector.collect(delta)
+		intent = input_collector.intent
+	if intent == null:
+		intent = InputIntent.new()
 
-	stepper.update_grounded(delta)
-	ability_manager.physics_update(intent, delta)
+	if assembler.is_enabled("StairStepper") and stepper != null:
+		stepper.update_grounded(delta)
+	if assembler.is_enabled("AbilityManager") and ability_manager != null:
+		ability_manager.physics_update(intent, delta)
 	fsm.physics_update(intent, delta)
 	motor.physics_step(delta)
 

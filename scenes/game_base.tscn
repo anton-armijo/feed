@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://ku1ctynsegq7"]
 
-[ext_resource type="Script" path="res://net/scripts/player_spawn_service.gd" id="1_spawner"]
-[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://4fwxd0w08r8w" path="res://net/scripts/player_spawn_service.gd" id="1_spawner"]
+[ext_resource type="PackedScene" uid="uid://cckpjswdrrl03" path="res://player/base_player.tscn" id="2_s22eq"]
 [ext_resource type="PackedScene" uid="uid://d3vl0wftqlyjb" path="res://scenes/loading_screen.tscn" id="3_loading"]
-[ext_resource type="Script" path="res://net/scripts/session_bootstrap.gd" id="5_bootstrap"]
 [ext_resource type="Script" uid="uid://ecasm5m30h5q" path="res://scripts/game/world_boundary.gd" id="4_boundary"]
+[ext_resource type="Script" uid="uid://d1txveqgffwfb" path="res://net/scripts/session_bootstrap.gd" id="5_bootstrap"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_base"]
 
@@ -22,30 +22,29 @@ sky = SubResource("Sky_base")
 [sub_resource type="BoxShape3D" id="BoundaryShape_base"]
 size = Vector3(500, 0.1, 500)
 
-[node name="GameBase" type="Node3D"]
+[node name="GameBase" type="Node3D" unique_id=1334943969]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=769386829]
 environment = SubResource("Environment_base")
 camera_attributes = SubResource("CameraAttributesPractical_base")
 compositor = SubResource("Compositor_base")
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." node_paths=PackedStringArray("spawn_location")]
-_spawnable_scenes = PackedStringArray()
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2133862722 node_paths=PackedStringArray("spawn_location")]
 spawn_path = NodePath("SpawnPoint")
 script = ExtResource("1_spawner")
-player_scene = ExtResource("2_player")
+player_scene = ExtResource("2_s22eq")
 spawn_location = NodePath("SpawnPoint")
 
-[node name="SpawnPoint" type="Node3D" parent="MultiplayerSpawner"]
+[node name="SpawnPoint" type="Node3D" parent="MultiplayerSpawner" unique_id=1690571846]
 
-[node name="LoadingScreen" parent="." instance=ExtResource("3_loading")]
+[node name="LoadingScreen" parent="." unique_id=1901983097 instance=ExtResource("3_loading")]
 
-[node name="WorldBoundary" type="Area3D" parent="."]
+[node name="WorldBoundary" type="Area3D" parent="." unique_id=1048081399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
 script = ExtResource("4_boundary")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldBoundary"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldBoundary" unique_id=1161797308]
 shape = SubResource("BoundaryShape_base")
 
-[node name="SessionBootstrap" type="Node" parent="."]
+[node name="SessionBootstrap" type="Node" parent="." unique_id=469610179]
 script = ExtResource("5_bootstrap")

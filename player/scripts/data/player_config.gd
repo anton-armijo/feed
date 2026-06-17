@@ -7,6 +7,7 @@ extends Resource
 @export var locomotion: LocomotionConfig
 @export var jump: JumpConfig
 @export var camera: CameraConfig
+@export var components: PlayerComponentsConfig
 
 ## Guarantees every sub-resource exists so components never null-check configs.
 func ensure_defaults() -> void:
@@ -16,3 +17,5 @@ func ensure_defaults() -> void:
 		jump = JumpConfig.new()
 	if camera == null:
 		camera = CameraConfig.new()
+	if components == null:
+		components = PlayerComponentsConfig.new()

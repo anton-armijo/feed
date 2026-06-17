@@ -13,10 +13,10 @@ func enter(_from: StringName) -> void:
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if not motor.is_grounded():
-		return &"Fall"
+		return &"Fall" if fsm.has_state(&"Fall") else &""
 
 	# Early cancel: jump intent, validated against the floor state above.
-	if intent.has_buffered_jump():
+	if intent.has_buffered_jump() and fsm.has_state(&"Jump"):
 		intent.consume_jump()
 		return &"Jump"
 

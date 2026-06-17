@@ -12,7 +12,7 @@ extends MultiplayerSpawner
 signal player_spawned(peer_id: int, player: Node)
 signal player_despawned(peer_id: int)
 
-@export var player_scene: PackedScene = load("uid://dxtje6oorvk5e")
+@export var player_scene: PackedScene = load("uid://cckpjswdrrl03")
 @export var spawn_location: Node3D
 
 func _ready() -> void:

@@ -29,11 +29,11 @@ func setup(body: CharacterBody3D, stepper: StairStepper, config: PlayerConfig) -
 
 ## Physics-grounded: on the floor or in the middle of a stair step-up.
 func is_grounded() -> bool:
-	return _body.is_on_floor() or _stepper.is_stepping
+	return _body.is_on_floor() or (_stepper != null and _stepper.is_stepping)
 
 ## Grounded for presentation purposes (includes stair step-down snapping).
 func is_grounded_visual() -> bool:
-	return is_grounded() or _stepper.is_stepping_down
+	return is_grounded() or (_stepper != null and _stepper.is_stepping_down)
 
 func horizontal_velocity() -> Vector3:
 	return Vector3(_body.velocity.x, 0.0, _body.velocity.z)
@@ -87,11 +87,12 @@ func set_velocity(velocity: Vector3) -> void:
 # --- Frame execution (called once per physics frame by Player) -----------------
 
 func physics_step(delta: float) -> void:
-	_stepper.step_up(horizontal_velocity() * delta)
+	if _stepper != null:
+		_stepper.step_up(horizontal_velocity() * delta)
 	_body.move_and_slide()
-	if _stepper.is_stepping:
+	if _stepper != null and _stepper.is_stepping:
 		_body.apply_floor_snap()
-	else:
+	elif _stepper != null:
 		_stepper.step_down()
 
 # --- Internals ------------------------------------------------------------------

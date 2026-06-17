@@ -2,11 +2,16 @@
 
 [ext_resource type="Script" uid="uid://ccmgs38roty0x" path="res://player/scripts/data/player_config.gd" id="1"]
 [ext_resource type="Resource" uid="uid://6homywwyjmrw" path="res://player/resources/default_locomotion.tres" id="2"]
+[ext_resource type="Script" uid="uid://rdeiqlc5x4a6" path="res://player/scripts/data/player_components_config.gd" id="2_1bpop"]
 [ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="3"]
 [ext_resource type="Resource" uid="uid://dtht0tgw8nrjv" path="res://player/resources/default_camera.tres" id="4"]
+
+[sub_resource type="Resource" id="Resource_pba5u"]
+script = ExtResource("2_1bpop")
 
 [resource]
 script = ExtResource("1")
 locomotion = ExtResource("2")
 jump = ExtResource("3")
 camera = ExtResource("4")
+components = SubResource("Resource_pba5u")

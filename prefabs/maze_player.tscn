@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://6edaaalo36s7"]
+[gd_scene format=3 uid="uid://bqbn3d1im8urp"]
 
-[ext_resource type="PackedScene" uid="uid://dxtje6oorvk5e" path="res://player/player_base.tscn" id="1_pu4cg"]
+[ext_resource type="PackedScene" uid="uid://cckpjswdrrl03" path="res://player/base_player.tscn" id="1_base"]
 [ext_resource type="Resource" uid="uid://dtht0tgw8nrjv" path="res://player/resources/default_camera.tres" id="2_tvvk7"]
 [ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="3_ke34l"]
 [ext_resource type="Resource" uid="uid://6homywwyjmrw" path="res://player/resources/default_locomotion.tres" id="4_w4tcv"]
@@ -21,10 +21,10 @@ force_first_person = true
 max_zoom = 0.0
 first_person_snap_distance = 17.295
 
-[node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_pu4cg")]
+[node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_base")]
 config = SubResource("Resource_4wr1m")
 
-[node name="CameraRig" parent="." index="7" unique_id=862009467]
+[node name="CameraRig" parent="." index="8" unique_id=862009467]
 config = SubResource("Resource_ke34l")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="CameraRig" index="2" unique_id=1341269380]
@@ -32,7 +32,7 @@ transform = Transform3D(1, 0, 7.1054274e-15, 0, 1, 0, -7.1054274e-15, 0, 1, -8.8
 light_energy = 0.67
 spot_angle = 53.50989
 
-[node name="GameLayer" type="Node" parent="." index="10" unique_id=1916536680]
+[node name="GameLayer" type="Node" parent="." index="12" unique_id=1916536680]
 script = ExtResource("13_5dacx")
 metadata/_custom_type_script = "uid://c1cm8bbtk6gcv"
 

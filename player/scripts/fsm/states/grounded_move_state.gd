@@ -14,10 +14,9 @@ func speed_tier_transition(_intent: InputIntent) -> StringName:
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if not motor.is_grounded():
-		return &"Fall"
+		return &"Fall" if fsm.has_state(&"Fall") else &""
 
-	# FSM validates the jump: grounded confirmed above, intent only signals.
-	if intent.has_buffered_jump():
+	if intent.has_buffered_jump() and fsm.has_state(&"Jump"):
 		intent.consume_jump()
 		return &"Jump"
 
