@@ -24,7 +24,7 @@ first_person_snap_distance = 17.295
 [node name="MazePlayer" unique_id=1072122291 instance=ExtResource("1_base")]
 config = SubResource("Resource_4wr1m")
 
-[node name="CameraRig" parent="." index="8" unique_id=862009467]
+[node name="CameraRig" parent="." index="8" unique_id=1117416754]
 config = SubResource("Resource_ke34l")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="CameraRig" index="2" unique_id=1341269380]

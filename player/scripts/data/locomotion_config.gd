@@ -3,8 +3,8 @@ class_name LocomotionConfig
 extends Resource
 
 @export_group("Speeds")
-@export var walk_speed := 3.5
-@export var run_speed := 5.5
+@export var walk_speed := 3.0
+@export var run_speed := 4.8
 
 @export_group("Acceleration")
 @export var acceleration := 25.0
