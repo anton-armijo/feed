@@ -6,6 +6,10 @@
 ## - External actors (abilities) can only *request* a transition; the FSM
 ##   validates it through can_exit/can_enter and may refuse.
 ## - The FSM is the only writer of bb.locomotion_state.
+##
+## state_changed is a public extension seam for external observers (HUD,
+## telemetry, game logic). Internal presentation layers use the blackboard's
+## state_changed signal instead; both fire on every transition.
 class_name LocomotionFSM
 extends Node
 
@@ -21,7 +25,7 @@ var _motor: MovementMotor
 var _stepper: StairStepper
 var _probe: GroundProbe
 var _bb: PlayerBlackboard
-var _config: PlayerConfig
+var _resolved: ResolvedPlayerConfig
 
 func setup(
 	body: CharacterBody3D,
@@ -29,14 +33,14 @@ func setup(
 	stepper: StairStepper,
 	probe: GroundProbe,
 	bb: PlayerBlackboard,
-	config: PlayerConfig
+	resolved: ResolvedPlayerConfig
 ) -> void:
 	_body = body
 	_motor = motor
 	_stepper = stepper
 	_probe = probe
 	_bb = bb
-	_config = config
+	_resolved = resolved
 	for child in get_children():
 		if child is LocomotionState:
 			register_state(child)
@@ -50,7 +54,7 @@ func register_state(state: LocomotionState) -> void:
 	state.stepper = _stepper
 	state.probe = _probe
 	state.bb = _bb
-	state.config = _config
+	state.resolved = _resolved
 	if not state.is_inside_tree():
 		add_child(state)
 	_states[state.state_id()] = state

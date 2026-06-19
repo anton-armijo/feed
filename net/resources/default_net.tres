@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="NetConfig" format=3 uid="uid://7ne7o6ol2hmp"]
 
 [ext_resource type="Script" uid="uid://hqx7lknvxxa7" path="res://net/scripts/data/net_config.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://uhydmr0o4cmd" path="res://scenes/main.tscn" id="1_6npae"]
 [ext_resource type="PackedScene" uid="uid://ba8dpuhykc2ud" path="res://scenes/menu.tscn" id="2"]
-[ext_resource type="PackedScene" uid="uid://cyp1sf4mffrj8" path="res://scenes/laberynth.tscn" id="3"]
 
 [resource]
 script = ExtResource("1")
 menu_scene = ExtResource("2")
-game_scene = ExtResource("3")
+game_scene = ExtResource("1_6npae")

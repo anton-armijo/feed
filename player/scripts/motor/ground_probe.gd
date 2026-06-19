@@ -4,17 +4,12 @@
 class_name GroundProbe
 extends Node3D
 
-## Ray lengths as a fraction of body height.
-@export var short_factor := 0.06
-@export var medium_factor := 0.17
-@export_flags_3d_physics var collision_mask: int = 1
-
 var _ray_short: RayCast3D
 var _ray_medium: RayCast3D
 
-func setup(body: CharacterBody3D, body_height: float) -> void:
-	_ray_short = _make_ray(body, body_height * short_factor)
-	_ray_medium = _make_ray(body, body_height * medium_factor)
+func setup(body: CharacterBody3D, config: ResolvedPlayerConfig.Probe, body_height: float) -> void:
+	_ray_short = _make_ray(body, body_height * config.short_factor, config.collision_mask)
+	_ray_medium = _make_ray(body, body_height * config.medium_factor, config.collision_mask)
 
 ## Ground close enough that airborne visuals should be suppressed entirely.
 func is_near_ground_short() -> bool:
@@ -24,7 +19,7 @@ func is_near_ground_short() -> bool:
 func is_near_ground_medium() -> bool:
 	return _ray_medium != null and _ray_medium.is_colliding()
 
-func _make_ray(body: CharacterBody3D, length: float) -> RayCast3D:
+func _make_ray(body: CharacterBody3D, length: float, collision_mask: int) -> RayCast3D:
 	var ray := RayCast3D.new()
 	ray.enabled = true
 	ray.target_position = Vector3(0.0, -length, 0.0)

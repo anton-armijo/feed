@@ -5,12 +5,27 @@
 class_name GroundedMoveState
 extends LocomotionState
 
+
 func target_speed() -> float:
-	return config.locomotion.walk_speed
+	return resolved.locomotion.walk_speed
+
 
 ## Walk -> Run / Run -> Walk decisions live in the subclasses.
 func speed_tier_transition(_intent: InputIntent) -> StringName:
 	return &""
+
+
+## Target speed adjusted for backpedaling: when the facing is locked to the
+## camera and the character moves into the rear semi-plane, it walks slower
+## and cannot sprint. Subclasses' speed_tier_transition() already block the
+## Run upgrade while backpedaling; this scales the actual speed used by the
+## motor for the current frame.
+func _backwalk_target_speed(intent: InputIntent) -> float:
+	var speed := target_speed()
+	if bb.is_backpedaling(intent.wish_dir):
+		speed *= resolved.locomotion.backwalk_speed_multiplier
+	return speed
+
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if not motor.is_grounded():
@@ -20,7 +35,12 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 		intent.consume_jump()
 		return &"Jump"
 
-	motor.move_ground(intent.wish_dir, target_speed(), delta)
+	var facing_locked := bb.is_facing_locked()
+	motor.move_ground_damped(intent.wish_dir, _backwalk_target_speed(intent), delta, facing_locked)
+
+	# Directional anim variant (e.g. walk_back) is resolved against the set the
+	# presenter advertised. Setter guards on equality, so this is cheap.
+	bb.anim_state = bb.resolve_anim(ground_anim(intent), intent.wish_dir)
 
 	if intent.wish_dir == Vector3.ZERO:
 		return &"Idle"

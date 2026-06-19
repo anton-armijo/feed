@@ -18,8 +18,11 @@ extends CharacterBody3D
 
 @export var config: PlayerConfig
 
+var resolved: ResolvedPlayerConfig
+
 @onready var assembler: PlayerAssembler = $PlayerAssembler
 @onready var blackboard: PlayerBlackboard = $Blackboard
+@onready var api: PlayerApi = $PlayerApi
 @onready var input_collector: InputCollector = $InputCollector
 @onready var motor: MovementMotor = $MovementMotor
 @onready var stepper: StairStepper = $MovementMotor/StairStepper
@@ -27,8 +30,7 @@ extends CharacterBody3D
 @onready var fsm: LocomotionFSM = $LocomotionFSM
 @onready var ability_manager: AbilityManager = $AbilityManager
 @onready var model: ModelVisual = $Model
-@onready var animation_controller: AnimationController = $Model/CharacterScene/AnimationTree
-@onready var animation_driver: AnimationDriver = $Model/CharacterScene/AnimationDriver
+@onready var presenter: CharacterPresenter = $Model/CharacterScene
 @onready var walk_sounds: WalkSounds = $WalkSounds
 @onready var camera_rig: CameraRig = $CameraRig
 
@@ -41,8 +43,6 @@ func _ready() -> void:
 	_is_local = peer_id == my_id or name == str(my_id)
 	add_to_group("players")
 
-	print("[Player] _ready: name=%s, peer_id=%d, my_id=%d, authority=%d, is_local=%s" % [name, peer_id, my_id, get_multiplayer_authority(), _is_local])
-
 	floor_snap_length = 0.35
 	floor_stop_on_slope = true
 	floor_block_on_wall = false
@@ -50,35 +50,48 @@ func _ready() -> void:
 	if config == null:
 		config = PlayerConfig.new()
 	config.ensure_defaults()
-	blackboard.body_height = config.body_height
+	resolved = ResolvedPlayerConfig.resolve(config)
+	blackboard.body_height = resolved.body_height
 
 	# Core — always present and wired.
-	motor.setup(self, stepper, config)
-	ground_probe.setup(self, config.body_height)
-	fsm.setup(self, motor, stepper, ground_probe, blackboard, config)
+	motor.setup(self, stepper, resolved)
+	ground_probe.setup(self, resolved.probe, resolved.body_height)
+	fsm.setup(self, motor, stepper, ground_probe, blackboard, resolved)
 	assembler.apply_initial_state()
 
 	# Semi-core — gated by assembler.
 	if assembler.is_enabled("StairStepper") and stepper != null:
-		stepper.setup(self)
+		stepper.setup(self, resolved.stair)
 	if assembler.is_enabled("InputCollector") and input_collector != null:
-		input_collector.setup(blackboard, config)
+		input_collector.setup(blackboard, resolved)
+
+	# Centralised verb surface — built after all subsystems are wired so it
+	# can forward to them. Abilities receive this instead of a dedicated context.
+	api.setup(blackboard, motor, fsm, input_collector, camera_rig, presenter, resolved, ability_manager)
 
 	if assembler.is_enabled("AbilityManager") and ability_manager != null:
-		ability_manager.setup(AbilityContext.new(self, motor, fsm, blackboard))
+		ability_manager.setup(api)
+		if assembler.is_enabled("LockOnCharacter"):
+			var lock_ability := LockOnCharacterAbility.new()
+			ability_manager.register(lock_ability)
 
 	# Presentation layers run on every peer (remote state arrives via sync).
 	if assembler.is_enabled("Model"):
 		model.setup(blackboard, self)
-		animation_controller.setup(blackboard)
-		animation_driver.setup(blackboard, config.locomotion)
+		presenter.setup_presenter(blackboard, resolved)
 
 	if assembler.is_enabled("WalkSounds"):
-		walk_sounds.setup(blackboard, config.locomotion, _is_local)
+		walk_sounds.setup(blackboard, resolved.locomotion, _is_local)
 
 	if _is_local:
 		if assembler.is_enabled("CameraRig"):
-			camera_rig.setup(blackboard, self, model)
+			camera_rig.setup(blackboard, self, model, presenter)
+			api.set_lock_mouse_default(config.components.default_lock_mouse_mode)
+			camera_rig.setup_effects(
+				resolved.camera_effects,
+				resolved.locomotion.run_speed,
+				_find_proximity_fade_config(resolved)
+			)
 		fsm.start()
 	else:
 		if assembler.is_enabled("CameraRig"):
@@ -111,7 +124,7 @@ func _physics_process(delta: float) -> void:
 ## Gameplay-facing yaw: faces the camera in first person / shift lock, or
 ## turns toward the move direction. ModelVisual applies it visually.
 func _update_model_yaw(intent: InputIntent, delta: float) -> void:
-	if blackboard.first_person or blackboard.shift_lock_toggle_on:
+	if blackboard.first_person or blackboard.lock_on_character:
 		blackboard.model_yaw = blackboard.camera_yaw
 		return
 	if intent.wish_dir == Vector3.ZERO:
@@ -119,7 +132,7 @@ func _update_model_yaw(intent: InputIntent, delta: float) -> void:
 	blackboard.model_yaw = lerp_angle(
 		blackboard.model_yaw,
 		atan2(-intent.wish_dir.x, -intent.wish_dir.z),
-		config.locomotion.model_turn_speed * delta
+		resolved.locomotion.model_turn_speed * delta
 	)
 
 func _publish_state(intent: InputIntent) -> void:
@@ -130,3 +143,12 @@ func _publish_state(intent: InputIntent) -> void:
 	blackboard.wish_direction = intent.wish_dir
 	blackboard.velocity = velocity
 	blackboard.move_speed_multiplier = motor.speed_multiplier()
+	if is_on_floor():
+		blackboard.last_safe_position = global_position
+
+## Searches resolved.extras for a ProximityFadeConfig. Returns null if not found.
+func _find_proximity_fade_config(resolved: ResolvedPlayerConfig) -> ProximityFadeConfig:
+	for c in resolved.extras:
+		if c is ProximityFadeConfig:
+			return c
+	return null

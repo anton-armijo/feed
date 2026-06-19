@@ -10,9 +10,9 @@ config_version=5
 
 [application]
 
-config/name="feed_your_teto"
+config/name="teto"
 run/main_scene="uid://ba8dpuhykc2ud"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -21,7 +21,7 @@ NetSession="*res://net/net_session.tscn"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
 
 [input]
 

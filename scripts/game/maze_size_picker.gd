@@ -7,6 +7,7 @@ extends VBoxContainer
 
 var _is_server: bool = false
 
+
 func _enter_tree() -> void:
 	# Only the host configures the maze. The intent is known before the peer
 	# exists, so we read the pending role rather than the (not yet set) role.
@@ -15,9 +16,11 @@ func _enter_tree() -> void:
 	if _is_server:
 		_loading_screen.hold()
 
+
 func _ready() -> void:
 	if _is_server:
 		_show_picker()
+
 
 func _show_picker() -> void:
 	_confirm_button.pressed.connect(_on_confirm)
@@ -26,23 +29,25 @@ func _show_picker() -> void:
 	_label.visible = false
 	_size_input.grab_focus()
 
+
 func _on_text_submitted(_text: String) -> void:
 	_on_confirm()
 
+
 func _on_confirm() -> void:
 	var raw := _size_input.text.strip_edges()
-	var _size := raw.to_int()
-	if _size < 5:
-		_size = 5
-	if _size > 200:
-		_size = 200
+	var size := raw.to_int()
+	if size < 5:
+		size = 5
+	if size > 200:
+		size = 200
 
 	# MazeNetSync applies the config locally (its maze_received signal makes the
 	# generator rebuild) and replicates it to every connected peer.
 	var mseed := randi()
 	var maze_sync := get_tree().get_first_node_in_group("maze_net_sync") as MazeNetSync
 	if maze_sync:
-		maze_sync.configure(_size, _size, mseed)
+		maze_sync.configure(size, size, mseed)
 
 	visible = false
 	_label.visible = true

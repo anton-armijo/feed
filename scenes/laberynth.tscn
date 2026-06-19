@@ -65,9 +65,6 @@ placeholder_text = "Ancho y alto"
 layout_mode = 2
 text = "Generar"
 
-[node name="CollisionShape3D" parent="WorldBoundary" parent_id_path=PackedInt32Array(1048081399) index="0" unique_id=1161797308]
-disabled = true
-
 [node name="MazeNetSync" type="Node" parent="." index="5" unique_id=240556201]
 script = ExtResource("9_mazesync")
 

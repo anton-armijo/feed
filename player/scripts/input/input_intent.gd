@@ -33,3 +33,4 @@ func clear() -> void:
 	wish_dir = Vector3.ZERO
 	run_held = false
 	jump_held = false
+	_jump_buffer = 0.0

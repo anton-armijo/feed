@@ -13,18 +13,22 @@ const _GROUND_STATES: Array[StringName] = [&"Idle", &"Walk", &"Run", &"Land"]
 var _coyote := 0.0
 var _fall_distance := 0.0
 var _from_jump := false
+var _did_pre_land_blend := false
+
 
 func enter(from: StringName) -> void:
 	_fall_distance = 0.0
 	_from_jump = from == &"Jump"
+	_did_pre_land_blend = false
 	if not _from_jump:
 		bb.air_time = 0.0
 	# Coyote only applies when walking off ground, never after a jump.
-	_coyote = config.jump.coyote_time if from in _GROUND_STATES else 0.0
+	_coyote = resolved.jump.coyote_time if from in _GROUND_STATES else 0.0
+
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	motor.apply_gravity(delta)
-	motor.move_air(intent.wish_dir, _air_target_speed(intent), delta)
+	motor.move_air_damped(intent.wish_dir, _air_target_speed(intent), delta, bb.is_facing_locked())
 
 	_coyote = maxf(_coyote - delta, 0.0)
 	bb.air_time += delta
@@ -35,21 +39,27 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if motor.is_grounded() and body.velocity.y <= 0.0:
 		bb.notify_landed(_fall_distance)
 		bb.air_time = 0.0
-		if _fall_distance >= config.jump.land_anim_min_fall and fsm.has_state(&"Land"):
+		if _fall_distance >= resolved.jump.land_anim_min_fall and fsm.has_state(&"Land"):
 			return &"Land"
 		return ground_state(intent)  # trivial fall: skip Land entirely
 
 	# Coyote jump: intent only signals; the FSM validates the window here.
-	if intent.has_buffered_jump() and _coyote > 0.0 and body.velocity.y <= 0.0 \
-		and fsm.has_state(&"Jump"):
+	if (
+		intent.has_buffered_jump()
+		and _coyote > 0.0
+		and body.velocity.y <= 0.0
+		and fsm.has_state(&"Jump")
+	):
 		intent.consume_jump()
 		return &"Jump"
 
 	_update_anim(intent)
 	return &""
 
+
 func _air_target_speed(intent: InputIntent) -> float:
-	return config.locomotion.run_speed if intent.run_held else config.locomotion.walk_speed
+	return resolved.locomotion.run_speed if intent.run_held else resolved.locomotion.walk_speed
+
 
 ## Presentation decision for the airborne phase. Keeps ground visuals during
 ## micro-falls (stairs, slopes) and blends back to a ground pose right before
@@ -63,7 +73,11 @@ func _update_anim(intent: InputIntent) -> void:
 	if probe.is_near_ground_short():
 		return  # about to touch down, keep current visuals
 	if bb.anim_state == &"fall" and probe.is_near_ground_medium():
-		bb.anim_state = ground_anim(intent)  # pre-land blend
+		bb.anim_state = bb.resolve_anim(ground_anim(intent), intent.wish_dir)
+		_did_pre_land_blend = true
 		return
-	if _from_jump or _fall_distance >= config.jump.fall_anim_min_fall:
+	if (
+		not _did_pre_land_blend
+		and (_from_jump or _fall_distance >= resolved.jump.fall_anim_min_fall)
+	):
 		bb.anim_state = &"fall"

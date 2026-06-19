@@ -38,7 +38,8 @@ func host() -> bool:
 		return false
 	multiplayer.multiplayer_peer = peer
 	_state.local_peer_id = multiplayer.get_unique_id()
-	print("[NetTransport] Server up on port %d, peer_id=%d" % [_config.port, _state.local_peer_id])
+	if OS.is_debug_build():
+		print("[NetTransport] Server up on port %d, peer_id=%d" % [_config.port, _state.local_peer_id])
 	return true
 
 ## Starts an ENet client connecting to `ip`. Returns false on bad input or
@@ -55,7 +56,8 @@ func join(ip: String) -> bool:
 		return false
 	multiplayer.multiplayer_peer = peer
 	_state.local_peer_id = multiplayer.get_unique_id()
-	print("[NetTransport] Client connecting to %s:%d, peer_id=%d" % [ip, _config.port, _state.local_peer_id])
+	if OS.is_debug_build():
+		print("[NetTransport] Client connecting to %s:%d, peer_id=%d" % [ip, _config.port, _state.local_peer_id])
 	return true
 
 ## Tears down the active peer (idempotent).

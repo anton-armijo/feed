@@ -1,7 +1,7 @@
 ## Base class for modular character abilities (Sprint, Climb, Attack, ...).
 ## Add a subclass node under AbilityManager and it is live; remove the node
 ## and the capability is gone. Abilities act exclusively through the injected
-## AbilityContext and signal intent — they can never force an FSM transition.
+## PlayerApi and signal intent — they can never force an FSM transition.
 class_name Ability
 extends Node
 
@@ -11,7 +11,7 @@ signal deactivated
 @export var config: AbilityConfig
 @export var enabled := true
 
-var ctx: AbilityContext
+var api: PlayerApi
 var is_active := false
 
 ## Identity inside the AbilityManager registry. Defaults to the node name.

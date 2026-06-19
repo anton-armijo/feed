@@ -22,6 +22,7 @@ var grid: PackedByteArray
 ## one is received.
 @onready var _net_sync: MazeNetSync = get_tree().get_first_node_in_group("maze_net_sync")
 
+
 func _ready() -> void:
 	if _net_sync:
 		_net_sync.maze_received.connect(_on_maze_received)
@@ -40,8 +41,10 @@ func _ready() -> void:
 	_generate_maze()
 	_build_maze()
 
+
 func _on_maze_received(w: int, h: int, s: int) -> void:
 	regenerate(w, h, s)
+
 
 func regenerate(new_width: int, new_height: int, using_seed: int = 0) -> void:
 	grid_width = new_width
@@ -61,16 +64,19 @@ func regenerate(new_width: int, new_height: int, using_seed: int = 0) -> void:
 	_generate_maze()
 	_build_maze()
 
+
 func _make_dimensions_odd() -> void:
 	if grid_width % 2 == 0:
 		grid_width += 1
 	if grid_height % 2 == 0:
 		grid_height += 1
 
+
 func _move_spawn_point() -> void:
 	var sp := get_node_or_null("../MultiplayerSpawner/SpawnPoint") as Node3D
 	if sp:
 		sp.position = Vector3(1.5 * cell_size, 0.0, 1.5 * cell_size)
+
 
 # ─────────────────────────────────────────────────────────────────────────
 ## Growing Tree algorithm.
@@ -86,6 +92,7 @@ func _move_spawn_point() -> void:
 ##   3 = Mix (defecto) (elige al azar del 60% más reciente)
 @export var cell_selection: int = 3
 
+
 func _generate_maze() -> void:
 	grid = PackedByteArray()
 	grid.resize(grid_width * grid_height)
@@ -98,13 +105,13 @@ func _generate_maze() -> void:
 	while active.size() > 0:
 		var idx: int
 		match cell_selection:
-			0: # Random
+			0:  # Random
 				idx = randi() % active.size()
-			1: # Newest — recursive backtracker
+			1:  # Newest — recursive backtracker
 				idx = active.size() - 1
-			2: # Oldest — BFS
+			2:  # Oldest — BFS
 				idx = 0
-			_: # Mix — random entre el 60% más reciente
+			_:  # Mix — random entre el 60% más reciente
 				var thresh := maxi(1, int(ceil(active.size() * 0.4)))
 				if active.size() == 1 or thresh >= active.size():
 					idx = randi() % active.size()
@@ -131,6 +138,7 @@ func _generate_maze() -> void:
 			active.append(chosen)
 
 	grid[1] = 1
+
 
 ## Devuelve los vecinos no visitados a distancia 2 de (r,c).
 ## Un vecino está "no visitado" si está en posición de pasillo y aún es muro (1).
@@ -159,20 +167,20 @@ func _get_unvisited_neighbors(r: int, c: int) -> PackedInt32Array:
 
 	return result
 
+
 # ─────────────────────────────────────────────────────────────────────────
 func _build_maze() -> void:
 	var exit_object_pos = Vector3(
-		(grid_width - 2) * cell_size + cell_size * 0.5,
-		 0, 
-		grid_height * cell_size - cell_size * 1.5)
+		(grid_width - 2) * cell_size + cell_size * 0.5, 0, grid_height * cell_size - cell_size * 1.5
+	)
 	var exit_obj_node = exit_object.instantiate()
 	exit_obj_node.position = exit_object_pos
 	add_child(exit_obj_node)
 	var half_h := wall_height * 0.5
-	var half_c := cell_size  * 0.5
+	var half_c := cell_size * 0.5
 
 	# ── Suelo ────────────────────────────────────────────────────────────
-	var total_w := grid_width  * cell_size
+	var total_w := grid_width * cell_size
 	var total_d := grid_height * cell_size
 	var floor_center := Vector3(total_w * 0.5, -0.05, total_d * 0.5)
 
@@ -254,9 +262,7 @@ func _build_maze() -> void:
 			shape.size = Vector3(rect_w, wall_height, rect_d)
 			col.shape = shape
 			col.position = Vector3(
-				c * cell_size + rect_w * 0.5,
-				half_h,
-				r * cell_size + rect_d * 0.5
+				c * cell_size + rect_w * 0.5, half_h, r * cell_size + rect_d * 0.5
 			)
 			walls_body.add_child(col)
 
@@ -270,11 +276,9 @@ func _build_maze() -> void:
 	for r in range(grid_height):
 		for c in range(grid_width):
 			if grid[r * grid_width + c] == 1:
-				wall_positions.append(Vector3(
-					c * cell_size + half_c,
-					half_h,
-					r * cell_size + half_c
-				))
+				wall_positions.append(
+					Vector3(c * cell_size + half_c, half_h, r * cell_size + half_c)
+				)
 
 	if wall_positions.is_empty():
 		return
@@ -289,7 +293,7 @@ func _build_maze() -> void:
 	var wall_box := BoxMesh.new()
 	wall_box.size = Vector3(cell_size, wall_height, cell_size)
 	wall_box.material = wall_material
-	mm.mesh = wall_box               # mesh primero, luego instance_count
+	mm.mesh = wall_box  # mesh primero, luego instance_count
 	mm.instance_count = wall_positions.size()
 
 	for i in range(wall_positions.size()):

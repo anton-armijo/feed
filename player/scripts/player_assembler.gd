@@ -8,8 +8,6 @@
 class_name PlayerAssembler
 extends Node
 
-signal component_toggled(name: StringName, enabled: bool)
-
 var enabled: Dictionary = {}
 
 var _player: Player
@@ -40,6 +38,7 @@ func _ready() -> void:
 	enabled["FSM.Run"]                = cfg.enable_sprint
 	enabled["FSM.Jump"]               = cfg.enable_jump
 	enabled["FSM.Land"]               = cfg.enable_jump
+	enabled["LockOnCharacter"]        = cfg.enable_lock_on_character
 
 # --- Public API ---------------------------------------------------------------
 
@@ -59,8 +58,6 @@ func set_enabled(component: StringName, value: bool) -> void:
 				_fsm.register_state(node)
 		else:
 			_fsm.unregister_state(state_name)
-
-	component_toggled.emit(component, value)
 
 func toggle(component: StringName) -> bool:
 	set_enabled(component, not is_enabled(component))

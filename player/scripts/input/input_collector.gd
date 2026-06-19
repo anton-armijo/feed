@@ -8,18 +8,32 @@ extends Node
 
 var intent := InputIntent.new()
 
+## When non-null, replaces device input entirely (cutscenes, AI, remote peer).
+## Set via PlayerApi.inject_intent(). While set, collect() does NOT read Input.
+var injected_intent: InputIntent = null
+
 var _bb: PlayerBlackboard
 var _jump_buffer_time := 0.1
 
-func setup(blackboard: PlayerBlackboard, config: PlayerConfig) -> void:
+func setup(blackboard: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
 	_bb = blackboard
-	_jump_buffer_time = config.jump.jump_buffer_time
+	_jump_buffer_time = resolved.jump.jump_buffer_time
 	get_window().focus_exited.connect(_on_focus_changed.bind(false))
 	get_window().focus_entered.connect(_on_focus_changed.bind(true))
 
 ## Called by the Player coordinator at the start of every physics frame.
 func collect(delta: float) -> void:
 	intent.tick(delta)
+
+	if injected_intent != null:
+		intent.move_dir = injected_intent.move_dir
+		intent.wish_dir = injected_intent.wish_dir
+		intent.run_held = injected_intent.run_held
+		intent.jump_held = injected_intent.jump_held
+		if injected_intent.has_buffered_jump():
+			intent.buffer_jump(_jump_buffer_time)
+			injected_intent.consume_jump()
+		return
 
 	if not _bb.input_enabled:
 		intent.clear()

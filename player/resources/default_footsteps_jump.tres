@@ -1,10 +1,7 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="FootstepStateConfig" format=3 uid="uid://cdwqd1da5lxby"]
 
-[ext_resource type="Script" path="res://player/scripts/data/footstep_state_config.gd" id="1_cfg"]
+[ext_resource type="Script" uid="uid://m4562dsq4a4w" path="res://player/scripts/data/footstep_state_config.gd" id="1_cfg"]
 
 [resource]
 script = ExtResource("1_cfg")
 locomotion_state = &"Jump"
-sound_pool = Array[AudioStream]([])
-volume_db_base = -2.0
-enabled = true

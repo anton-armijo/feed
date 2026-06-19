@@ -18,6 +18,7 @@ func run() -> bool:
 		args = OS.get_cmdline_args()
 	if not args.has(_config.dedicated_server_arg):
 		return false
-	print("[CmdlineBootstrap] Dedicated server flag detected, starting headless.")
+	if OS.is_debug_build():
+		print("[CmdlineBootstrap] Dedicated server flag detected, starting headless.")
 	_session.start_dedicated()
 	return true

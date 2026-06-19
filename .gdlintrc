@@ -1,0 +1,20 @@
+tab-characters: 1
+max-line-length: 120
+max-file-lines: 1000
+max-returns: 6
+max-public-methods: 20
+function-arguments-number: 10
+excluded_directories: !!set
+  .git: null
+  addons: null
+  .godot: null
+disable:
+- class-definitions-order
+- no-elif-return
+- no-else-return
+- unnecessary-pass
+- expression-not-assigned
+- comparison-with-itself
+- duplicated-load
+- load-constant-name
+- max-public-methods

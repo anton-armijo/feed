@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dkvxe80d4mer8" path="res://player/scripts/camera/camera_rig.gd" id="1"]
 [ext_resource type="Script" uid="uid://dx4r02wxtmt7k" path="res://player/scripts/camera/camera_collision.gd" id="2"]
+[ext_resource type="PackedScene" path="res://player/proximity_fade_controller.tscn" id="3_w4iex"]
 
 [sub_resource type="Resource" id="Resource_wnob3"]
 metadata/__load_path__ = "res://resources/player/default_camera.tres"
@@ -20,3 +21,5 @@ current = true
 
 [node name="CameraCollision" type="Node" parent="." unique_id=330822495]
 script = ExtResource("2")
+
+[node name="ProximityFadeController" parent="." unique_id=385889636 instance=ExtResource("3_w4iex")]

@@ -4,22 +4,20 @@
 class_name StairStepper
 extends Node
 
-@export var max_step_up := 0.5
-@export var step_check_iterations := 6
-@export var min_horizontal_motion := 0.001
-
 ## True the frame the body was teleported up a step.
 var is_stepping := false
 ## True while snapping down onto a step below (kept briefly to avoid flicker).
 var is_stepping_down := false
 
 var _body: CharacterBody3D
+var _config: ResolvedPlayerConfig.Stair
 var _was_grounded := true
 var _is_grounded_raw := true
 var _step_down_timer := 0.0
 
-func setup(body: CharacterBody3D) -> void:
+func setup(body: CharacterBody3D, config: ResolvedPlayerConfig.Stair) -> void:
 	_body = body
+	_config = config
 
 ## Must run once per physics frame, before the FSM ticks.
 func update_grounded(delta: float) -> void:
@@ -38,7 +36,7 @@ func step_up(horizontal_motion: Vector3) -> void:
 	is_stepping = false
 	if not _body.is_on_floor():
 		return
-	if horizontal_motion.length_squared() < min_horizontal_motion * min_horizontal_motion:
+	if horizontal_motion.length_squared() < _config.min_horizontal_motion * _config.min_horizontal_motion:
 		return
 
 	var params := PhysicsTestMotionParameters3D.new()
@@ -51,8 +49,8 @@ func step_up(horizontal_motion: Vector3) -> void:
 	if not PhysicsServer3D.body_test_motion(_body.get_rid(), params, result):
 		return
 
-	for i in range(1, step_check_iterations + 1):
-		var step_height := max_step_up * float(i) / float(step_check_iterations)
+	for i in range(1, _config.step_check_iterations + 1):
+		var step_height := _config.max_step_up * float(i) / float(_config.step_check_iterations)
 
 		# 1) Is there headroom to lift the body?
 		params.from = _body.global_transform
@@ -69,7 +67,7 @@ func step_up(horizontal_motion: Vector3) -> void:
 
 		# 3) Is there a floor to land on after the step?
 		params.from = lifted.translated(horizontal_motion)
-		params.motion = Vector3.DOWN * (max_step_up + 0.1)
+		params.motion = Vector3.DOWN * (_config.max_step_up + 0.1)
 		if not PhysicsServer3D.body_test_motion(_body.get_rid(), params, result):
 			continue
 
@@ -81,9 +79,10 @@ func step_up(horizontal_motion: Vector3) -> void:
 func step_down() -> void:
 	if _body.velocity.y > 0.0 or not _was_grounded:
 		return
-	# Do not snap when falling off a ledge with real downward velocity.
 	if _body.velocity.y < -0.5:
 		return
+	if _body.is_on_floor():
+		return  # already snapped, nothing to do
 	is_stepping_down = true
 	_step_down_timer = 0.1
 	_body.apply_floor_snap()

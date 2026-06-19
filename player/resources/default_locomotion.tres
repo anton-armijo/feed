@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1")
+air_control = 0.5

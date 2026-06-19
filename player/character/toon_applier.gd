@@ -76,5 +76,6 @@ func _make_toon(old_mat: Material) -> ShaderMaterial:
 	new_mat.set_shader_parameter("specular_size", specular_size)
 	new_mat.set_shader_parameter("rim_power", rim_power)
 	new_mat.set_shader_parameter("rim_brightness", rim_brightness)
+	new_mat.set_shader_parameter("fade_alpha", 1.0)
 
 	return new_mat

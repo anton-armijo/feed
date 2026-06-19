@@ -40,7 +40,6 @@ func _spawn(peer_id: int) -> void:
 	var player := spawn(peer_id)
 	if player:
 		player_spawned.emit(peer_id, player)
-		print("[PlayerSpawnService] Spawned player peer_id=%d" % peer_id)
 
 func _on_session_started() -> void:
 	# Host's own local player (clients receive theirs via replication).
@@ -59,4 +58,3 @@ func _on_peer_left(peer_id: int) -> void:
 	if player:
 		player.queue_free()
 		player_despawned.emit(peer_id)
-		print("[PlayerSpawnService] Despawned player peer_id=%d" % peer_id)

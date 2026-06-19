@@ -22,3 +22,6 @@ sounds/
 models/
 player/character/model/
 godot-docs/
+
+# gdUnit4 test reports
+reports/

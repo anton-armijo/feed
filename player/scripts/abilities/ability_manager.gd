@@ -1,6 +1,6 @@
 ## Registry and update loop for modular abilities. Child Ability nodes are
 ## auto-registered at setup; abilities can also be added/removed at runtime.
-## The manager hands every ability the same restricted AbilityContext.
+## The manager hands every ability the same PlayerApi instance.
 class_name AbilityManager
 extends Node
 
@@ -8,20 +8,20 @@ signal ability_registered(id: StringName)
 signal ability_unregistered(id: StringName)
 
 var _abilities: Dictionary = {}  # StringName -> Ability
-var _ctx: AbilityContext
+var _api: PlayerApi
 
-func setup(ctx: AbilityContext) -> void:
-	_ctx = ctx
+func setup(api: PlayerApi) -> void:
+	_api = api
 	for child in get_children():
 		if child is Ability:
 			register(child)
 
 func register(ability: Ability) -> void:
-	ability.ctx = _ctx
+	ability.api = _api
 	if ability.config != null:
 		ability.enabled = ability.config.enabled_by_default
 	for state in ability.provided_states():
-		_ctx.register_state(state)
+		_api.register_state(state)
 	if not ability.is_inside_tree():
 		add_child(ability)
 	_abilities[ability.ability_id()] = ability
@@ -33,7 +33,7 @@ func unregister(id: StringName) -> void:
 		return
 	ability.deactivate()
 	for state in ability.provided_states():
-		_ctx.unregister_state(state.state_id())
+		_api.unregister_state(state.state_id())
 	_abilities.erase(id)
 	ability_unregistered.emit(id)
 

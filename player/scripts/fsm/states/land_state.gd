@@ -7,9 +7,11 @@ extends LocomotionState
 
 var _timer := 0.0
 
+
 func enter(_from: StringName) -> void:
 	_timer = 0.0
 	bb.anim_state = &"land"
+
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if not motor.is_grounded():
@@ -21,9 +23,15 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 		return &"Jump"
 
 	# Movement is not locked during the recovery (matches previous feel).
-	motor.move_ground(intent.wish_dir, config.locomotion.walk_speed, delta)
+	# Backpedaling slows the recovery walk too; reverse-damp is gated by the
+	# facing-lock flag just like in GroundedMoveState.
+	var facing_locked := bb.is_facing_locked()
+	var speed := resolved.locomotion.walk_speed
+	if bb.is_backpedaling(intent.wish_dir):
+		speed *= resolved.locomotion.backwalk_speed_multiplier
+	motor.move_ground_damped(intent.wish_dir, speed, delta, facing_locked)
 
 	_timer += delta
-	if _timer >= config.jump.land_duration:
+	if _timer >= resolved.jump.land_duration:
 		return ground_state(intent)
 	return &""

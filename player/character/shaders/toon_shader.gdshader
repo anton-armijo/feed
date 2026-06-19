@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_disabled;
+render_mode blend_mix, depth_draw_always, cull_disabled;
 
 uniform sampler2D albedo_texture : source_color, filter_linear_mipmap;
 uniform sampler2D custom_normal : hint_normal, filter_linear_mipmap;
@@ -29,6 +29,10 @@ uniform float rim_power : hint_range(0.0, 10.0) = 3.0;
 uniform float rim_brightness : hint_range(0.0, 2.0) = 0.2;
 group_uniforms;
 
+group_uniforms Fade;
+uniform float fade_alpha : hint_range(0.0, 1.0) = 1.0;
+group_uniforms;
+
 void fragment() {
 	vec4 tex = texture(albedo_texture, UV);
 	ALBEDO = tex.rgb;
@@ -36,6 +40,8 @@ void fragment() {
 	if (use_alpha_scissor) {
 		ALPHA = tex.a;
 		ALPHA_SCISSOR_THRESHOLD = alpha_scissor_threshold;
+	} else {
+		ALPHA = fade_alpha;
 	}
 
 	if (use_normal_map) {
