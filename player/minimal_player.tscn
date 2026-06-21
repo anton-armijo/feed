@@ -4,7 +4,7 @@
 [ext_resource type="Resource" uid="uid://bbxxhvkvw080n" path="res://player/resources/default_player.tres" id="2_7onbh"]
 [ext_resource type="Script" uid="uid://bpqm0qtfdxg3l" path="res://player/scripts/player_assembler.gd" id="3_dpu5m"]
 [ext_resource type="Script" uid="uid://c05pshfypy1v4" path="res://player/scripts/blackboard.gd" id="4_0pbuu"]
-[ext_resource type="Script" path="res://player/scripts/player_api.gd" id="4_1_api"]
+[ext_resource type="Script" uid="uid://cdhae0vb3ckvt" path="res://player/scripts/player_api.gd" id="4_1_api"]
 [ext_resource type="Script" uid="uid://ca58jsdiqjpvl" path="res://player/scripts/motor/movement_motor.gd" id="5_skiww"]
 [ext_resource type="Script" uid="uid://bu5qh55gu280i" path="res://player/scripts/motor/stair_stepper.gd" id="6_dv734"]
 [ext_resource type="Script" uid="uid://dldk4sotthclu" path="res://player/scripts/motor/ground_probe.gd" id="7_fw4r0"]
@@ -15,6 +15,8 @@
 [ext_resource type="Script" uid="uid://hvvbd6edk2ey" path="res://player/scripts/fsm/states/jump_state.gd" id="12_y7g4v"]
 [ext_resource type="Script" uid="uid://0bsl70dmlrkb" path="res://player/scripts/fsm/states/fall_state.gd" id="13_ro04r"]
 [ext_resource type="Script" uid="uid://de7lirbujl8vh" path="res://player/scripts/fsm/states/land_state.gd" id="14_s6jo1"]
+[ext_resource type="Script" uid="uid://c6ge7vb5dmpoq" path="res://player/scripts/input/input_collector.gd" id="16_skiww"]
+[ext_resource type="Script" uid="uid://cq55qc1thycli" path="res://player/scripts/abilities/ability_manager.gd" id="17_dv734"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1kwk0"]
 radius = 0.13183594
@@ -34,8 +36,14 @@ script = ExtResource("3_dpu5m")
 [node name="Blackboard" type="Node" parent="." unique_id=987221185]
 script = ExtResource("4_0pbuu")
 
+[node name="InputCollector" type="Node" parent="." unique_id=2118452455]
+script = ExtResource("16_skiww")
+
 [node name="PlayerApi" type="Node" parent="." unique_id=1104293851]
 script = ExtResource("4_1_api")
+
+[node name="AbilityManager" type="Node" parent="." unique_id=1284435505]
+script = ExtResource("17_dv734")
 
 [node name="MovementMotor" type="Node" parent="." unique_id=775458657]
 script = ExtResource("5_skiww")

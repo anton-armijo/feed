@@ -3,25 +3,22 @@
 [ext_resource type="Script" uid="uid://ccmgs38roty0x" path="res://player/scripts/data/player_config.gd" id="1"]
 [ext_resource type="Resource" uid="uid://6homywwyjmrw" path="res://player/resources/default_locomotion.tres" id="2"]
 [ext_resource type="Script" uid="uid://rdeiqlc5x4a6" path="res://player/scripts/data/player_components_config.gd" id="2_1bpop"]
-[ext_resource type="Script" uid="uid://d012slcnhh6w4" path="res://player/scripts/data/camera_effects_config.gd" id="2_1tmq0"]
 [ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="3"]
 [ext_resource type="Resource" uid="uid://dtht0tgw8nrjv" path="res://player/resources/default_camera.tres" id="4"]
-[ext_resource type="Script" uid="uid://belln0ul6x2ou" path="res://player/scripts/data/probe_config.gd" id="5_ljc3r"]
-[ext_resource type="Script" uid="uid://c6eav4vo3xigm" path="res://player/scripts/data/stair_config.gd" id="7_1tmq0"]
+[ext_resource type="Script" uid="uid://c6eav4vo3xigm" path="res://player/scripts/data/stair_config.gd" id="6_pba5u"]
 
 [sub_resource type="Resource" id="Resource_1tmq0"]
-script = ExtResource("2_1tmq0")
 metadata/_custom_type_script = "uid://d012slcnhh6w4"
 
 [sub_resource type="Resource" id="Resource_pba5u"]
 script = ExtResource("2_1bpop")
 
 [sub_resource type="Resource" id="Resource_qddpm"]
-script = ExtResource("5_ljc3r")
 metadata/_custom_type_script = "uid://belln0ul6x2ou"
 
-[sub_resource type="Resource" id="Resource_6lh0n"]
-script = ExtResource("7_1tmq0")
+[sub_resource type="Resource" id="Resource_ljc3r"]
+script = ExtResource("6_pba5u")
+base_max_step_up = 0.7
 metadata/_custom_type_script = "uid://c6eav4vo3xigm"
 
 [resource]
@@ -30,6 +27,6 @@ locomotion = ExtResource("2")
 jump = ExtResource("3")
 camera = ExtResource("4")
 camera_effects = SubResource("Resource_1tmq0")
-stair = SubResource("Resource_6lh0n")
+stair = SubResource("Resource_ljc3r")
 probe = SubResource("Resource_qddpm")
 components = SubResource("Resource_pba5u")

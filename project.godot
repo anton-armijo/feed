@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="teto"
-run/main_scene="uid://ba8dpuhykc2ud"
+run/main_scene="uid://d3653lj3ds78m"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -22,6 +22,15 @@ NetSession="*res://net/net_session.tscn"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://IK_system_test/": "red",
+"res://net/": "orange",
+"res://player/": "purple",
+"res://sounds/": "pink"
+}
 
 [input]
 

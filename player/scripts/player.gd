@@ -31,7 +31,6 @@ var resolved: ResolvedPlayerConfig
 @onready var ability_manager: AbilityManager = $AbilityManager
 @onready var model: ModelVisual = $Model
 @onready var presenter: CharacterPresenter = $Model/CharacterScene
-@onready var walk_sounds: WalkSounds = $WalkSounds
 @onready var camera_rig: CameraRig = $CameraRig
 
 var peer_id: int
@@ -79,9 +78,6 @@ func _ready() -> void:
 	if assembler.is_enabled("Model"):
 		model.setup(blackboard, self)
 		presenter.setup_presenter(blackboard, resolved)
-
-	if assembler.is_enabled("WalkSounds"):
-		walk_sounds.setup(blackboard, resolved.locomotion, _is_local)
 
 	if _is_local:
 		if assembler.is_enabled("CameraRig"):
