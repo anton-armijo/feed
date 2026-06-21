@@ -12,6 +12,11 @@ extends AnimationTree
 var _playback: AnimationNodeStateMachinePlayback
 var _bb: PlayerBlackboard
 
+## Called by CharacterPresenter._setup_child_nodes() for auto-discovery.
+func presenter_setup(bb: PlayerBlackboard, _resolved: ResolvedPlayerConfig) -> void:
+	setup(bb)
+
+
 func setup(blackboard: PlayerBlackboard) -> void:
 	_bb = blackboard
 	_playback = get("parameters/playback")

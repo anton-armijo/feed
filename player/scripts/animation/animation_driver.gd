@@ -45,6 +45,11 @@ var _anim_player: AnimationPlayer
 var _triggered_this_cycle: Dictionary = {}
 
 
+## Called by CharacterPresenter._setup_child_nodes() for auto-discovery.
+func presenter_setup(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+	setup(bb, resolved.locomotion)
+
+
 func setup(p_blackboard: PlayerBlackboard, p_loco: ResolvedPlayerConfig.Locomotion) -> void:
 	blackboard = p_blackboard
 	locomotion_config = p_loco

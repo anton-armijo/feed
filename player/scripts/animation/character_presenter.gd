@@ -36,6 +36,19 @@ var _fade_materials: Dictionary = {}
 func setup_presenter(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
 	_bb = bb
 	_setup_fade_controller(resolved)
+	_setup_child_nodes(bb, resolved)
+
+
+## Iterates child nodes and calls presenter_setup(bb, resolved) on any that
+## implement the method. This lets scene authors add new setup-able child
+## nodes without modifying setup_presenter() overrides. Follows the same
+## auto-registration pattern used by AbilityManager and LocomotionFSM.
+func _setup_child_nodes(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+	for child in get_children():
+		if child == self:
+			continue
+		if child.has_method(&"presenter_setup"):
+			child.presenter_setup(bb, resolved)
 
 
 ## Finds ProximityFadeConfig in resolved.extras and configures the child

@@ -9,8 +9,6 @@ extends CharacterPresenter
 
 
 func setup_presenter(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
-	_anim_controller.setup(bb)
-	_anim_driver.setup(bb, resolved.locomotion)
 	_scan_directional_states(bb)
 	super.setup_presenter(bb, resolved)
 
