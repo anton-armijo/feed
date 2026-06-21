@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="3"]
 [ext_resource type="Resource" uid="uid://dtht0tgw8nrjv" path="res://player/resources/default_camera.tres" id="4"]
 [ext_resource type="Script" uid="uid://c6eav4vo3xigm" path="res://player/scripts/data/stair_config.gd" id="6_pba5u"]
+[ext_resource type="Script" uid="uid://cudpm2c74g5kt" path="res://player/scripts/data/proximity_fade_config.gd" id="7_fade"]
 
 [sub_resource type="Resource" id="Resource_1tmq0"]
 metadata/_custom_type_script = "uid://d012slcnhh6w4"
@@ -21,6 +22,10 @@ script = ExtResource("6_pba5u")
 base_max_step_up = 0.7
 metadata/_custom_type_script = "uid://c6eav4vo3xigm"
 
+[sub_resource type="Resource" id="Resource_fade1"]
+script = ExtResource("7_fade")
+metadata/_custom_type_script = "uid://cudpm2c74g5kt"
+
 [resource]
 script = ExtResource("1")
 locomotion = ExtResource("2")
@@ -30,3 +35,4 @@ camera_effects = SubResource("Resource_1tmq0")
 stair = SubResource("Resource_ljc3r")
 probe = SubResource("Resource_qddpm")
 components = SubResource("Resource_pba5u")
+extras = Array[Resource]([SubResource("Resource_fade1")])

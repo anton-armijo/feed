@@ -76,6 +76,12 @@ var horizontal_speed := 0.0
 var has_move_input := false
 var last_fall_distance := 0.0
 var body_height := 1.59
+## True when the body was teleported up a step this frame. Published by StairStepper.
+var is_stepping := false
+## True while snapping down onto a step below (kept briefly to avoid flicker). Published by StairStepper.
+var is_stepping_down := false
+## Height delta (meters) of the last successful step up. Published by StairStepper.
+var step_height_delta := 0.0
 var wish_direction := Vector3.ZERO
 var velocity := Vector3.ZERO
 var air_time := 0.0

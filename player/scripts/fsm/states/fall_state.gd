@@ -65,7 +65,7 @@ func _air_target_speed(intent: InputIntent) -> float:
 ## micro-falls (stairs, slopes) and blends back to a ground pose right before
 ## touchdown, matching the previous controller's feel.
 func _update_anim(intent: InputIntent) -> void:
-	if stepper != null and (stepper.is_stepping or stepper.is_stepping_down):
+	if bb.is_stepping or bb.is_stepping_down:
 		return  # stair adjustment, keep current visuals
 	if body.velocity.y > 0.1:
 		bb.anim_state = &"jump"  # ascending (external impulse)

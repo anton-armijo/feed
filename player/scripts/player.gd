@@ -53,14 +53,14 @@ func _ready() -> void:
 	blackboard.body_height = resolved.body_height
 
 	# Core — always present and wired.
-	motor.setup(self, stepper, resolved)
+	motor.setup(self, blackboard, stepper, resolved)
 	ground_probe.setup(self, resolved.probe, resolved.body_height)
 	fsm.setup(self, motor, stepper, ground_probe, blackboard, resolved)
 	assembler.apply_initial_state()
 
 	# Semi-core — gated by assembler.
 	if assembler.is_enabled("StairStepper") and stepper != null:
-		stepper.setup(self, resolved.stair)
+		stepper.setup(self, blackboard, resolved.stair)
 	if assembler.is_enabled("InputCollector") and input_collector != null:
 		input_collector.setup(blackboard, resolved)
 
@@ -85,8 +85,7 @@ func _ready() -> void:
 			api.set_lock_mouse_default(config.components.default_lock_mouse_mode)
 			camera_rig.setup_effects(
 				resolved.camera_effects,
-				resolved.locomotion.run_speed,
-				_find_proximity_fade_config(resolved)
+				resolved.locomotion.run_speed
 			)
 		fsm.start()
 	else:
@@ -141,10 +140,3 @@ func _publish_state(intent: InputIntent) -> void:
 	blackboard.move_speed_multiplier = motor.speed_multiplier()
 	if is_on_floor():
 		blackboard.last_safe_position = global_position
-
-## Searches resolved.extras for a ProximityFadeConfig. Returns null if not found.
-func _find_proximity_fade_config(resolved: ResolvedPlayerConfig) -> ProximityFadeConfig:
-	for c in resolved.extras:
-		if c is ProximityFadeConfig:
-			return c
-	return null

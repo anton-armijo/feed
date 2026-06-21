@@ -17,8 +17,8 @@
 ## temporary material_override on every MeshInstance3D. The original material
 ## is restored when fade returns to 0, so the toon shader (or any other
 ## material) is never overwritten or bugged. The ProximityFadeController
-## (child of CameraRig) raycasts against the Area3D nodes returned by
-## get_fade_areas() to decide the fade amount based on camera distance.
+## (child of this node) raycasts from the active camera toward the Area3D
+## nodes returned by get_fade_areas() to decide the fade amount.
 class_name CharacterPresenter
 extends Node3D
 
@@ -33,8 +33,29 @@ var _fade_materials: Dictionary = {}
 ## Called by Player._ready() after the blackboard and resolved config are
 ## built. Subclasses wire their internal animation/audio nodes here, then
 ## call super.setup_presenter().
-func setup_presenter(bb: PlayerBlackboard, _resolved: ResolvedPlayerConfig) -> void:
+func setup_presenter(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
 	_bb = bb
+	_setup_fade_controller(resolved)
+
+
+## Finds ProximityFadeConfig in resolved.extras and configures the child
+## ProximityFadeController, if present.
+func _setup_fade_controller(resolved: ResolvedPlayerConfig) -> void:
+	var config: ProximityFadeConfig = _find_fade_config(resolved)
+	var ctrl := get_node_or_null("ProximityFadeController") as ProximityFadeController
+	if ctrl != null and config != null:
+		ctrl.setup(self, config)
+	elif ctrl != null:
+		ctrl.set_enabled(false)
+
+
+## Searches resolved.extras for a ProximityFadeConfig. Returns null if not found.
+func _find_fade_config(resolved: ResolvedPlayerConfig) -> ProximityFadeConfig:
+	for c in resolved.extras:
+		if c is ProximityFadeConfig:
+			return c
+	return null
+
 
 ## The character's skeleton, or null if it has none. Used by future systems
 ## (procedural foot IK) that need bone access without knowing the rig.

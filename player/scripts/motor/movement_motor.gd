@@ -13,14 +13,16 @@ var gravity_enabled := true
 var current_speed := 0.0
 
 var _body: CharacterBody3D
+var _bb: PlayerBlackboard
 var _stepper: StairStepper
 var _loco: ResolvedPlayerConfig.Locomotion
 var _jump: ResolvedPlayerConfig.Jump
 var _speed_modifiers: Dictionary = {}  # StringName -> float multiplier
 
 
-func setup(body: CharacterBody3D, stepper: StairStepper, resolved: ResolvedPlayerConfig) -> void:
+func setup(body: CharacterBody3D, bb: PlayerBlackboard, stepper: StairStepper, resolved: ResolvedPlayerConfig) -> void:
 	_body = body
+	_bb = bb
 	_stepper = stepper
 	_loco = resolved.locomotion
 	_jump = resolved.jump
@@ -32,12 +34,12 @@ func setup(body: CharacterBody3D, stepper: StairStepper, resolved: ResolvedPlaye
 
 ## Physics-grounded: on the floor or in the middle of a stair step-up.
 func is_grounded() -> bool:
-	return _body.is_on_floor() or (_stepper != null and _stepper.is_stepping)
+	return _body.is_on_floor() or (_bb != null and _bb.is_stepping)
 
 
 ## Grounded for presentation purposes (includes stair step-down snapping).
 func is_grounded_visual() -> bool:
-	return is_grounded() or (_stepper != null and _stepper.is_stepping_down)
+	return is_grounded() or (_bb != null and _bb.is_stepping_down)
 
 
 func horizontal_velocity() -> Vector3:
@@ -126,7 +128,7 @@ func physics_step(delta: float) -> void:
 	if _stepper != null:
 		_stepper.step_up(horizontal_velocity() * delta)
 	_body.move_and_slide()
-	if _stepper != null and _stepper.is_stepping:
+	if _bb != null and _bb.is_stepping:
 		_body.apply_floor_snap()
 	elif _stepper != null:
 		_stepper.step_down()

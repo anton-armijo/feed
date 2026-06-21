@@ -1,22 +1,19 @@
 ## Detects and resolves stair steps via shape test motions.
-## Self-contained: publishes its results through is_stepping /
-## is_stepping_down instead of writing into a shared manager.
+## Self-contained: publishes its results through the blackboard
+## (bb.is_stepping, bb.is_stepping_down, bb.step_height_delta).
 class_name StairStepper
 extends Node
 
-## True the frame the body was teleported up a step.
-var is_stepping := false
-## True while snapping down onto a step below (kept briefly to avoid flicker).
-var is_stepping_down := false
-
 var _body: CharacterBody3D
+var _bb: PlayerBlackboard
 var _config: ResolvedPlayerConfig.Stair
 var _was_grounded := true
 var _is_grounded_raw := true
 var _step_down_timer := 0.0
 
-func setup(body: CharacterBody3D, config: ResolvedPlayerConfig.Stair) -> void:
+func setup(body: CharacterBody3D, bb: PlayerBlackboard, config: ResolvedPlayerConfig.Stair) -> void:
 	_body = body
+	_bb = bb
 	_config = config
 
 ## Must run once per physics frame, before the FSM ticks.
@@ -30,10 +27,11 @@ func update_grounded(delta: float) -> void:
 		return
 
 	if _is_grounded_raw or not _was_grounded:
-		is_stepping_down = false
+		_bb.is_stepping_down = false
 
 func step_up(horizontal_motion: Vector3) -> void:
-	is_stepping = false
+	_bb.is_stepping = false
+	_bb.step_height_delta = 0.0
 	if not _body.is_on_floor():
 		return
 	if horizontal_motion.length_squared() < _config.min_horizontal_motion * _config.min_horizontal_motion:
@@ -73,7 +71,8 @@ func step_up(horizontal_motion: Vector3) -> void:
 
 		_body.global_position = lifted.origin
 		_body.velocity.y = maxf(_body.velocity.y, 0.0)  # preserve an active jump
-		is_stepping = true
+		_bb.is_stepping = true
+		_bb.step_height_delta = step_height
 		return
 
 func step_down() -> void:
@@ -83,6 +82,6 @@ func step_down() -> void:
 		return
 	if _body.is_on_floor():
 		return  # already snapped, nothing to do
-	is_stepping_down = true
+	_bb.is_stepping_down = true
 	_step_down_timer = 0.1
 	_body.apply_floor_snap()

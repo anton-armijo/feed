@@ -44,6 +44,7 @@
 [ext_resource type="Script" uid="uid://c8lduny4ovh06" path="res://player/character/toon_applier.gd" id="42_4gq62"]
 [ext_resource type="Script" uid="uid://diknk6own07ot" path="res://player/scripts/animation/animation_driver.gd" id="43_anmnt"]
 [ext_resource type="Script" uid="uid://daucllewakdd5" path="res://player/character/teto_presenter.gd" id="44_presenter"]
+[ext_resource type="Script" uid="uid://bjg1iox6nwudr" path="res://player/scripts/camera/proximity_fade_controller.gd" id="45_fade_ctrl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xrrdd"]
 resource_name = "arm01_CH_SKIN_SD001T5H0OZ.001"
@@ -1888,3 +1889,6 @@ monitorable = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.305008, 0)
 shape = SubResource("CylinderShape3D_d8176")
 debug_color = Color(0, 0.6, 0.7019608, 0.41960785)
+
+[node name="ProximityFadeController" type="Node" parent="." unique_id=1162735893]
+script = ExtResource("45_fade_ctrl")

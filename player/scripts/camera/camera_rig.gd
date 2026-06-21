@@ -9,15 +9,9 @@ class_name CameraRig
 extends Node3D
 
 @export var config: CameraConfig
-## Optional proximity-fade configuration. When set on the CameraRig scene,
-## the built-in ProximityFadeController is configured automatically. If both
-## this export and the value passed to setup_effects() are set, the scene-level
-## export wins, so the rig instance can override the aggregate player config.
-@export var fade_config: ProximityFadeConfig
 
 @onready var x_pivot: Node3D = $XPivot
 @onready var camera: Camera3D = $XPivot/Camera3D
-@onready var fade_controller: ProximityFadeController = $ProximityFadeController
 
 var target_zoom := 0.0
 var current_zoom := 0.0
@@ -74,24 +68,17 @@ func setup(
 	# React to UI-layer mouse-capture blocks without knowing who sets them.
 	NetSession.state.mouse_capture_blocked_changed.connect(_on_mouse_capture_blocked_changed)
 
-## Wires the dynamic camera effects (FOV + shake) and the proximity fade
-## controller. Called by Player after setup() if camera effects are enabled.
+## Wires the dynamic camera effects (FOV + shake). Called by Player after
+## setup() if camera effects are enabled.
 func setup_effects(
 	effects: ResolvedPlayerConfig.CameraEffects,
-	run_speed: float,
-	proximity_fade_config: ProximityFadeConfig
+	run_speed: float
 ) -> void:
 	_effects = effects
 	_effects_enabled = effects.enabled
 	_run_speed = run_speed
 	if _effects_enabled:
 		camera.fov = effects.base_fov
-	# Proximity fade controller — raycasts to players' collision areas.
-	# Scene-level fade_config wins over the value passed by Player, so the
-	# rig instance can override the aggregate config per-prefab (e.g. base_player).
-	var effective_fade_config := fade_config if fade_config != null else proximity_fade_config
-	if fade_controller != null and effective_fade_config != null and effective_fade_config.enabled:
-		fade_controller.setup(camera, effective_fade_config)
 
 ## True when the user intentionally zoomed past the snap threshold.
 ## Uses target_zoom (intent) rather than current_zoom so collision-driven
