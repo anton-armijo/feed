@@ -5,7 +5,7 @@
 ##     anim_state, is_grounded, velocity_y, model_yaw, wish_direction,
 ##     velocity, air_time, move_speed_multiplier, ...).
 ##   - InputCollector  -> input_enabled.
-##   - CameraRig       -> camera_yaw, camera_pitch, first_person, lock_on_character, lock_mouse.
+##   - CameraRig       -> camera_yaw, camera_pitch, camera_zoom, first_person, lock_on_character, lock_mouse.
 ##   - Abilities       -> verbs via PlayerApi (speed modifiers, state requests, ...).
 ## Everyone else reads, or connects to the change signals below.
 ##
@@ -59,9 +59,6 @@ var anim_state_override: StringName = &"":
 ## rotation offset). Applied locally by ModelVisual on every peer.
 var model_yaw := 0.0
 
-## Reserved for the Sprint ability (kept here so it is sync-ready).
-var is_sprinting := false
-
 # --- Local gameplay state (read-only for observers) --------------------------
 
 var is_grounded := true:
@@ -95,6 +92,8 @@ var last_safe_position := Vector3.ZERO
 
 var camera_yaw := 0.0
 var camera_pitch := 0.0
+## Current camera zoom distance (0.0 = first person, max_zoom = furthest).
+var camera_zoom := 0.0
 var first_person := false:
 	set(value):
 		if first_person == value:

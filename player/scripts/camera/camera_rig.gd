@@ -4,7 +4,7 @@
 ## blackboard) and never participates in movement physics.
 ##
 ## Blackboard fields owned (written) by this rig:
-##   camera_yaw, camera_pitch, first_person, lock_on_character, lock_mouse.
+##   camera_yaw, camera_pitch, camera_zoom, first_person, lock_on_character, lock_mouse.
 class_name CameraRig
 extends Node3D
 
@@ -290,6 +290,8 @@ func _update_zoom(delta: float) -> void:
 		target_zoom = config.first_person_snap_distance
 		_set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		_bb.first_person = false
+
+	_bb.camera_zoom = current_zoom
 
 func _input(event: InputEvent) -> void:
 	if _bb == null or not _bb.input_enabled:

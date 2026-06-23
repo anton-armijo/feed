@@ -58,15 +58,12 @@ properties/2/replication_mode = 2
 properties/3/path = NodePath("Blackboard:anim_state")
 properties/3/spawn = true
 properties/3/replication_mode = 2
-properties/4/path = NodePath("Blackboard:is_sprinting")
-properties/4/spawn = true
+properties/4/path = NodePath("Blackboard:horizontal_speed")
+properties/4/spawn = false
 properties/4/replication_mode = 2
-properties/5/path = NodePath("Blackboard:horizontal_speed")
+properties/5/path = NodePath("Blackboard:move_speed_multiplier")
 properties/5/spawn = false
 properties/5/replication_mode = 2
-properties/6/path = NodePath("Blackboard:move_speed_multiplier")
-properties/6/spawn = false
-properties/6/replication_mode = 2
 
 [node name="BasePlayer" unique_id=1093356318 instance=ExtResource("1_crbit")]
 config = SubResource("Resource_na54m")

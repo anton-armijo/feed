@@ -4,11 +4,6 @@ Briefing del proyecto para agentes de IA (opencode, codex, etc.). Léelo al
 iniciar sesión para saber cómo construir, correr, lintar y testear sin que se
 te explique cada vez.
 
-## Resumen
-
-Godot 4.6, GDScript only (sin C#), Jolt physics. Multiplayer maze 3DF
-("Find the Teto"). Renderer: **gl_compatibility** (`project.godot:15,96-97`).
-
 ## Documentacion
 Lee godot-docs/README.md para ver la documentacion de godot 4.6
 
@@ -40,9 +35,11 @@ gdformat <file>...                          # formatea (normaliza ws, blank line
 ```
 
 Requiere `godot-gdscript-toolkit` (`pip install --user gdtoolkit`).
-Config en `.gdlintrc` (tabs, max-line 120, excluye `addons/`/`.godot/`).
-`class-definitions-order` está deshabilitado (estilístico, requeriría
-reformatear todo el codebase existente). El resto de reglas aplica.
+Config en `.gdlintrc` (tabs, max-line 120, excluye `addons/`/`.godot/`/`.git/`).
+Reglas deshabilitadas: `class-definitions-order`, `no-elif-return`,
+`no-else-return`, `unnecessary-pass`, `expression-not-assigned`,
+`comparison-with-itself`, `duplicated-load`, `load-constant-name`,
+`max-public-methods`. El resto de reglas aplica.
 
 **Antes de commit:** `gdlint` debe pasar en los archivos que toques.
 
@@ -97,8 +94,16 @@ modelo. Cada escena de modelo tiene un script en su root que extiende
 `CharacterPresenter` (`player/scripts/animation/character_presenter.gd`) y
 posee su propio `AnimationTree`/`AnimationPlayer`/`AnimationDriver`/shaders.
 `Player` referencia el presenter por nodo tipado (`$Model/CharacterScene`)
-y llama `setup_presenter(bb, resolved.locomotion)`. Swap de personaje =
+y llama `setup_presenter(bb, resolved)`. Swap de personaje =
 swap de escena que extiende `CharacterPresenter`.
+
+El presenter base implementa:
+- `set_fade(amount)` — transparencia alpha real via `fade_alpha` uniform del
+  toon shader. Usado por `ProximityFadeController` para ocultar el modelo
+  cuando la cámara está cerca.
+- `get_fade_areas()` — retorna las `Area3D` hijas (en collision layer 8)
+  usadas por el `ProximityFadeController` para raycast de distancia.
+- `get_skeleton()` — hook para futuros sistemas (Foot IK).
 
 ### `PlayerApi` vs `PlayerBlackboard`
 
@@ -124,8 +129,8 @@ Son **complementarios**, no la misma cosa:
 después de todos los `setup()` de componentes. 3 tiers:
 1. **Core**: speed modifiers, gravity, velocity, FSM requests, input,
    abilities — cubre abilities y game layer.
-2. **Feel**: intent injection, camera verbs, animation override — para
-   cutscenes/AI.
+2. **Feel**: intent injection, camera verbs, animation override, camera
+   effects (FOV/shake), model fade — para cutscenes/AI.
 3. **Extensión**: `register_verb`/`call_verb` — nodos auxiliares publican
    sus propios verbos sin que `PlayerApi` los conozca.
 
@@ -133,7 +138,7 @@ Ownership documentada por verbo (comentarios `##`), no enforced runtime.
 
 ### Reglas clave (single-writers por convención)
 
-- Sólo `MovementMotor` llama `move_and_slide()` (`movement_motor.gd:89`).
+- Sólo `MovementMotor` llama `move_and_slide()` (`movement_motor.gd`).
 - Sólo `NetTransport` escribe `multiplayer.multiplayer_peer`.
 - Sólo `LocomotionFSM` escribe `bb.locomotion_state`.
 - El blackboard es la **única** superficie de lectura para presentación/sync.
@@ -145,8 +150,8 @@ Ownership documentada por verbo (comentarios `##`), no enforced runtime.
 `JumpConfig`, `CameraConfig`, `CameraEffectsConfig`, `StairConfig`,
 `ProbeConfig`, `PlayerComponentsConfig`. Serializados como `.tres` en
 `player/resources/`. `ensure_defaults()` garantiza sub-resources no-null.
-`extras: Array[Resource]` lleva configs misceláneos (ej. `HeadTrackConfig`)
-que los presenters/nodos auxiliares buscan por tipo.
+`extras: Array[Resource]` lleva configs misceláneos que los presenters/nodos
+auxiliares buscan por tipo (ej. `ProximityFadeConfig`).
 
 **Patrón Resolved\*:** `Player` construye un `ResolvedPlayerConfig` inmutable
 una vez en `setup()` vía `ResolvedPlayerConfig.resolve(config)`. Los
@@ -160,6 +165,25 @@ resolver hace:
 Las modificaciones runtime (abilities que cambian velocidad) van por el
 modifier stack del motor, **no** mutando config. El resolver es inmutable.
 
+### Camera effects (FOV + shake)
+
+`CameraEffectsConfig` (colgado de `PlayerConfig`) configura:
+- **FOV**: `base_fov`, `run_fov_add`, `fall_fov_add` — escalan con velocidad
+  y caída. `land_fov_kick` añade FOV al impactar.
+- **Shake**: trauma-based con ladeo (wind resistance feel). `land_shake_amount`
+  (impulso al aterrizar), `fall_shake_ramp_speed`/`fall_shake_max` (crece
+  durante caída), `tilt_amount` (grados de ladeo), `run_shake_amount`
+  (continuo al correr).
+- `CameraRig` aplica los efectos automáticamente. `PlayerApi` expone
+  `set_fov()`, `add_shake()`, `set_effects_enabled()` para control manual.
+
+### Proximity fade (dithered transparency)
+
+`ProximityFadeController` (hijo del `CameraRig`) raycastea desde la cámara a
+las `Area3D` (layer 8) del presenter de cada player. Mapea distancia a fade
+y llama `presenter.set_fade(amount)`. Configurado por `ProximityFadeConfig`
+en `extras` (`fade_start_distance`, `fade_end_distance`, `checked_areas`).
+
 ## Convenciones
 
 - **Indentación:** tabs.
@@ -171,8 +195,8 @@ modifier stack del motor, **no** mutando config. El resolver es inmutable.
   Scripts genéricos de juego en `scripts/game/`.
 - **Doc-comments** `##` en cabeceras de archivo y clases (documentan
   ownership, single-writers, intención).
-- **Autoloads:** sólo `NetSession` (`project.godot:20`).
-- **Input actions** en `project.godot:26-87`: WASD, jump (Space),
+- **Autoloads:** sólo `NetSession` (`project.godot`).
+- **Input actions** en `project.godot`: WASD, jump (Space),
   shift_lock (F3, toggle lock_on_character), run (F2), click, right_click
   (invierte lock_mouse), wheel_up/down.
 
@@ -189,12 +213,14 @@ modifier stack del motor, **no** mutando config. El resolver es inmutable.
 
 ## Gotchas
 
-- **Arte/audio/materiales gitignored** (`materials/`, `sounds/`, `models/`,
+- **Arte/audio/materiales gitignored** (`materials/`, `/sounds/`, `models/`,
   `player/character/model/`): un `git clone` solo no produce un juego
-  runnable — faltan los assets locales.
-- **Renderer mismatch** (ver Resumen).
+  runnable — faltan los assets locales. Los scripts de
+  `player/scripts/sounds/` **sí** están trackeados (no son assets).
 - **`NetSession` es el único autoload** — no hay `AudioManager` ni player
   autoload (el jugador se instancia vía `MultiplayerSpawner`).
 - **`maze_player.tscn`** hereda `base_player.tscn` y configura
   `force_first_person` + game layer; **NO** es el player base.
 - **`scenes/main.tscn`** es sandbox, **no** el main scene.
+- **`IK_system_test/`** es scratch gitignored — escenas y scripts de prueba
+  para IK. No versión, puede cambiar o descartarse.
