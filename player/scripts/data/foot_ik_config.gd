@@ -67,6 +67,10 @@ extends Resource
 ## Frames to keep using the last valid hit after a ray loses contact, smoothing
 ## out the flicker when a foot crosses the edge of a step mid-stride.
 @export_range(0, 30) var ray_miss_grace_frames := 5
+## When front and back ray Y differ by more than this fraction of sole_offset,
+## use the highest hit instead of averaging (prevents target floating between
+## steps on stair edges).
+@export_range(0.5, 3.0, 0.1) var step_edge_sole_ratio := 1.5
 
 @export_group("Derivation")
 ## Sole-offset multiplier when climbing UP a slope (1.0 = no change).

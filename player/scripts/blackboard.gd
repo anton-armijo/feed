@@ -88,6 +88,10 @@ var move_speed_multiplier := 1.0
 ## nearest safe spot instead of the spawnpoint.
 var last_safe_position := Vector3.ZERO
 
+## Current time (seconds) within the currently playing animation.
+## Published every frame by AnimationDriver. Read surface for effects, IK, audio, etc.
+var current_anim_time: float = 0.0
+
 # --- Camera-owned state -------------------------------------------------------
 
 var camera_yaw := 0.0

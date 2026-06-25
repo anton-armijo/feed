@@ -161,14 +161,24 @@ func _process(delta: float) -> void:
 	_speed_scale = _compute_speed_scale()
 	animation_tree.advance(delta * _speed_scale)
 
+	_anim_clock += delta * _speed_scale
+
+	# Publish current time to blackboard (read surface).
+	# Clamp so it never exceeds the length (avoid floor(frame) showing the next
+	# cycle when the clock overshoots by a tiny epsilon before fmod).
+	var length: float = _anim_lengths.get(_current_anim, INF)
+	if length < INF and _anim_clock >= length:
+		blackboard.current_anim_time = length
+	else:
+		blackboard.current_anim_time = _anim_clock
+
 	var markers: Array = _marker_config.get(_current_anim, [])
 	if markers.is_empty():
 		return
 
-	_anim_clock += delta * _speed_scale
-	var length: float = _anim_lengths.get(_current_anim, 1.0)
-	if _anim_clock >= length:
-		_anim_clock = fmod(_anim_clock, length)
+	var cycle_len: float = _anim_lengths.get(_current_anim, 1.0)
+	if _anim_clock >= cycle_len:
+		_anim_clock = fmod(_anim_clock, cycle_len)
 		_triggered_this_cycle.clear()
 
 	for entry: Dictionary in markers:

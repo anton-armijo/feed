@@ -90,8 +90,16 @@ var _last_hit_y_left: float = 0.0
 var _last_hit_y_right: float = 0.0
 var _last_height_diff_left: float = 0.0
 var _last_height_diff_right: float = 0.0
+var _last_pos_y_left: float = 0.0
+var _last_pos_y_right: float = 0.0
 var _miss_frames_left := 0
 var _miss_frames_right := 0
+
+# Cached from calibrator for runtime constraints
+var _left_hip_idx: int = -1
+var _right_hip_idx: int = -1
+var _left_leg_length: float = 0.0
+var _right_leg_length: float = 0.0
 
 ## Y offset (metres) to lower the body for hip adjustment on slopes.
 ## [ModelVisual] reads this and blends it into its Y smoothing.
@@ -109,6 +117,8 @@ func presenter_setup(bb: PlayerBlackboard, config: PlayerConfig) -> void:
 	_bb = bb
 	_config = config.foot_ik
 
+	print(_bb.footstep_markers)
+	print(_bb.anim_lengths)
 	if _bb == null or _config == null:
 		push_warning("[FootIKController] Invalid Player setup")
 		set_physics_process(false)
@@ -334,11 +344,20 @@ func _process_leg_ik(
 	else:
 		_miss_frames_right = 0
 
-	# Weighted average of hit points
+	# ── Fix 1: Highest ray strategy on step edges ──────────────────────────
+	# When front and back rays differ by more than sole_offset * ratio, it
+	# means the foot spans a step edge. Averaging would put the target between
+	# steps (mid-air), so use the HIGHEST hit instead.
 	var avg_hit_y: float
 	if f_hit and b_hit:
-		var wf := _config.front_ray_weight
-		avg_hit_y = ray_f.get_collision_point().y * wf + ray_b.get_collision_point().y * (1.0 - wf)
+		var front_y := ray_f.get_collision_point().y
+		var back_y := ray_b.get_collision_point().y
+		var sole: float = _calibrator.metrics.sole_offset
+		if absf(front_y - back_y) > sole * _config.step_edge_sole_ratio:
+			avg_hit_y = maxf(front_y, back_y)
+		else:
+			var wf := _config.front_ray_weight
+			avg_hit_y = front_y * wf + back_y * (1.0 - wf)
 	elif f_hit:
 		avg_hit_y = ray_f.get_collision_point().y
 	else:
@@ -363,12 +382,38 @@ func _process_leg_ik(
 	var slope_thresh: float = m.slope_threshold
 	var sole: float = m.sole_offset
 
-	# Adaptive Y offset based on slope classification
-	var pos_y: float = sole  # flat default
-	if height_diff > slope_thresh:
-		pos_y = m.pos_y_height_up
-	elif height_diff < -slope_thresh:
-		pos_y = m.pos_y_height_down
+	# ── Fix 2: Continuous slope blending ──────────────────────────────────
+	# Replace the ternary hard-switch with smoothstep interpolation between
+	# down / flat / up offsets. This eliminates the jump when height_diff
+	# oscillates around the threshold (common on stairs where the body
+	# position bounces slightly each step).
+	#
+	# height_diff > 0  → foot is *below* body (stepping up)
+	# height_diff < 0  → foot is *above* body (stepping down)
+	# Maps [0, slope_thresh] → [flat, up] for positive
+	# Maps [-slope_thresh, 0] → [down, flat] for negative
+	var pos_y: float
+	if height_diff > 0.0:
+		var t := smoothstep(0.0, slope_thresh, height_diff)
+		pos_y = lerp(sole, m.pos_y_height_up, t)
+	elif height_diff < 0.0:
+		var t := smoothstep(0.0, slope_thresh, -height_diff)
+		pos_y = lerp(m.pos_y_height_down, sole, t)
+	else:
+		pos_y = sole
+
+	# ── Fix 3: Freeze pos_y during stair teleport ─────────────────────────
+	# When StairStepper teleports the body upward, height_diff spikes
+	# because the body moved but the foot ray is still hitting the old step.
+	# Using the fresh height_diff would change pos_y classification mid-step.
+	# Reuse the previous frame's pos_y during the teleport frame so the
+	# target Y doesn't jump.
+	if _bb.is_stepping or _bb.is_stepping_down:
+		pos_y = _last_pos_y_left if is_left else _last_pos_y_right
+	if is_left:
+		_last_pos_y_left = pos_y
+	else:
+		_last_pos_y_right = pos_y
 
 	# Set the target Y directly (no smoothing). The original repo does this
 	# and it is what keeps the feet glued to the step without lag. Smoothing
@@ -382,6 +427,36 @@ func _process_leg_ik(
 	# offset, in world space, independent of the skeleton.
 	var foot_pos := bone_attach.global_position
 	target_marker.global_position = Vector3(foot_pos.x, target_y, foot_pos.z)
+
+	# ── Fix 5: Hip width constraint (X/Z) ─────────────────────────────────
+	# Project the foot target onto a cylinder centered on the upper leg bone
+	# to prevent the legs from splaying wider than the hips allow.
+	var hip_idx := _left_hip_idx if is_left else _right_hip_idx
+	if hip_idx >= 0:
+		var hip_world := _skeleton.global_transform * _skeleton.get_bone_global_rest(hip_idx).origin
+		var to_target := target_marker.global_position - hip_world
+		var max_xz: float = _calibrator.metrics.hip_separation * 0.55
+		var xz_dist := Vector2(to_target.x, to_target.z).length()
+		if xz_dist > max_xz:
+			var scale: float = max_xz / xz_dist
+			target_marker.global_position = Vector3(
+				hip_world.x + to_target.x * scale,
+				target_marker.global_position.y,
+				hip_world.z + to_target.z * scale
+			)
+
+	# ── Fix 4: Soft clamp against TwoBoneIK singularity ────────────────────
+	# When the foot target approaches max reach, the TwoBoneIK solver loses
+	# its ability to determine a unique knee position (singularity). Clamp
+	# the target to 97% of total leg length so there's always a minimum bend.
+	if hip_idx >= 0:
+		var hip_world := _skeleton.global_transform * _skeleton.get_bone_global_rest(hip_idx).origin
+		var leg_length := _left_leg_length if is_left else _right_leg_length
+		var max_reach := leg_length * 0.97
+		var to_target := target_marker.global_position - hip_world
+		if to_target.length() > max_reach:
+			target_marker.global_position = hip_world + to_target.normalized() * max_reach
+
 	ik.influence = lerpf(ik.influence, _target_influence(), _current_lerp_speed() * delta)
 
 	return height_diff
@@ -725,6 +800,12 @@ func _calibrate() -> void:
 	# Foot rotation modifiers
 	if _config.foot_rotation_enabled and _copy_rot_left:
 		_setup_copy_modifiers()
+
+	# Cache hip indices and leg lengths for runtime constraint solvers
+	_left_hip_idx = _calibrator.bone_indices.get("left_upper_leg_idx", -1)
+	_right_hip_idx = _calibrator.bone_indices.get("right_upper_leg_idx", -1)
+	_left_leg_length = _calibrator.metrics.get("left_leg_length", 1.0)
+	_right_leg_length = _calibrator.metrics.get("right_leg_length", 1.0)
 
 	_is_calibrated = true
 	set_physics_process(true)
