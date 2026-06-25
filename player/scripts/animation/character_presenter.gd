@@ -30,6 +30,7 @@ var _original_overrides: Dictionary = {}
 var _original_visibilities: Dictionary = {}
 var _fade_materials: Dictionary = {}
 
+
 ## Called by Player._ready() after the blackboard and resolved config are
 ## built. Subclasses wire their internal animation/audio nodes here, then
 ## call super.setup_presenter().
@@ -39,12 +40,14 @@ func setup_presenter(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> vo
 	_setup_child_nodes(bb, resolved)
 
 
-## Iterates child nodes and calls presenter_setup(bb, resolved) on any that
-## implement the method. This lets scene authors add new setup-able child
-## nodes without modifying setup_presenter() overrides. Follows the same
-## auto-registration pattern used by AbilityManager and LocomotionFSM.
+## Iterates descendant nodes and calls presenter_setup(bb, resolved) on any
+## that implement the method. This lets scene authors add new setup-able child
+## nodes (including ones nested under the skeleton, e.g. a FootIkController
+## living under GeneralSkeleton) without modifying setup_presenter() overrides.
+## Follows the same auto-registration pattern used by AbilityManager and
+## LocomotionFSM. Recursive so modifiers parented to the Skeleton3D are wired.
 func _setup_child_nodes(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
-	for child in get_children():
+	for child in find_children("*", "", true, true):
 		if child == self:
 			continue
 		if child.has_method(&"presenter_setup"):
@@ -76,6 +79,7 @@ func _find_fade_config(resolved: ResolvedPlayerConfig) -> ProximityFadeConfig:
 func get_skeleton() -> Skeleton3D:
 	return null
 
+
 ## Sets the model fade amount (0 = fully visible, 1 = fully invisible).
 ## The base implementation applies a dedicated fade shader
 ## (Bayer dither pattern) as MeshInstance3D.material_override only while
@@ -91,6 +95,7 @@ func set_fade(amount: float) -> void:
 		_apply_fade_to_materials(mi, alpha)
 		_apply_fade_override(mi, alpha)
 
+
 ## Applies the fade alpha to a MeshInstance3D's override and surface materials.
 func _apply_fade_to_materials(mi: MeshInstance3D, alpha: float) -> void:
 	if mi.material_override is ShaderMaterial:
@@ -99,6 +104,7 @@ func _apply_fade_to_materials(mi: MeshInstance3D, alpha: float) -> void:
 		var mat := mi.get_surface_override_material(i)
 		if mat is ShaderMaterial:
 			(mat as ShaderMaterial).set_shader_parameter("fade_alpha", alpha)
+
 
 ## Applies or removes the dedicated fade material override on the mesh.
 func _apply_fade_override(mi: MeshInstance3D, alpha: float) -> void:
@@ -124,6 +130,7 @@ func _apply_fade_override(mi: MeshInstance3D, alpha: float) -> void:
 			_original_overrides.erase(mi)
 			_original_visibilities.erase(mi)
 
+
 func _get_or_create_fade_material(mi: MeshInstance3D) -> ShaderMaterial:
 	if _fade_materials.has(mi):
 		return _fade_materials[mi]
@@ -134,6 +141,7 @@ func _get_or_create_fade_material(mi: MeshInstance3D) -> ShaderMaterial:
 		fade_mat.set_shader_parameter("albedo_texture", tex)
 	_fade_materials[mi] = fade_mat
 	return fade_mat
+
 
 func _extract_albedo_texture(mi: MeshInstance3D) -> Texture2D:
 	var override := mi.material_override
@@ -156,6 +164,7 @@ func _extract_albedo_texture(mi: MeshInstance3D) -> Texture2D:
 			if tex is Texture2D:
 				return tex
 	return null
+
 
 ## Returns all Area3D children of the presenter (used by
 ## ProximityFadeController for raycast-based fade detection). Override in

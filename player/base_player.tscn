@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://bt2exgm8pg6v3" path="res://player/scripts/animation/model_visual.gd" id="5_86sgf"]
 [ext_resource type="Resource" uid="uid://w3cdiis47qpb" path="res://player/resources/default_jump.tres" id="5_cjuxb"]
 [ext_resource type="Resource" uid="uid://6homywwyjmrw" path="res://player/resources/default_locomotion.tres" id="6_jkkg1"]
+[ext_resource type="Resource" uid="uid://ciqxl6lj8cb8k" path="res://player/resources/default_foot_ik.tres" id="6_sriaj"]
 [ext_resource type="PackedScene" uid="uid://6178wwf8ahrb" path="res://player/character/character_scene.tscn" id="6_xit0w"]
 [ext_resource type="Script" uid="uid://belln0ul6x2ou" path="res://player/scripts/data/probe_config.gd" id="7_5mijv"]
 [ext_resource type="Script" uid="uid://dfvwpuqfqf7jx" path="res://player/scripts/sounds/walk_sounds.gd" id="7_qrwaw"]
@@ -43,6 +44,7 @@ camera_effects = SubResource("Resource_1tmq0")
 stair = SubResource("Resource_6lh0n")
 probe = SubResource("Resource_qddpm")
 components = SubResource("Resource_pba5u")
+foot_ik = ExtResource("6_sriaj")
 extras = Array[Resource]([SubResource("Resource_nfrn4")])
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_dugmo"]

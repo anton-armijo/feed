@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="FootIKConfig" format=3 uid="uid://ciqxl6lj8cb8k"]
+
+[ext_resource type="Script" uid="uid://de42snjrh2fcn" path="res://player/scripts/data/foot_ik_config.gd" id="1_sjsre"]
+
+[resource]
+script = ExtResource("1_sjsre")
+ray_collision_mask = 1

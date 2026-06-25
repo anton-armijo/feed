@@ -33,6 +33,7 @@ func _ready() -> void:
 	enabled["CameraRig"]              = cfg.enable_camera
 	enabled["Model"]                  = cfg.enable_model
 	enabled["WalkSounds"]             = cfg.enable_footsteps
+	enabled["FootIK"]                 = cfg.enable_foot_ik
 	enabled["AbilityManager"]         = cfg.enable_abilities
 	enabled["MultiplayerSynchronizer"] = cfg.enable_multiplayer_sync
 	enabled["FSM.Run"]                = cfg.enable_sprint

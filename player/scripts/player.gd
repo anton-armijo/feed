@@ -79,6 +79,13 @@ func _ready() -> void:
 		model.setup(blackboard, self)
 		presenter.setup_presenter(blackboard, resolved)
 
+	# Wire FootIKController (auto-discovered by presenter_setup) to ModelVisual
+	# so the IK's hip-lowering offset is blended into Y smoothing.
+	if assembler.is_enabled("FootIK"):
+		var ik_controller: FootIKController = _find_ik_controller()
+		if ik_controller != null:
+			model.set_ik_controller(ik_controller)
+
 	if _is_local:
 		if assembler.is_enabled("CameraRig"):
 			camera_rig.setup(blackboard, self, model, presenter)
@@ -140,3 +147,10 @@ func _publish_state(intent: InputIntent) -> void:
 	blackboard.move_speed_multiplier = motor.speed_multiplier()
 	if is_on_floor():
 		blackboard.last_safe_position = global_position
+
+func _find_ik_controller() -> FootIKController:
+	if presenter == null:
+		return null
+	for child in presenter.find_children("FootIKController", "FootIKController", false, true):
+		return child as FootIKController
+	return null

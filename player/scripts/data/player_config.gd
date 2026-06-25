@@ -17,6 +17,7 @@ extends Resource
 @export var stair: StairConfig
 @export var probe: ProbeConfig
 @export var components: PlayerComponentsConfig
+@export var foot_ik: FootIKConfig
 
 ## Miscelaneos per-character configs for auxiliary nodes (aura effects, custom
 ## visual configs, etc.). Each auxiliary node searches this array for its
@@ -40,3 +41,5 @@ func ensure_defaults() -> void:
 		probe = ProbeConfig.new()
 	if components == null:
 		components = PlayerComponentsConfig.new()
+	if foot_ik == null:
+		foot_ik = FootIKConfig.new()

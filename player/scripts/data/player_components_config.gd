@@ -10,6 +10,7 @@ extends Resource
 @export var enable_camera := true
 @export var enable_model := true
 @export var enable_footsteps := true
+@export var enable_foot_ik := true
 @export var enable_abilities := true
 @export var enable_multiplayer_sync := true
 @export var enable_lock_on_character := false

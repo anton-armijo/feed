@@ -29,6 +29,7 @@ var camera: Camera
 var camera_effects: CameraEffects
 var stair: Stair
 var probe: Probe
+var foot_ik: FootIK
 var extras: Array[Resource]
 
 # --- Inner data classes -------------------------------------------------------
@@ -121,6 +122,47 @@ class Probe:
 	var collision_mask: int
 
 
+class FootIK:
+	extends RefCounted
+	# Activation
+	var ik_during_walk: bool
+	var ik_during_run: bool
+	var ik_always_on: bool
+	# Influence
+	var idle_influence: float
+	var walk_influence: float
+	var run_influence: float
+	# Transitions
+	var normal_lerp_speed: float
+	var land_lerp_speed: float
+	var hard_land_lerp_speed: float
+	var hard_land_distance: float
+	var body_reset_lerp_speed: float
+	var body_lower_lerp_speed: float
+	# Foot rotation
+	var foot_rotation_enabled: bool
+	var idle_foot_rot_influence: float
+	var walk_foot_rot_influence: float
+	var step_foot_rot_influence: float
+	var foot_rot_slerp_speed: float
+	var foot_rot_lerp_speed: float
+	var foot_rot_y_lerp_speed: float
+	# Raycast
+	var front_ray_weight: float
+	var ray_origin_height_ratio: float
+	var ray_ground_margin: float
+	var ray_collision_mask: int
+	var ray_miss_grace_frames: int
+	# Derivation
+	var sole_offset_up_ratio: float
+	var sole_offset_down_ratio: float
+	var slope_threshold_ratio: float
+	var pole_forward_ratio: float
+	var pole_y_offset: float
+	var ray_back_foot_ratio: float
+	var ray_front_foot_ratio: float
+
+
 # --- Factory ------------------------------------------------------------------
 
 
@@ -140,6 +182,7 @@ static func resolve(cfg: PlayerConfig) -> ResolvedPlayerConfig:
 	r.camera_effects = _resolve_camera_effects(cfg)
 	r.stair = _resolve_stair(cfg)
 	r.probe = _resolve_probe(cfg)
+	r.foot_ik = _resolve_foot_ik(cfg)
 	r.extras = cfg.extras.duplicate()
 	return r
 
@@ -257,6 +300,77 @@ static func _resolve_probe(cfg: PlayerConfig) -> Probe:
 	p.medium_factor = cfg.probe.medium_factor
 	p.collision_mask = cfg.probe.collision_mask
 	return p
+
+
+static func _resolve_foot_ik(cfg: PlayerConfig) -> FootIK:
+	var f := FootIK.new()
+	if cfg.foot_ik == null:
+		# Defaults — IK disabled when no config is provided
+		f.foot_rotation_enabled = false
+		f.ik_during_walk = false
+		f.ik_during_run = false
+		f.ik_always_on = false
+		f.idle_influence = 1.0
+		f.walk_influence = 0.6
+		f.run_influence = 0.2
+		f.normal_lerp_speed = 10.0
+		f.land_lerp_speed = 25.0
+		f.hard_land_lerp_speed = 35.0
+		f.hard_land_distance = 2.0
+		f.body_reset_lerp_speed = 15.0
+		f.body_lower_lerp_speed = 10.0
+		f.idle_foot_rot_influence = 1.0
+		f.walk_foot_rot_influence = 0.5
+		f.step_foot_rot_influence = 0.3
+		f.foot_rot_slerp_speed = 15.0
+		f.foot_rot_lerp_speed = 15.0
+		f.foot_rot_y_lerp_speed = 20.0
+		f.front_ray_weight = 0.5
+		f.ray_origin_height_ratio = 0.4
+		f.ray_ground_margin = 0.3
+		f.ray_collision_mask = 2
+		f.ray_miss_grace_frames = 5
+		f.sole_offset_up_ratio = 0.95
+		f.sole_offset_down_ratio = 0.90
+		f.slope_threshold_ratio = 0.03
+		f.pole_forward_ratio = 0.7
+		f.pole_y_offset = 0.1
+		f.ray_back_foot_ratio = 0.6
+		f.ray_front_foot_ratio = 0.3
+		return f
+	var s := cfg.foot_ik
+	f.ik_during_walk = s.ik_during_walk
+	f.ik_during_run = s.ik_during_run
+	f.ik_always_on = s.ik_always_on
+	f.idle_influence = s.idle_influence
+	f.walk_influence = s.walk_influence
+	f.run_influence = s.run_influence
+	f.normal_lerp_speed = s.normal_lerp_speed
+	f.land_lerp_speed = s.land_lerp_speed
+	f.hard_land_lerp_speed = s.hard_land_lerp_speed
+	f.hard_land_distance = s.hard_land_distance
+	f.body_reset_lerp_speed = s.body_reset_lerp_speed
+	f.body_lower_lerp_speed = s.body_lower_lerp_speed
+	f.foot_rotation_enabled = s.foot_rotation_enabled
+	f.idle_foot_rot_influence = s.idle_foot_rot_influence
+	f.walk_foot_rot_influence = s.walk_foot_rot_influence
+	f.step_foot_rot_influence = s.step_foot_rot_influence
+	f.foot_rot_slerp_speed = s.foot_rot_slerp_speed
+	f.foot_rot_lerp_speed = s.foot_rot_lerp_speed
+	f.foot_rot_y_lerp_speed = s.foot_rot_y_lerp_speed
+	f.front_ray_weight = s.front_ray_weight
+	f.ray_origin_height_ratio = s.ray_origin_height_ratio
+	f.ray_ground_margin = s.ray_ground_margin
+	f.ray_collision_mask = s.ray_collision_mask
+	f.ray_miss_grace_frames = s.ray_miss_grace_frames
+	f.sole_offset_up_ratio = s.sole_offset_up_ratio
+	f.sole_offset_down_ratio = s.sole_offset_down_ratio
+	f.slope_threshold_ratio = s.slope_threshold_ratio
+	f.pole_forward_ratio = s.pole_forward_ratio
+	f.pole_y_offset = s.pole_y_offset
+	f.ray_back_foot_ratio = s.ray_back_foot_ratio
+	f.ray_front_foot_ratio = s.ray_front_foot_ratio
+	return f
 
 
 # --- Derivation functions -----------------------------------------------------
