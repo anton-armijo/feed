@@ -42,7 +42,10 @@ func _ready() -> void:
 	_is_local = peer_id == my_id or name == str(my_id)
 	add_to_group("players")
 
-	floor_snap_length = 0.35
+	# The custom StairStepper handles all step-up/step-down logic. Disabling
+	# the built-in floor snap prevents it from fighting the stepper's upward
+	# teleport and producing vertical jitter on stairs.
+	floor_snap_length = 0.0
 	floor_stop_on_slope = true
 	floor_block_on_wall = false
 

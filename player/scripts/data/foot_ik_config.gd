@@ -9,21 +9,10 @@
 class_name FootIKConfig
 extends Resource
 
-@export_group("Activation")
-## If true, IK also runs while the character walks (not just idle).
-@export var ik_during_walk := true
-## If true, IK also runs while the character runs.
-@export var ik_during_run := false
-## If true, IK is forced on regardless of locomotion state (debug / cutscene).
-@export var ik_always_on := false
-
-@export_group("Influence")
-## Target TwoBoneIK3D influence when the character is idle.
-@export_range(0.0, 1.0) var idle_influence := 1.0
-## Target TwoBoneIK3D influence while walking.
-@export_range(0.0, 1.0) var walk_influence := 0.6
-## Target TwoBoneIK3D influence while running.
-@export_range(0.0, 1.0) var run_influence := 0.2
+## Per-animation influence profiles. Each entry maps an animation name to an
+## [IKInfluenceProfile] that drives the foot IK influence over time. Supports
+## FOOTSTEP, LAND, CONSTANT, and ZERO modes.
+@export var animation_profiles: Array[AnimIKEntry] = []
 
 @export_group("Transitions")
 ## Lerp speed for influence transitions during normal operation.

@@ -129,7 +129,12 @@ func physics_step(delta: float) -> void:
 		_stepper.step_up(horizontal_velocity() * delta)
 	_body.move_and_slide()
 	if _bb != null and _bb.is_stepping:
+		# Temporary snap length: the global floor_snap_length is 0 (set in
+		# Player._ready()) so the built-in snap doesn't fight the stepper.
+		var saved := _body.floor_snap_length
+		_body.floor_snap_length = _stepper.get_max_step_up()
 		_body.apply_floor_snap()
+		_body.floor_snap_length = saved
 	elif _stepper != null:
 		_stepper.step_down()
 

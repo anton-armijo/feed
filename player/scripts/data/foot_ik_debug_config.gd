@@ -12,3 +12,7 @@ extends Resource
 @export_range(3, 60) var debug_oscillation_history_size := 20
 @export_range(0.001, 0.5, 0.001) var debug_oscillation_threshold := 0.03
 @export var debug_oscillation_min_frames := 6
+
+## If true, logs the current animation name, resolved base, profile mode,
+## and target influence value at the same interval as debug_log_frame.
+@export var debug_log_profile_info := false

@@ -211,7 +211,7 @@ func _physics_process(delta: float) -> void:
 	if should_ik != _was_ik_active:
 		_was_ik_active = should_ik
 
-	_debug.debug_update(delta, ik_y_offset)
+	_debug.debug_update(delta, ik_y_offset, _target_influence())
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -220,8 +220,6 @@ func _physics_process(delta: float) -> void:
 
 
 func _should_ik_be_active() -> bool:
-	if _config.ik_always_on:
-		return true
 	# Stepping overrides: always IK during stair transitions, even if the
 	# body briefly leaves the floor mid step-up — the feet must stay planted
 	# on the steps. This must run before the grounded check below.
@@ -229,33 +227,113 @@ func _should_ik_be_active() -> bool:
 		return true
 	if not _bb.is_grounded:
 		return false
-	return _active_for_state(_bb.locomotion_state)
-
-
-func _active_for_state(state: StringName) -> bool:
-	match state:
-		&"Idle":
-			return true
-		&"Walk", &"Land":
-			return _config.ik_during_walk
-		&"Run":
-			return _config.ik_during_run
-		_:
-			return false
+	var anim: StringName = _bb.anim_state_override if not _bb.anim_state_override.is_empty() else _bb.anim_state
+	return _entry_for_anim(anim) != null
 
 
 func _target_influence() -> float:
-	var state := _bb.locomotion_state
-	match state:
-		&"Idle":
-			return _config.idle_influence
-		&"Walk", &"Land":
-			return _config.walk_influence
-		&"Run":
-			return _config.run_influence
-		_:
-			return _config.walk_influence
+	var anim: StringName = _bb.anim_state_override if not _bb.anim_state_override.is_empty() else _bb.anim_state
+	var entry: AnimIKEntry = _entry_for_anim(anim)
+	if entry != null and entry.profile != null:
+		return _evaluate_profile(entry.profile, anim)
+	return 0.0
 
+
+func _entry_for_anim(anim: StringName) -> AnimIKEntry:
+	var base := _resolve_base_anim(anim)
+	for entry: AnimIKEntry in _config.animation_profiles:
+		if entry and entry.animation_name == base and entry.profile != null:
+			return entry
+	# Fall back to the first profile as default for undefined animations
+	if _config.animation_profiles.size() > 0:
+		return _config.animation_profiles[0]
+	return null
+
+## Strips directional suffixes (_back, _left, _right) to resolve
+## "walk_back" → "walk" etc., so directional variants use the base profile.
+func _resolve_base_anim(anim: StringName) -> StringName:
+	var s := String(anim)
+	for suffix in ["_back", "_left", "_right"]:
+		if s.ends_with(suffix):
+			return StringName(s.trim_suffix(suffix))
+	return anim
+
+func _evaluate_profile(p: IKInfluenceProfile, anim: StringName) -> float:
+	match p.mode:
+		IKInfluenceProfile.Mode.CONSTANT:
+			return p.constant_value
+		IKInfluenceProfile.Mode.ZERO:
+			return 0.0
+		IKInfluenceProfile.Mode.FOOTSTEP:
+			return _eval_footstep_profile(p, anim)
+		IKInfluenceProfile.Mode.LAND:
+			return _eval_land_profile(p, anim)
+	return 1.0
+
+
+func _eval_footstep_profile(p: IKInfluenceProfile, anim: StringName) -> float:
+	var markers: Array = _bb.footstep_markers.get(anim, [])
+	if markers.is_empty() or p.curve == null:
+		return 1.0
+
+	var dur: float = _bb.anim_lengths.get(anim, 1.0)
+	var t: float = _bb.current_anim_time
+	var n: int = markers.size()
+
+	var best_idx: int = 0
+	var best_abs: float = INF
+	for i: int in n:
+		var d: float = _cyc(t - markers[i].time, dur)
+		if absf(d) < best_abs:
+			best_abs = absf(d)
+			best_idx = i
+
+	var dt: float = _cyc(t - markers[best_idx].time, dur)
+	var m_t: float = markers[best_idx].time
+
+	var prev_idx: int = (best_idx - 1 + n) % n
+	var next_idx: int = (best_idx + 1) % n
+	var prev_t: float = markers[prev_idx].time
+	var next_t: float = markers[next_idx].time
+
+	if prev_idx >= best_idx:
+		prev_t -= dur
+	if next_idx <= best_idx:
+		next_t += dur
+
+	var half_before: float = (m_t - prev_t) * 0.5
+	var half_after: float = (next_t - m_t) * 0.5
+
+	var x: float = absf(dt) / maxf(
+		half_before if dt <= 0.0 else half_after,
+		1e-4
+	)
+	return p.curve.sample(clampf(x, 0.0, 1.0))
+
+
+func _eval_land_profile(p: IKInfluenceProfile, anim: StringName) -> float:
+	var markers: Array = _bb.footstep_markers.get(anim, [])
+	if markers.is_empty() or p.curve == null:
+		return 0.0
+
+	var land_t: float = markers[0].time
+	var t: float = _bb.current_anim_time
+
+	if t < land_t:
+		return 0.0
+
+	var dur: float = _bb.anim_lengths.get(anim, 1.0)
+	var x: float = (t - land_t) / maxf(dur - land_t, 1e-4)
+	return p.curve.sample(clampf(x, 0.0, 1.0))
+
+
+## Distancia con signo colapsada a (-dur/2, dur/2]
+func _cyc(d: float, dur: float) -> float:
+	while d > dur * 0.5:
+		d -= dur
+	while d <= -dur * 0.5:
+		d += dur
+	return d
 
 func _target_foot_rot_influence() -> float:
 	if _bb.is_stepping or _bb.is_stepping_down:
@@ -477,7 +555,31 @@ func _compute_body_offset(delta: float) -> void:
 		ik_y_offset = lerp(ik_y_offset, 0.0, _config.body_reset_lerp_speed * delta)
 		return
 
-	var lowest = min(_last_offset_left, _last_offset_right)
+	# When airborne (Jump/Fall) the rays can't hit the ground; the old
+	# height_diff values would pull the body downward. Always reset during
+	# airtime regardless of ik_always_on.
+	if not _bb.is_grounded:
+		ik_y_offset = lerp(ik_y_offset, 0.0, _config.body_reset_lerp_speed * delta)
+		return
+
+	# Only consider height diffs from feet that are actively planted
+	# (influence > threshold). A foot in swing phase with influence near 0
+	# can produce rapidly changing height_diff on stairs as its rays hit
+	# different steps — that would oscillate the body offset every stride.
+	var l_active := _ik_leg_left.influence > 0.1
+	var r_active := _ik_leg_right.influence > 0.1
+	var lowest: float
+	if l_active and r_active:
+		lowest = min(_last_offset_left, _last_offset_right)
+	elif l_active:
+		lowest = _last_offset_left
+	elif r_active:
+		lowest = _last_offset_right
+	else:
+		# Neither foot planted — reset offset
+		ik_y_offset = lerp(ik_y_offset, 0.0, _config.body_reset_lerp_speed * delta)
+		return
+
 	var speed := _current_lerp_speed()
 
 	if lowest < 0.0:
@@ -593,23 +695,20 @@ func _update_copy_influence(delta: float, target: float) -> void:
 
 func _on_state_changed(_previous: StringName, next: StringName) -> void:
 	if next == &"Jump" or next == &"Fall":
-		# Snap IK off immediately when airborne
+		# Snap IK + hip offset immediately so the model doesn't lag behind
+		# the body's Y velocity while lerping to 0 (sticks to ground / pop).
 		_ik_leg_left.influence = 0.0
 		_ik_leg_right.influence = 0.0
+		ik_y_offset = 0.0
 
 
 func _on_grounded_changed(_grounded: bool) -> void:
 	pass  # _should_ik_be_active() reads _bb.is_grounded each frame
 
-
-func _on_landed(fall_distance: float) -> void:
-	# Hard-land boost is handled by _current_lerp_speed() checking air_time
-	# but we can force a higher target influence here
-	if fall_distance > _config.hard_land_distance:
-		if _ik_leg_left:
-			_ik_leg_left.influence = _config.idle_influence
-		if _ik_leg_right:
-			_ik_leg_right.influence = _config.idle_influence
+func _on_landed(_fall_distance: float) -> void:
+	# Hard-land influence is handled by the LAND animation profile and
+	# _current_lerp_speed() checking air_time.
+	pass
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -714,10 +813,8 @@ func _build_nodes() -> void:
 
 func _create_copy_modifier(m_name: String) -> SkeletonModifier3D:
 	var modifier: SkeletonModifier3D
-	if ClassDB.class_exists("CopyTransformModifier3D"):
-		modifier = ClassDB.instantiate("CopyTransformModifier3D")
-	else:
-		modifier = SkeletonModifier3D.new()
+	modifier = ClassDB.instantiate("CopyTransformModifier3D")
+
 	modifier.name = m_name
 	return modifier
 
@@ -874,9 +971,9 @@ func _setup_copy_modifiers() -> void:
 	if _copy_rot_right.has_method("set_reference_type"):
 		_copy_rot_right.set_reference_type(0, BoneConstraint3D.REFERENCE_TYPE_NODE)
 	if _copy_rot_left.has_method("set_reference_node"):
-		_copy_rot_left.set_reference_node(0, _target_rot_left.get_path())
+		_copy_rot_left.set_reference_node(0, _copy_rot_left.get_path_to(_target_rot_left))
 	if _copy_rot_right.has_method("set_reference_node"):
-		_copy_rot_right.set_reference_node(0, _target_rot_right.get_path())
+		_copy_rot_right.set_reference_node(0, _copy_rot_right.get_path_to(_target_rot_right))
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -891,7 +988,6 @@ func _find_presenter() -> CharacterPresenter:
 			return node
 		node = node.get_parent()
 	return null
-
 
 func _get_body() -> CharacterBody3D:
 	# Walk up to find the Player (CharacterBody3D)

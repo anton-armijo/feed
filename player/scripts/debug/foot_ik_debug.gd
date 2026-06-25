@@ -24,6 +24,7 @@ var _presenter: CharacterPresenter
 var _bb: PlayerBlackboard
 var _body: CharacterBody3D
 var _ik_y_offset: float
+var _current_target_influence: float
 
 func set_config(
 	config: FootIKDebugConfig, ik_config: FootIKConfig,
@@ -53,13 +54,16 @@ func set_nodes(
 	_ik_leg_left = ik_leg_left
 	_ik_leg_right = ik_leg_right
 
-func debug_update(delta: float, ik_y_offset: float) -> void:
+func debug_update(delta: float, ik_y_offset: float, target_influence: float = 0.0) -> void:
 	_ik_y_offset = ik_y_offset
+	_current_target_influence = target_influence
 	if _config.debug_draw_rays or _config.debug_draw_targets or _config.debug_draw_poles:
 		_debug_ensure_root()
 		_debug_draw()
 	if _config.debug_log_frame:
 		_debug_log(delta)
+	if _config.debug_log_profile_info:
+		_debug_log_profile_info(delta)
 	if _config.debug_detect_oscillation:
 		_debug_check_oscillation()
 
@@ -162,6 +166,50 @@ func _debug_log_ray(label: String, ray: RayCast3D) -> void:
 	)
 
 
+func _debug_log_profile_info(delta: float) -> void:
+	if _config.debug_log_interval > 0.0:
+		_debug_timer += delta
+		if _debug_timer < _config.debug_log_interval:
+			return
+		_debug_timer -= _config.debug_log_interval
+
+	var anim := _bb.anim_state_override if not _bb.anim_state_override.is_empty() else _bb.anim_state
+	var base := anim
+	for suffix in ["_back", "_left", "_right"]:
+		if String(anim).ends_with(suffix):
+			base = StringName(String(anim).trim_suffix(suffix))
+			break
+
+	var mode_str := "—"
+	for entry: AnimIKEntry in _ik_config.animation_profiles:
+		if entry and entry.animation_name == base and entry.profile:
+			match entry.profile.mode:
+				IKInfluenceProfile.Mode.CONSTANT: mode_str = "CONSTANT"
+				IKInfluenceProfile.Mode.ZERO: mode_str = "ZERO"
+				IKInfluenceProfile.Mode.FOOTSTEP: mode_str = "FOOTSTEP"
+				IKInfluenceProfile.Mode.LAND: mode_str = "LAND"
+			break
+
+	var time: float = _bb.current_anim_time
+	var dur: float = _bb.anim_lengths.get(anim, 0.0)
+	var n_markers: int = (_bb.footstep_markers.get(anim, []) as Array).size()
+
+	print(
+		(
+			"[FootIK Profile] anim=%s base=%s mode=%s target_infl=%.3f time=%.3f/%.3f markers=%d"
+			% [
+				anim,
+				base,
+				mode_str,
+				_current_target_influence,
+				time,
+				dur,
+				n_markers,
+			]
+		)
+	)
+
+
 func _debug_check_oscillation() -> void:
 	_debug_oscillation_history.append(_ik_y_offset)
 	if _debug_oscillation_history.size() > _config.debug_oscillation_history_size:
@@ -250,8 +298,6 @@ func _debug_cleanup() -> void:
 		_debug_root = null
 
 func _should_ik_be_active() -> bool:
-	if _ik_config.ik_always_on:
-		return true
 	# Stepping overrides: always IK during stair transitions, even if the
 	# body briefly leaves the floor mid step-up — the feet must stay planted
 	# on the steps. This must run before the grounded check below.
@@ -259,16 +305,20 @@ func _should_ik_be_active() -> bool:
 		return true
 	if not _bb.is_grounded:
 		return false
-	return _active_for_state(_bb.locomotion_state)
+	var anim: StringName = _bb.anim_state_override if not _bb.anim_state_override.is_empty() else _bb.anim_state
+	return _entry_for_anim(anim) != null
 
 
-func _active_for_state(state: StringName) -> bool:
-	match state:
-		&"Idle":
-			return true
-		&"Walk", &"Land":
-			return _ik_config.ik_during_walk
-		&"Run":
-			return _ik_config.ik_during_run
-		_:
-			return false
+func _entry_for_anim(anim: StringName) -> AnimIKEntry:
+	var base := anim
+	for suffix in ["_back", "_left", "_right"]:
+		if String(anim).ends_with(suffix):
+			base = StringName(String(anim).trim_suffix(suffix))
+			break
+	for entry: AnimIKEntry in _ik_config.animation_profiles:
+		if entry and entry.animation_name == base and entry.profile != null:
+			return entry
+	# Fall back to the first profile as default for undefined animations
+	if _ik_config.animation_profiles.size() > 0:
+		return _ik_config.animation_profiles[0]
+	return null

@@ -95,43 +95,7 @@ func test_aim_basis_is_orthonormal_right_handed() -> void:
 	assert_float(b.y.dot(b.z)).is_equal_approx(0.0, EPS)
 
 
-# --- Suppression rule --------------------------------------------------------
 
-
-func test_should_ik_be_active_when_grounded_walking() -> void:
-	var states: Array[StringName] = [&"idle", &"walk", &"run"]
-	var ok := FootIkController.should_ik_be_active(true, &"walk", &"", false, states, true)
-	assert_bool(ok).is_true()
-
-
-func test_should_ik_be_active_false_when_airborne() -> void:
-	var states: Array[StringName] = [&"idle", &"walk", &"run"]
-	var ok := FootIkController.should_ik_be_active(false, &"walk", &"", false, states, true)
-	assert_bool(ok).is_false()
-
-
-func test_should_ik_be_active_false_when_override_active() -> void:
-	var states: Array[StringName] = [&"idle", &"walk", &"run"]
-	var ok := FootIkController.should_ik_be_active(true, &"idle", &"emote", false, states, true)
-	assert_bool(ok).is_false()
-
-
-func test_should_ik_be_active_false_when_first_person() -> void:
-	var states: Array[StringName] = [&"idle", &"walk", &"run"]
-	var ok := FootIkController.should_ik_be_active(true, &"idle", &"", true, states, true)
-	assert_bool(ok).is_false()
-
-
-func test_should_ik_be_active_false_for_non_active_state() -> void:
-	var states: Array[StringName] = [&"idle", &"walk", &"run"]
-	var ok := FootIkController.should_ik_be_active(true, &"jump", &"", false, states, true)
-	assert_bool(ok).is_false()
-
-
-func test_should_ik_be_active_false_when_disabled() -> void:
-	var states: Array[StringName] = [&"idle", &"walk", &"run"]
-	var ok := FootIkController.should_ik_be_active(true, &"walk", &"", false, states, false)
-	assert_bool(ok).is_false()
 
 
 # --- Pelvis spring -----------------------------------------------------------

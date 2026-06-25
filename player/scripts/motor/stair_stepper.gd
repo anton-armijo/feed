@@ -18,6 +18,12 @@ func setup(body: CharacterBody3D, bb: PlayerBlackboard, config: StairConfig, bod
 	_config = config
 	_max_step_up = config.compute_max_step_up(body_height)
 
+## Returns the maximum step-up height (m) the stepper can handle, used by
+## MovementMotor for the post-step floor snap length.
+func get_max_step_up() -> float:
+	return _max_step_up
+
+
 ## Must run once per physics frame, before the FSM ticks.
 func update_grounded(delta: float) -> void:
 	_was_grounded = _is_grounded_raw
@@ -86,4 +92,10 @@ func step_down() -> void:
 		return  # already snapped, nothing to do
 	_bb.is_stepping_down = true
 	_step_down_timer = 0.1
+	# Temporarily restore floor snap length so apply_floor_snap() works even
+	# when the global snap length is 0 (set in Player._ready() to prevent
+	# built-in snapping from interfering with the custom stepper).
+	var saved := _body.floor_snap_length
+	_body.floor_snap_length = _max_step_up
 	_body.apply_floor_snap()
+	_body.floor_snap_length = saved
