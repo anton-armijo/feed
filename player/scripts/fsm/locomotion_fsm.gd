@@ -25,7 +25,7 @@ var _motor: MovementMotor
 var _stepper: StairStepper
 var _probe: GroundProbe
 var _bb: PlayerBlackboard
-var _resolved: ResolvedPlayerConfig
+var _config: PlayerConfig
 
 func setup(
 	body: CharacterBody3D,
@@ -33,14 +33,14 @@ func setup(
 	stepper: StairStepper,
 	probe: GroundProbe,
 	bb: PlayerBlackboard,
-	resolved: ResolvedPlayerConfig
+	config: PlayerConfig
 ) -> void:
 	_body = body
 	_motor = motor
 	_stepper = stepper
 	_probe = probe
 	_bb = bb
-	_resolved = resolved
+	_config = config
 	for child in get_children():
 		if child is LocomotionState:
 			register_state(child)
@@ -54,7 +54,7 @@ func register_state(state: LocomotionState) -> void:
 	state.stepper = _stepper
 	state.probe = _probe
 	state.bb = _bb
-	state.resolved = _resolved
+	state.config = _config
 	if not state.is_inside_tree():
 		add_child(state)
 	_states[state.state_id()] = state

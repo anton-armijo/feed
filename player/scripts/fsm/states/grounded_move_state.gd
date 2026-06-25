@@ -7,7 +7,7 @@ extends LocomotionState
 
 
 func target_speed() -> float:
-	return resolved.locomotion.walk_speed
+	return config.locomotion.walk_speed
 
 
 ## Walk -> Run / Run -> Walk decisions live in the subclasses.
@@ -23,7 +23,7 @@ func speed_tier_transition(_intent: InputIntent) -> StringName:
 func _backwalk_target_speed(intent: InputIntent) -> float:
 	var speed := target_speed()
 	if bb.is_backpedaling(intent.wish_dir):
-		speed *= resolved.locomotion.backwalk_speed_multiplier
+		speed *= config.locomotion.backwalk_speed_multiplier
 	return speed
 
 

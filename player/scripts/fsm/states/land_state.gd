@@ -26,12 +26,12 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 	# Backpedaling slows the recovery walk too; reverse-damp is gated by the
 	# facing-lock flag just like in GroundedMoveState.
 	var facing_locked := bb.is_facing_locked()
-	var speed := resolved.locomotion.walk_speed
+	var speed := config.locomotion.walk_speed
 	if bb.is_backpedaling(intent.wish_dir):
-		speed *= resolved.locomotion.backwalk_speed_multiplier
+		speed *= config.locomotion.backwalk_speed_multiplier
 	motor.move_ground_damped(intent.wish_dir, speed, delta, facing_locked)
 
 	_timer += delta
-	if _timer >= resolved.jump.land_duration:
+	if _timer >= config.jump.land_duration:
 		return ground_state(intent)
 	return &""

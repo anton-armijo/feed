@@ -10,7 +10,7 @@ func enter(_from: StringName) -> void:
 
 
 func target_speed() -> float:
-	return resolved.locomotion.run_speed
+	return config.locomotion.run_speed
 
 
 func speed_tier_transition(intent: InputIntent) -> StringName:

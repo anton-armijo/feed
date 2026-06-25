@@ -7,7 +7,7 @@ extends Node3D
 var _ray_short: RayCast3D
 var _ray_medium: RayCast3D
 
-func setup(body: CharacterBody3D, config: ResolvedPlayerConfig.Probe, body_height: float) -> void:
+func setup(body: CharacterBody3D, config: ProbeConfig, body_height: float) -> void:
 	_ray_short = _make_ray(body, body_height * config.short_factor, config.collision_mask)
 	_ray_medium = _make_ray(body, body_height * config.medium_factor, config.collision_mask)
 

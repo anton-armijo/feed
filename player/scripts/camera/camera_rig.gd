@@ -37,7 +37,7 @@ var _first_person_forced := false
 ## or "always_off" (mouse free by default, right-click locks). Set via PlayerApi.
 var _lock_mouse_default: StringName = &"always_off"
 # --- Camera effects (FOV + shake) ---------------------------------------------
-var _effects: ResolvedPlayerConfig.CameraEffects
+var _effects: CameraEffectsConfig
 var _effects_enabled := true
 var _manual_fov: float = -1.0  # < 0 = no manual override
 var _shake_trauma: float = 0.0
@@ -71,7 +71,7 @@ func setup(
 ## Wires the dynamic camera effects (FOV + shake). Called by Player after
 ## setup() if camera effects are enabled.
 func setup_effects(
-	effects: ResolvedPlayerConfig.CameraEffects,
+	effects: CameraEffectsConfig,
 	run_speed: float
 ) -> void:
 	_effects = effects

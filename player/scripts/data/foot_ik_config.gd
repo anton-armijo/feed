@@ -1,7 +1,5 @@
 ## Tuning data for the procedural foot IK system. Pure data — no logic,
-## no node references. Follows the same pattern as [StairConfig] and [ProbeConfig]:
-## resolved at startup by [ResolvedPlayerConfig] and consumed read-only by
-## [FootIKController].
+## no node references.
 ##
 ## All positions and offsets are derived automatically by [FootIKCalibrator]
 ## from the [Skeleton3D]; these knobs control *behaviour* and *feel*, not

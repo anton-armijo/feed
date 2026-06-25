@@ -6,15 +6,17 @@ extends Node
 
 var _body: CharacterBody3D
 var _bb: PlayerBlackboard
-var _config: ResolvedPlayerConfig.Stair
+var _config: StairConfig
+var _max_step_up: float
 var _was_grounded := true
 var _is_grounded_raw := true
 var _step_down_timer := 0.0
 
-func setup(body: CharacterBody3D, bb: PlayerBlackboard, config: ResolvedPlayerConfig.Stair) -> void:
+func setup(body: CharacterBody3D, bb: PlayerBlackboard, config: StairConfig, body_height: float) -> void:
 	_body = body
 	_bb = bb
 	_config = config
+	_max_step_up = config.compute_max_step_up(body_height)
 
 ## Must run once per physics frame, before the FSM ticks.
 func update_grounded(delta: float) -> void:
@@ -48,7 +50,7 @@ func step_up(horizontal_motion: Vector3) -> void:
 		return
 
 	for i in range(1, _config.step_check_iterations + 1):
-		var step_height := _config.max_step_up * float(i) / float(_config.step_check_iterations)
+		var step_height := _max_step_up * float(i) / float(_config.step_check_iterations)
 
 		# 1) Is there headroom to lift the body?
 		params.from = _body.global_transform
@@ -65,7 +67,7 @@ func step_up(horizontal_motion: Vector3) -> void:
 
 		# 3) Is there a floor to land on after the step?
 		params.from = lifted.translated(horizontal_motion)
-		params.motion = Vector3.DOWN * (_config.max_step_up + 0.1)
+		params.motion = Vector3.DOWN * (_max_step_up + 0.1)
 		if not PhysicsServer3D.body_test_motion(_body.get_rid(), params, result):
 			continue
 

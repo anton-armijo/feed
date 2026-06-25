@@ -23,7 +23,7 @@ metadata/_custom_type_script = "uid://belln0ul6x2ou"
 
 [sub_resource type="Resource" id="Resource_ljc3r"]
 script = ExtResource("6_pba5u")
-base_max_step_up = 0.7
+max_step_up_ratio = 0.44
 metadata/_custom_type_script = "uid://c6eav4vo3xigm"
 
 [resource]

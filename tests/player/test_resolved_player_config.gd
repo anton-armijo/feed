@@ -1,163 +1,94 @@
-## Unit tests for ResolvedPlayerConfig resolver (pure logic, no nodes).
-class_name TestResolvedPlayerConfig
+## Unit tests for PlayerConfig and its sub-resource methods (pure data, no nodes).
+class_name TestPlayerConfig
 extends GdUnitTestSuite
 
 
-func test_reference_weight_gives_base_turn_speed() -> void:
+func test_default_body_height_and_weight() -> void:
 	var cfg := PlayerConfig.new()
 	cfg.ensure_defaults()
-	cfg.weight = 70.0  # reference weight
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.locomotion.model_turn_speed).is_equal(cfg.locomotion.base_model_turn_speed)
+	assert_float(cfg.body_height).is_equal(1.59)
+	assert_float(cfg.weight).is_equal(47.0)
 
 
-func test_teto_weight_increases_turn_speed() -> void:
+func test_ensure_defaults_creates_sub_resources() -> void:
 	var cfg := PlayerConfig.new()
 	cfg.ensure_defaults()
-	cfg.weight = 47.0  # Teto
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	# factor = (70/47)^1.0 * 1.0 = ~1.489
-	assert_float(r.locomotion.model_turn_speed).is_equal_approx(
-		cfg.locomotion.base_model_turn_speed * (70.0 / 47.0), 0.001
-	)
+	assert_object(cfg.locomotion).is_not_null()
+	assert_object(cfg.jump).is_not_null()
+	assert_object(cfg.camera).is_not_null()
+	assert_object(cfg.camera_effects).is_not_null()
+	assert_object(cfg.stair).is_not_null()
+	assert_object(cfg.probe).is_not_null()
+	assert_object(cfg.components).is_not_null()
+	assert_object(cfg.foot_ik).is_not_null()
 
 
-func test_heavier_weight_reduces_turn_speed() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.weight = 100.0
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	# factor = (70/100)^1.0 = 0.7
-	assert_float(r.locomotion.model_turn_speed).is_equal_approx(
-		cfg.locomotion.base_model_turn_speed * 0.7, 0.0001
-	)
+func test_locomotion_config_defaults() -> void:
+	var c := LocomotionConfig.new()
+	assert_float(c.walk_speed).is_equal(3.0)
+	assert_float(c.run_speed).is_equal(5.4)
+	assert_float(c.model_turn_speed).is_equal(12.0)
+	assert_float(c.weight_turn_factor).is_equal(0.01)
 
 
-func test_weight_turn_disabled_uses_base() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.weight = 200.0
-	cfg.locomotion.weight_turn_enabled = false
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.locomotion.model_turn_speed).is_equal(cfg.locomotion.base_model_turn_speed)
+func test_model_turn_speed_no_weight_effect_when_factor_zero() -> void:
+	var c := LocomotionConfig.new()
+	c.weight_turn_factor = 0.0
+	assert_float(c.compute_model_turn_speed(100.0)).is_equal(c.model_turn_speed)
 
 
-func test_weight_turn_exponent_changes_curve() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.weight = 47.0
-	cfg.locomotion.weight_turn_exponent = 2.0
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	# factor = (70/47)^2.0 ≈ 2.218
-	var expected := cfg.locomotion.base_model_turn_speed * pow(70.0 / 47.0, 2.0)
-	assert_float(r.locomotion.model_turn_speed).is_equal_approx(expected, 0.001)
+func test_model_turn_speed_scales_with_weight() -> void:
+	var c := LocomotionConfig.new()
+	c.model_turn_speed = 12.0
+	c.weight_turn_factor = 0.01
+	# heavier = slower
+	var light := c.compute_model_turn_speed(47.0)
+	var heavy := c.compute_model_turn_speed(100.0)
+	assert_bool(light > heavy).is_true()
 
 
-func test_weight_turn_scale_applies() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.weight = 47.0
-	cfg.locomotion.weight_turn_scale = 0.5
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	# factor = (70/47)^1.0 * 0.5
-	assert_float(r.locomotion.model_turn_speed).is_equal_approx(
-		cfg.locomotion.base_model_turn_speed * (70.0 / 47.0) * 0.5, 0.001
-	)
+func test_model_turn_speed_formula() -> void:
+	var c := LocomotionConfig.new()
+	c.model_turn_speed = 12.0
+	c.weight_turn_factor = 0.02
+	var expected := 12.0 / (1.0 + 0.02 * 70.0)
+	assert_float(c.compute_model_turn_speed(70.0)).is_equal_approx(expected, 0.0001)
 
 
-func test_extreme_weight_clamped() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.weight = 1000.0
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	# factor = (70/1000)^1.0 = 0.07, clamped to 0.2
-	assert_float(r.locomotion.model_turn_speed).is_equal_approx(
-		cfg.locomotion.base_model_turn_speed * 0.2, 0.0001
-	)
+func test_max_step_up_from_ratio() -> void:
+	var c := StairConfig.new()
+	c.max_step_up_ratio = 0.314
+	assert_float(c.compute_max_step_up(1.59)).is_equal_approx(0.5, 0.001)
 
 
-func test_default_height_gives_base_step_up() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.stair.max_step_up).is_equal(cfg.stair.base_max_step_up)
+func test_max_step_up_scales_with_body_height() -> void:
+	var c := StairConfig.new()
+	c.max_step_up_ratio = 0.44
+	assert_float(c.compute_max_step_up(3.18)).is_equal_approx(1.4, 0.001)
+	assert_float(c.compute_max_step_up(0.795)).is_equal_approx(0.35, 0.001)
 
 
-func test_taller_character_steps_higher() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.body_height = 3.18  # double the reference
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.stair.max_step_up).is_equal_approx(cfg.stair.base_max_step_up * 2.0, 0.0001)
+func test_stair_config_defaults() -> void:
+	var c := StairConfig.new()
+	assert_float(c.max_step_up_ratio).is_equal(0.314)
+	assert_int(c.step_check_iterations).is_equal(6)
+	assert_float(c.min_horizontal_motion).is_equal(0.001)
 
 
-func test_shorter_character_steps_lower() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.body_height = 0.795  # half the reference
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.stair.max_step_up).is_equal_approx(cfg.stair.base_max_step_up * 0.5, 0.0001)
+func test_probe_config_defaults() -> void:
+	var c := ProbeConfig.new()
+	assert_float(c.short_factor).is_equal(0.06)
+	assert_float(c.medium_factor).is_equal(0.17)
+	assert_int(c.collision_mask).is_equal(1)
 
 
-func test_locomotion_passthroughs() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.locomotion.walk_speed = 4.0
-	cfg.locomotion.run_speed = 7.0
-	cfg.locomotion.air_control = 0.5
-	cfg.locomotion.backwalk_speed_multiplier = 0.5
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.locomotion.walk_speed).is_equal(4.0)
-	assert_float(r.locomotion.run_speed).is_equal(7.0)
-	assert_float(r.locomotion.air_control).is_equal(0.5)
-	assert_float(r.locomotion.backwalk_speed_multiplier).is_equal(0.5)
+func test_jump_config_defaults() -> void:
+	var c := JumpConfig.new()
+	assert_float(c.jump_velocity).is_equal(4.2)
+	assert_float(c.jump_buffer_time).is_equal(0.1)
+	assert_float(c.land_duration).is_equal(0.35)
 
 
-func test_backwalk_speed_multiplier_default() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.locomotion.backwalk_speed_multiplier).is_equal(0.6)
-
-
-func test_jump_passthroughs() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.jump.jump_velocity = 5.0
-	cfg.jump.coyote_time = 0.2
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.jump.jump_velocity).is_equal(5.0)
-	assert_float(r.jump.coyote_time).is_equal(0.2)
-
-
-func test_probe_passthroughs() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.probe.short_factor = 0.1
-	cfg.probe.medium_factor = 0.2
-	cfg.probe.collision_mask = 7
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_float(r.probe.short_factor).is_equal(0.1)
-	assert_float(r.probe.medium_factor).is_equal(0.2)
-	assert_int(r.probe.collision_mask).is_equal(7)
-
-
-func test_stair_passthroughs() -> void:
-	var cfg := PlayerConfig.new()
-	cfg.ensure_defaults()
-	cfg.stair.step_check_iterations = 10
-	cfg.stair.min_horizontal_motion = 0.005
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_int(r.stair.step_check_iterations).is_equal(10)
-	assert_float(r.stair.min_horizontal_motion).is_equal(0.005)
-
-
-func test_ensure_defaults_called() -> void:
-	var cfg := PlayerConfig.new()
-	# Don't call ensure_defaults — resolve() should do it.
-	var r := ResolvedPlayerConfig.resolve(cfg)
-	assert_object(r.locomotion).is_not_null()
-	assert_object(r.jump).is_not_null()
-	assert_object(r.camera).is_not_null()
-	assert_object(r.stair).is_not_null()
-	assert_object(r.probe).is_not_null()
+func test_player_config_weight_default() -> void:
+	var c := PlayerConfig.new()
+	assert_float(c.weight).is_equal(47.0)

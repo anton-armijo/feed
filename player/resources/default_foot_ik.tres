@@ -4,4 +4,6 @@
 
 [resource]
 script = ExtResource("1_sjsre")
+ik_during_run = true
+front_ray_weight = 0.35
 ray_collision_mask = 1

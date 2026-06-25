@@ -31,43 +31,43 @@ var _original_visibilities: Dictionary = {}
 var _fade_materials: Dictionary = {}
 
 
-## Called by Player._ready() after the blackboard and resolved config are
+## Called by Player._ready() after the blackboard and config are
 ## built. Subclasses wire their internal animation/audio nodes here, then
 ## call super.setup_presenter().
-func setup_presenter(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+func setup_presenter(bb: PlayerBlackboard, config: PlayerConfig) -> void:
 	_bb = bb
-	_setup_fade_controller(resolved)
-	_setup_child_nodes(bb, resolved)
+	_setup_fade_controller(config)
+	_setup_child_nodes(bb, config)
 
 
-## Iterates descendant nodes and calls presenter_setup(bb, resolved) on any
+## Iterates descendant nodes and calls presenter_setup(bb, config) on any
 ## that implement the method. This lets scene authors add new setup-able child
 ## nodes (including ones nested under the skeleton, e.g. a FootIkController
 ## living under GeneralSkeleton) without modifying setup_presenter() overrides.
 ## Follows the same auto-registration pattern used by AbilityManager and
 ## LocomotionFSM. Recursive so modifiers parented to the Skeleton3D are wired.
-func _setup_child_nodes(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+func _setup_child_nodes(bb: PlayerBlackboard, config: PlayerConfig) -> void:
 	for child in find_children("*", "", true, true):
 		if child == self:
 			continue
 		if child.has_method(&"presenter_setup"):
-			child.presenter_setup(bb, resolved)
+			child.presenter_setup(bb, config)
 
 
-## Finds ProximityFadeConfig in resolved.extras and configures the child
+## Finds ProximityFadeConfig in config.extras and configures the child
 ## ProximityFadeController, if present.
-func _setup_fade_controller(resolved: ResolvedPlayerConfig) -> void:
-	var config: ProximityFadeConfig = _find_fade_config(resolved)
+func _setup_fade_controller(player_cfg: PlayerConfig) -> void:
+	var fade_cfg: ProximityFadeConfig = _find_fade_config(player_cfg)
 	var ctrl := get_node_or_null("ProximityFadeController") as ProximityFadeController
-	if ctrl != null and config != null:
-		ctrl.setup(self, config)
+	if ctrl != null and fade_cfg != null:
+		ctrl.setup(self, fade_cfg)
 	elif ctrl != null:
 		ctrl.set_enabled(false)
 
 
-## Searches resolved.extras for a ProximityFadeConfig. Returns null if not found.
-func _find_fade_config(resolved: ResolvedPlayerConfig) -> ProximityFadeConfig:
-	for c in resolved.extras:
+## Searches config.extras for a ProximityFadeConfig. Returns null if not found.
+func _find_fade_config(player_cfg: PlayerConfig) -> ProximityFadeConfig:
+	for c in player_cfg.extras:
 		if c is ProximityFadeConfig:
 			return c
 	return null

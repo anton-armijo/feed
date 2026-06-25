@@ -38,7 +38,7 @@ var bone_indices: Dictionary = {}
 
 ## Ejecuta la calibración completa. Devuelve [code]true[/code] si tuvo éxito.
 func calibrate(
-	skeleton: Skeleton3D, bone_names: Dictionary, config: ResolvedPlayerConfig.FootIK
+	skeleton: Skeleton3D, bone_names: Dictionary, config: FootIKConfig
 ) -> bool:
 	if skeleton == null:
 		push_error("[FootIKCalibrator] skeleton es null")
@@ -161,7 +161,7 @@ func _read_rest_positions(skeleton: Skeleton3D) -> Dictionary:
 	return p
 
 
-func _compute_leg_metrics(p: Dictionary, config: ResolvedPlayerConfig.FootIK) -> void:
+func _compute_leg_metrics(p: Dictionary, config: FootIKConfig) -> void:
 	var l_thigh: float = p.left_hip.distance_to(p.left_knee)
 	var l_shin: float = p.left_knee.distance_to(p.left_ankle)
 	var l_leg: float = l_thigh + l_shin
@@ -234,7 +234,7 @@ func _compute_foot_rotation_offsets(skeleton: Skeleton3D) -> void:
 	metrics.foot_rot_offset_right = r_rest.orthonormalized().get_rotation_quaternion()
 
 
-func _compute_raycast_config(config: ResolvedPlayerConfig.FootIK) -> void:
+func _compute_raycast_config(config: FootIKConfig) -> void:
 	var avg_sole: float = metrics.sole_offset
 	var avg_foot: float = metrics.avg_foot_length
 	var hip_h: float = metrics.hip_height
@@ -248,7 +248,7 @@ func _compute_raycast_config(config: ResolvedPlayerConfig.FootIK) -> void:
 	metrics.ray_front_offset = avg_foot * config.ray_front_foot_ratio
 
 
-func _compute_pole_knee_positions(p: Dictionary, config: ResolvedPlayerConfig.FootIK) -> void:
+func _compute_pole_knee_positions(p: Dictionary, config: FootIKConfig) -> void:
 	var fwd_scale: float = metrics.avg_leg_length * config.pole_forward_ratio
 
 	# Derive the character's forward direction from the foot bones (ankle →

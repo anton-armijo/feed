@@ -21,6 +21,11 @@ const SAMPLES := 64
 const FOOT_L := "LeftFoot"
 const FOOT_R := "RightFoot"
 
+## For non-footstep animations (e.g. land) the marker is set to a fixed time
+## instead of bone-sampled.
+const LAND_MARKER_TIME := 0.1013
+const LAND_MARKER_NAME := &"landed"
+
 
 func _run() -> void:
 	_author_all()
@@ -65,6 +70,14 @@ func _author_all() -> void:
 				% [anim_name, t_l, t_r, err]
 			)
 		)
+
+	# Land is not a footstep cycle — set a fixed marker for the landing impact.
+	var anim_land := lib.get_animation("land") as Animation
+	if anim_land != null:
+		var land_markers: Array = [{"time": LAND_MARKER_TIME, "name": LAND_MARKER_NAME}]
+		anim_land.set_meta("footstep_markers", land_markers)
+		var err := ResourceSaver.save(anim_land, anim_land.resource_path)
+		print("footstep_marker_editor: land -> landed@%.3f (save %d)" % [LAND_MARKER_TIME, err])
 
 	instance.queue_free()
 

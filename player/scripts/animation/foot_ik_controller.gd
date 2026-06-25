@@ -44,10 +44,9 @@ extends Node
 # ──────────────────────────────────────────────────────────────────────────────
 
 var _bb: PlayerBlackboard
-var _resolved: ResolvedPlayerConfig
 var _skeleton: Skeleton3D
 var _presenter: CharacterPresenter
-var _config: ResolvedPlayerConfig.FootIK
+var _config: FootIKConfig
 
 # ──────────────────────────────────────────────────────────────────────────────
 # State — calibration
@@ -104,14 +103,13 @@ var _debug: FootIKDebug
 
 
 ## Called by [CharacterPresenter._setup_child_nodes] for auto-discovery.
-## Receives the same [PlayerBlackboard] and [ResolvedPlayerConfig] that every
+## Receives the same [PlayerBlackboard] and [PlayerConfig] that every
 ## presenter-level component receives.
-func presenter_setup(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+func presenter_setup(bb: PlayerBlackboard, config: PlayerConfig) -> void:
 	_bb = bb
-	_resolved = resolved
-	_config = resolved.foot_ik
+	_config = config.foot_ik
 
-	if _bb == null or _resolved == null or _config == null:
+	if _bb == null or _config == null:
 		push_warning("[FootIKController] Invalid Player setup")
 		set_physics_process(false)
 		return

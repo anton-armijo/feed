@@ -16,7 +16,7 @@ var motor: MovementMotor
 var stepper: StairStepper
 var probe: GroundProbe
 var bb: PlayerBlackboard
-var resolved: ResolvedPlayerConfig
+var config: PlayerConfig
 
 ## Identity of the state inside the FSM. Defaults to the node name.
 func state_id() -> StringName:

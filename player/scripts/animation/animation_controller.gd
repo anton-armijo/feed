@@ -13,7 +13,7 @@ var _playback: AnimationNodeStateMachinePlayback
 var _bb: PlayerBlackboard
 
 ## Called by CharacterPresenter._setup_child_nodes() for auto-discovery.
-func presenter_setup(bb: PlayerBlackboard, _resolved: ResolvedPlayerConfig) -> void:
+func presenter_setup(bb: PlayerBlackboard, _config: PlayerConfig) -> void:
 	setup(bb)
 
 

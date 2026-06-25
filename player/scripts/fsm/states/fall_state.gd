@@ -23,7 +23,7 @@ func enter(from: StringName) -> void:
 	if not _from_jump:
 		bb.air_time = 0.0
 	# Coyote only applies when walking off ground, never after a jump.
-	_coyote = resolved.jump.coyote_time if from in _GROUND_STATES else 0.0
+	_coyote = config.jump.coyote_time if from in _GROUND_STATES else 0.0
 
 
 func physics_update(intent: InputIntent, delta: float) -> StringName:
@@ -39,7 +39,7 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 	if motor.is_grounded() and body.velocity.y <= 0.0:
 		bb.notify_landed(_fall_distance)
 		bb.air_time = 0.0
-		if _fall_distance >= resolved.jump.land_anim_min_fall and fsm.has_state(&"Land"):
+		if _fall_distance >= config.jump.land_anim_min_fall and fsm.has_state(&"Land"):
 			return &"Land"
 		return ground_state(intent)  # trivial fall: skip Land entirely
 
@@ -58,7 +58,7 @@ func physics_update(intent: InputIntent, delta: float) -> StringName:
 
 
 func _air_target_speed(intent: InputIntent) -> float:
-	return resolved.locomotion.run_speed if intent.run_held else resolved.locomotion.walk_speed
+	return config.locomotion.run_speed if intent.run_held else config.locomotion.walk_speed
 
 
 ## Presentation decision for the airborne phase. Keeps ground visuals during
@@ -78,6 +78,6 @@ func _update_anim(intent: InputIntent) -> void:
 		return
 	if (
 		not _did_pre_land_blend
-		and (_from_jump or _fall_distance >= resolved.jump.fall_anim_min_fall)
+		and (_from_jump or _fall_distance >= config.jump.fall_anim_min_fall)
 	):
 		bb.anim_state = &"fall"

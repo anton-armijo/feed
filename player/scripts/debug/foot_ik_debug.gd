@@ -2,7 +2,7 @@ class_name FootIKDebug
 extends Resource
 
 var _config: FootIKDebugConfig
-var _ik_config: ResolvedPlayerConfig.FootIK
+var _ik_config: FootIKConfig
 
 var _ik_leg_left: TwoBoneIK3D
 var _ik_leg_right: TwoBoneIK3D
@@ -26,7 +26,7 @@ var _body: CharacterBody3D
 var _ik_y_offset: float
 
 func set_config(
-	config: FootIKDebugConfig, ik_config: ResolvedPlayerConfig.FootIK,
+	config: FootIKDebugConfig, ik_config: FootIKConfig,
 	presenter: CharacterPresenter, bb: PlayerBlackboard, body: CharacterBody3D
 	) -> void:
 	_config = config

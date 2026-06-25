@@ -15,9 +15,9 @@ var injected_intent: InputIntent = null
 var _bb: PlayerBlackboard
 var _jump_buffer_time := 0.1
 
-func setup(blackboard: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+func setup(blackboard: PlayerBlackboard, jump: JumpConfig) -> void:
 	_bb = blackboard
-	_jump_buffer_time = resolved.jump.jump_buffer_time
+	_jump_buffer_time = jump.jump_buffer_time
 	get_window().focus_exited.connect(_on_focus_changed.bind(false))
 	get_window().focus_entered.connect(_on_focus_changed.bind(true))
 

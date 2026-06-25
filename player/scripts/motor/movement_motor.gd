@@ -15,17 +15,17 @@ var current_speed := 0.0
 var _body: CharacterBody3D
 var _bb: PlayerBlackboard
 var _stepper: StairStepper
-var _loco: ResolvedPlayerConfig.Locomotion
-var _jump: ResolvedPlayerConfig.Jump
+var _loco: LocomotionConfig
+var _jump: JumpConfig
 var _speed_modifiers: Dictionary = {}  # StringName -> float multiplier
 
 
-func setup(body: CharacterBody3D, bb: PlayerBlackboard, stepper: StairStepper, resolved: ResolvedPlayerConfig) -> void:
+func setup(body: CharacterBody3D, bb: PlayerBlackboard, stepper: StairStepper, loco: LocomotionConfig, jump: JumpConfig) -> void:
 	_body = body
 	_bb = bb
 	_stepper = stepper
-	_loco = resolved.locomotion
-	_jump = resolved.jump
+	_loco = loco
+	_jump = jump
 	current_speed = _loco.walk_speed
 
 

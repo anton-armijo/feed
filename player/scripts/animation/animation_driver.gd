@@ -24,7 +24,7 @@ extends Node
 @export var animation_tree: AnimationTree
 
 var blackboard: PlayerBlackboard
-var locomotion_config: ResolvedPlayerConfig.Locomotion
+var locomotion_config: LocomotionConfig
 
 ## anim_state → Array[{time: float, name: StringName}]. Populated from
 ## Animation.get_meta("footstep_markers") at setup.
@@ -46,11 +46,11 @@ var _triggered_this_cycle: Dictionary = {}
 
 
 ## Called by CharacterPresenter._setup_child_nodes() for auto-discovery.
-func presenter_setup(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
-	setup(bb, resolved.locomotion)
+func presenter_setup(bb: PlayerBlackboard, config: PlayerConfig) -> void:
+	setup(bb, config.locomotion)
 
 
-func setup(p_blackboard: PlayerBlackboard, p_loco: ResolvedPlayerConfig.Locomotion) -> void:
+func setup(p_blackboard: PlayerBlackboard, p_loco: LocomotionConfig) -> void:
 	blackboard = p_blackboard
 	locomotion_config = p_loco
 	_current_anim = blackboard.anim_state
@@ -96,6 +96,21 @@ func _load_anim_data() -> void:
 			if a.get_meta("speed_driven", false):
 				_speed_driven[StringName(anim_name)] = true
 
+	# Fallback: land animation has no authored footstep metadata (it's a
+	# landing animation, not a footstep cycle). Inject a default marker so
+	# the landing feel (sound, vibration, etc.) works out of the box.
+	if &"land" in _anim_lengths and &"land" not in _marker_config:
+		_marker_config[&"land"] = [{time = 0.1013, name = &"landed"}]
+
+	_publish_to_blackboard()
+
+
+func _publish_to_blackboard() -> void:
+	if blackboard == null:
+		return
+	blackboard.footstep_markers = _marker_config.duplicate()
+	blackboard.anim_lengths = _anim_lengths.duplicate()
+
 
 func _on_anim_state_changed(anim: StringName) -> void:
 	_current_anim = anim
@@ -123,7 +138,7 @@ func _compute_speed_scale() -> float:
 	return clamped * cfg.animation_speed_multiplier
 
 
-func _reference_speed_for(anim: StringName, cfg: ResolvedPlayerConfig.Locomotion) -> float:
+func _reference_speed_for(anim: StringName, cfg: LocomotionConfig) -> float:
 	match anim:
 		&"walk", &"walk_back":
 			return cfg.walk_speed

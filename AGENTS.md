@@ -153,17 +153,15 @@ Ownership documentada por verbo (comentarios `##`), no enforced runtime.
 `extras: Array[Resource]` lleva configs misceláneos que los presenters/nodos
 auxiliares buscan por tipo (ej. `ProximityFadeConfig`).
 
-**Patrón Resolved\*:** `Player` construye un `ResolvedPlayerConfig` inmutable
-una vez en `setup()` vía `ResolvedPlayerConfig.resolve(config)`. Los
-components leen **sólo** del resolved — nunca del `.tres` en runtime. El
-resolver hace:
-- **Passthrough** de knobs independientes (walk_speed, gravity, etc.).
-- **Derivaciones cross-config** (weight → model_turn_speed,
-  body_height → max_step_up).
-- **Validación** centralizada (run_speed > walk_speed, weight > 0, etc.).
+**Config directa:** Los componentes leen directamente de los `*Config` Resources
+(`PlayerConfig`, `LocomotionConfig`, etc.) — no hay capa intermedia. Las
+derivaciones cross-config viven como métodos en los Resources:
+- `LocomotionConfig.compute_model_turn_speed(weight)` — escala por peso.
+- `StairConfig.compute_max_step_up(body_height)` — fracción de altura.
+- `PlayerConfig.validate()` — invariantes en `_ready()`.
 
 Las modificaciones runtime (abilities que cambian velocidad) van por el
-modifier stack del motor, **no** mutando config. El resolver es inmutable.
+modifier stack del motor, **no** mutando config.
 
 ### Camera effects (FOV + shake)
 

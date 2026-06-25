@@ -8,9 +8,9 @@ extends CharacterPresenter
 @onready var _anim_driver: AnimationDriver = $AnimationDriver
 
 
-func setup_presenter(bb: PlayerBlackboard, resolved: ResolvedPlayerConfig) -> void:
+func setup_presenter(bb: PlayerBlackboard, config: PlayerConfig) -> void:
 	_scan_directional_states(bb)
-	super.setup_presenter(bb, resolved)
+	super.setup_presenter(bb, config)
 
 
 ## Scans the AnimationTree's root state machine for state names containing "_"

@@ -18,7 +18,7 @@ extends CharacterBody3D
 
 @export var config: PlayerConfig
 
-var resolved: ResolvedPlayerConfig
+var _model_turn_speed: float
 
 @onready var assembler: PlayerAssembler = $PlayerAssembler
 @onready var blackboard: PlayerBlackboard = $Blackboard
@@ -49,24 +49,25 @@ func _ready() -> void:
 	if config == null:
 		config = PlayerConfig.new()
 	config.ensure_defaults()
-	resolved = ResolvedPlayerConfig.resolve(config)
-	blackboard.body_height = resolved.body_height
+	config.validate()
+	blackboard.body_height = config.body_height
+	_model_turn_speed = config.locomotion.compute_model_turn_speed(config.weight)
 
 	# Core — always present and wired.
-	motor.setup(self, blackboard, stepper, resolved)
-	ground_probe.setup(self, resolved.probe, resolved.body_height)
-	fsm.setup(self, motor, stepper, ground_probe, blackboard, resolved)
+	motor.setup(self, blackboard, stepper, config.locomotion, config.jump)
+	ground_probe.setup(self, config.probe, config.body_height)
+	fsm.setup(self, motor, stepper, ground_probe, blackboard, config)
 	assembler.apply_initial_state()
 
 	# Semi-core — gated by assembler.
 	if assembler.is_enabled("StairStepper") and stepper != null:
-		stepper.setup(self, blackboard, resolved.stair)
+		stepper.setup(self, blackboard, config.stair, config.body_height)
 	if assembler.is_enabled("InputCollector") and input_collector != null:
-		input_collector.setup(blackboard, resolved)
+		input_collector.setup(blackboard, config.jump)
 
 	# Centralised verb surface — built after all subsystems are wired so it
 	# can forward to them. Abilities receive this instead of a dedicated context.
-	api.setup(blackboard, motor, fsm, input_collector, camera_rig, presenter, resolved, ability_manager)
+	api.setup(blackboard, motor, fsm, input_collector, camera_rig, presenter, config, ability_manager)
 
 	if assembler.is_enabled("AbilityManager") and ability_manager != null:
 		ability_manager.setup(api)
@@ -77,7 +78,7 @@ func _ready() -> void:
 	# Presentation layers run on every peer (remote state arrives via sync).
 	if assembler.is_enabled("Model"):
 		model.setup(blackboard, self)
-		presenter.setup_presenter(blackboard, resolved)
+		presenter.setup_presenter(blackboard, config)
 
 	# Wire FootIKController (auto-discovered by presenter_setup) to ModelVisual
 	# so the IK's hip-lowering offset is blended into Y smoothing.
@@ -91,8 +92,8 @@ func _ready() -> void:
 			camera_rig.setup(blackboard, self, model, presenter)
 			api.set_lock_mouse_default(config.components.default_lock_mouse_mode)
 			camera_rig.setup_effects(
-				resolved.camera_effects,
-				resolved.locomotion.run_speed
+				config.camera_effects,
+				config.locomotion.run_speed
 			)
 		fsm.start()
 	else:
@@ -134,7 +135,7 @@ func _update_model_yaw(intent: InputIntent, delta: float) -> void:
 	blackboard.model_yaw = lerp_angle(
 		blackboard.model_yaw,
 		atan2(-intent.wish_dir.x, -intent.wish_dir.z),
-		resolved.locomotion.model_turn_speed * delta
+		_model_turn_speed * delta
 	)
 
 func _publish_state(intent: InputIntent) -> void:

@@ -25,18 +25,19 @@ extends Resource
 
 @export_group("Visuals")
 ## How fast the model rotates toward the move direction (rad-lerp factor).
-## This is the *base* value; ResolvedPlayerConfig scales it by weight
-## (heavier characters turn more slowly).
-@export var base_model_turn_speed := 12.0
+@export var model_turn_speed := 12.0
 
 @export_group("Weight Turn")
-## When true, model_turn_speed is derived from weight (heavier = slower turn).
-## When false, base_model_turn_speed is used as-is.
-@export var weight_turn_enabled := true
-## Exponent applied to the weight ratio (1.0 = linear, 2.0 = more pronounced).
-@export_range(0.1, 4.0, 0.1) var weight_turn_exponent := 1.0
-## Scale multiplier on the derived turn speed (1.0 = no extra scaling).
-@export_range(0.1, 4.0, 0.1) var weight_turn_scale := 1.0
+## Weight turn factor. 0 = no weight effect (model_turn_speed used as-is).
+## > 0 makes heavier characters turn slower:
+##   effective = model_turn_speed / (1.0 + weight_turn_factor * weight)
+## Higher values = more pronounced effect.
+@export_range(0.0, 0.5, 0.01) var weight_turn_factor := 0.01
+
+func compute_model_turn_speed(weight: float) -> float:
+	if weight_turn_factor <= 0.0 or weight <= 0.0:
+		return model_turn_speed
+	return model_turn_speed / (1.0 + weight_turn_factor * weight)
 
 @export_group("Animation Speed")
 ## Speed scale lower bound: animation never freezes.

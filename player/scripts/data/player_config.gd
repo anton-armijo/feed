@@ -5,9 +5,7 @@ extends Resource
 
 @export_group("Body")
 @export var body_height := 1.59
-## Character weight in kilograms. Drives derived values like model turn speed
-## (heavier = slower turn). Reference weight is 70 kg (average human adult).
-## Teto weighs 47 kg.
+## Character weight in kilograms. Drives derived values like model turn speed.
 @export var weight := 47.0
 
 @export var locomotion: LocomotionConfig
@@ -43,3 +41,17 @@ func ensure_defaults() -> void:
 		components = PlayerComponentsConfig.new()
 	if foot_ik == null:
 		foot_ik = FootIKConfig.new()
+
+## Validates config invariants. Pushes errors but does not abort.
+func validate() -> void:
+	if weight <= 0.0:
+		push_error("PlayerConfig: weight must be > 0, got %f" % weight)
+	if body_height <= 0.0:
+		push_error("PlayerConfig: body_height must be > 0, got %f" % body_height)
+	if locomotion.run_speed <= locomotion.walk_speed:
+		push_error(
+			"PlayerConfig: run_speed (%f) must be > walk_speed (%f)"
+			% [locomotion.run_speed, locomotion.walk_speed]
+		)
+	if locomotion.min_animation_speed > locomotion.max_animation_speed:
+		push_error("PlayerConfig: min_animation_speed > max_animation_speed")

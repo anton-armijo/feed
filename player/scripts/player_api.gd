@@ -36,7 +36,7 @@ var _fsm: LocomotionFSM
 var _input: InputCollector
 var _camera_rig: CameraRig
 var _presenter: CharacterPresenter
-var _resolved: ResolvedPlayerConfig
+var _config: PlayerConfig
 var _ability_mgr: AbilityManager
 
 # Tier 3: extension verbs registered by auxiliary nodes.
@@ -50,7 +50,7 @@ func setup(
 	input_collector: InputCollector,
 	camera_rig: CameraRig,
 	presenter: CharacterPresenter,
-	resolved: ResolvedPlayerConfig,
+	config: PlayerConfig,
 	ability_mgr: AbilityManager
 ) -> void:
 	_bb = blackboard
@@ -59,7 +59,7 @@ func setup(
 	_input = input_collector
 	_camera_rig = camera_rig
 	_presenter = presenter
-	_resolved = resolved
+	_config = config
 	_ability_mgr = ability_mgr
 
 
@@ -71,9 +71,9 @@ func blackboard() -> PlayerBlackboard:
 	return _bb
 
 
-## The immutable resolved config. Read-only.
-func resolved() -> ResolvedPlayerConfig:
-	return _resolved
+## The player config resource. Read-only.
+func get_config() -> PlayerConfig:
+	return _config
 
 
 # --- Tier 1: core verbs -------------------------------------------------------

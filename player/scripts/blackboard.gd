@@ -120,6 +120,14 @@ func get_lock_mouse_mode() -> StringName:
 # routes to a directional clip if the presenter advertised it here.
 var directional_anim_states: Array[StringName] = []
 
+## Per-animation footstep marker data, populated by AnimationDriver at setup.
+## {anim_name: [{time: float, name: StringName}]}
+var footstep_markers: Dictionary = {}
+
+## Per-animation cycle length in seconds, populated by AnimationDriver at setup.
+## {anim_name: float}
+var anim_lengths: Dictionary = {}
+
 
 ## True when the model is locked to camera facing (first person or
 ## lock_on_character). In this mode the character backpedals instead of
