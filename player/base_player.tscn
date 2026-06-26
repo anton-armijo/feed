@@ -78,7 +78,7 @@ script = ExtResource("20_fsc")
 locomotion_state = &"Land"
 sound_pool = Array[AudioStream]([ExtResource("17_ywjl4"), ExtResource("18_eruow"), ExtResource("19_mvppv"), ExtResource("20_nfrn4"), ExtResource("21_xgyl0"), ExtResource("22_fphyj"), ExtResource("23_cjuxb")])
 pitch_range = Vector2(0.9, 1)
-volume_db_base = 0.0
+volume_db_base = -5.0
 foot_bias_strength = 0.0
 groove_swing = 0.0
 
