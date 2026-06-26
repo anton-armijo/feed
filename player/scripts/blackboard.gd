@@ -59,8 +59,7 @@ var anim_state_override: StringName = &"":
 ## rotation offset). Applied locally by ModelVisual on every peer.
 var model_yaw := 0.0
 
-# --- Local gameplay state (read-only for observers) --------------------------
-
+## True when on floor. Referenced by FootIKController, StairStepper, etc.
 var is_grounded := true:
 	set(value):
 		if is_grounded == value:

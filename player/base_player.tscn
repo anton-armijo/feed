@@ -115,6 +115,18 @@ properties/4/replication_mode = 2
 properties/5/path = NodePath("Blackboard:move_speed_multiplier")
 properties/5/spawn = false
 properties/5/replication_mode = 2
+properties/6/path = NodePath("Blackboard:is_grounded")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath("Blackboard:is_stepping")
+properties/7/spawn = false
+properties/7/replication_mode = 2
+properties/8/path = NodePath("Blackboard:is_stepping_down")
+properties/8/spawn = false
+properties/8/replication_mode = 2
+properties/9/path = NodePath("Blackboard:air_time")
+properties/9/spawn = false
+properties/9/replication_mode = 2
 
 [node name="BasePlayer" unique_id=1093356318 instance=ExtResource("1_crbit")]
 config = SubResource("Resource_na54m")
