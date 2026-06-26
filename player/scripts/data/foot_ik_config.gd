@@ -31,12 +31,6 @@ extends Resource
 @export_group("Foot Rotation")
 ## If true, feet align to the surface normal via CopyTransformModifier3D.
 @export var foot_rotation_enabled := true
-## Target CopyTransformModifier3D influence when idle.
-@export_range(0.0, 1.0) var idle_foot_rot_influence := 1.0
-## Target CopyTransformModifier3D influence while walking.
-@export_range(0.0, 1.0) var walk_foot_rot_influence := 0.5
-## Target CopyTransformModifier3D influence while stepping (stairs).
-@export_range(0.0, 1.0) var step_foot_rot_influence := 0.3
 ## SLERP speed for quaternion smoothing on foot rotation.
 @export_range(1.0, 30.0) var foot_rot_slerp_speed := 15.0
 ## Lerp speed for the CopyTransformModifier3D influence.
@@ -73,6 +67,6 @@ extends Resource
 ## Extra vertical offset for the pole-knee marker.
 @export var pole_y_offset := 0.1
 ## Foot-length fraction used for the back-ray offset (heel).
-@export_range(0.1, 1.0) var ray_back_foot_ratio := 0.6
+@export_range(0.1, 1.0) var ray_back_foot_ratio := 0.45
 ## Foot-length fraction used for the front-ray offset (toe).
-@export_range(0.1, 1.0) var ray_front_foot_ratio := 0.3
+@export_range(0.1, 1.0) var ray_front_foot_ratio := 0.45

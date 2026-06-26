@@ -117,8 +117,6 @@ func presenter_setup(bb: PlayerBlackboard, config: PlayerConfig) -> void:
 	_bb = bb
 	_config = config.foot_ik
 
-	print(_bb.footstep_markers)
-	print(_bb.anim_lengths)
 	if _bb == null or _config == null:
 		push_warning("[FootIKController] Invalid Player setup")
 		set_physics_process(false)
@@ -335,19 +333,6 @@ func _cyc(d: float, dur: float) -> float:
 		d += dur
 	return d
 
-func _target_foot_rot_influence() -> float:
-	if _bb.is_stepping or _bb.is_stepping_down:
-		return _config.step_foot_rot_influence
-	var state := _bb.locomotion_state
-	match state:
-		&"Idle":
-			return _config.idle_foot_rot_influence
-		&"Walk", &"Land":
-			return _config.walk_foot_rot_influence
-		_:
-			return 0.0
-
-
 func _current_lerp_speed() -> float:
 	# Boost on landing
 	if _bb.is_grounded and _bb.air_time < 0.15:
@@ -422,20 +407,19 @@ func _process_leg_ik(
 	else:
 		_miss_frames_right = 0
 
-	# ── Fix 1: Highest ray strategy on step edges ──────────────────────────
-	# When front and back rays differ by more than sole_offset * ratio, it
-	# means the foot spans a step edge. Averaging would put the target between
-	# steps (mid-air), so use the HIGHEST hit instead.
 	var avg_hit_y: float
+	var sole: float
 	if f_hit and b_hit:
 		var front_y := ray_f.get_collision_point().y
 		var back_y := ray_b.get_collision_point().y
-		var sole: float = _calibrator.metrics.sole_offset
+		sole = _calibrator.metrics.sole_offset
 		if absf(front_y - back_y) > sole * _config.step_edge_sole_ratio:
 			avg_hit_y = maxf(front_y, back_y)
 		else:
 			var wf := _config.front_ray_weight
-			avg_hit_y = front_y * wf + back_y * (1.0 - wf)
+			var low_y := minf(front_y, back_y)
+			var high_y := maxf(front_y, back_y)
+			avg_hit_y = lerpf(low_y, high_y, wf)
 	elif f_hit:
 		avg_hit_y = ray_f.get_collision_point().y
 	else:
@@ -458,14 +442,8 @@ func _process_leg_ik(
 		_last_height_diff_right = height_diff
 
 	var slope_thresh: float = m.slope_threshold
-	var sole: float = m.sole_offset
+	sole = m.sole_offset
 
-	# ── Fix 2: Continuous slope blending ──────────────────────────────────
-	# Replace the ternary hard-switch with smoothstep interpolation between
-	# down / flat / up offsets. This eliminates the jump when height_diff
-	# oscillates around the threshold (common on stairs where the body
-	# position bounces slightly each step).
-	#
 	# height_diff > 0  → foot is *below* body (stepping up)
 	# height_diff < 0  → foot is *above* body (stepping down)
 	# Maps [0, slope_thresh] → [flat, up] for positive
@@ -480,12 +458,6 @@ func _process_leg_ik(
 	else:
 		pos_y = sole
 
-	# ── Fix 3: Freeze pos_y during stair teleport ─────────────────────────
-	# When StairStepper teleports the body upward, height_diff spikes
-	# because the body moved but the foot ray is still hitting the old step.
-	# Using the fresh height_diff would change pos_y classification mid-step.
-	# Reuse the previous frame's pos_y during the teleport frame so the
-	# target Y doesn't jump.
 	if _bb.is_stepping or _bb.is_stepping_down:
 		pos_y = _last_pos_y_left if is_left else _last_pos_y_right
 	if is_left:
@@ -506,9 +478,6 @@ func _process_leg_ik(
 	var foot_pos := bone_attach.global_position
 	target_marker.global_position = Vector3(foot_pos.x, target_y, foot_pos.z)
 
-	# ── Fix 5: Hip width constraint (X/Z) ─────────────────────────────────
-	# Project the foot target onto a cylinder centered on the upper leg bone
-	# to prevent the legs from splaying wider than the hips allow.
 	var hip_idx := _left_hip_idx if is_left else _right_hip_idx
 	if hip_idx >= 0:
 		var hip_world := _skeleton.global_transform * _skeleton.get_bone_global_rest(hip_idx).origin
@@ -523,10 +492,6 @@ func _process_leg_ik(
 				hip_world.z + to_target.z * scale
 			)
 
-	# ── Fix 4: Soft clamp against TwoBoneIK singularity ────────────────────
-	# When the foot target approaches max reach, the TwoBoneIK solver loses
-	# its ability to determine a unique knee position (singularity). Clamp
-	# the target to 97% of total leg length so there's always a minimum bend.
 	if hip_idx >= 0:
 		var hip_world := _skeleton.global_transform * _skeleton.get_bone_global_rest(hip_idx).origin
 		var leg_length := _left_leg_length if is_left else _right_leg_length
@@ -615,7 +580,7 @@ func _process_foot_rotation_system(delta: float) -> void:
 			_target_rot_right,
 			_calibrator.metrics.foot_rot_offset_right
 		)
-		_update_copy_influence(delta, _target_foot_rot_influence())
+		_update_copy_influence(delta, _target_influence())
 	else:
 		_update_copy_influence(delta, 0.0)
 

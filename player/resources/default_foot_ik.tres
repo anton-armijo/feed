@@ -4,14 +4,6 @@
 [ext_resource type="Script" uid="uid://bwdhxja4kinfh" path="res://player/scripts/data/anim_ik_entry.gd" id="2_t6rfs"]
 [ext_resource type="Script" uid="uid://chxjuwgov0h7" path="res://player/scripts/data/ik_influence_profile.gd" id="3_6cdbe"]
 
-[sub_resource type="Resource" id="Resource_rlhri"]
-script = ExtResource("3_6cdbe")
-
-[sub_resource type="Resource" id="Resource_sriaj"]
-script = ExtResource("2_t6rfs")
-animation_name = &"idle"
-profile = SubResource("Resource_rlhri")
-
 [sub_resource type="Resource" id="Resource_gg5i6"]
 script = ExtResource("3_6cdbe")
 mode = 1
@@ -21,6 +13,24 @@ constant_value = 0.0
 script = ExtResource("2_t6rfs")
 animation_name = &"jump"
 profile = SubResource("Resource_gg5i6")
+
+[sub_resource type="Resource" id="Resource_rlhri"]
+script = ExtResource("3_6cdbe")
+
+[sub_resource type="Resource" id="Resource_sriaj"]
+script = ExtResource("2_t6rfs")
+animation_name = &"idle"
+profile = SubResource("Resource_rlhri")
+
+[sub_resource type="Resource" id="Resource_x3vc1"]
+script = ExtResource("3_6cdbe")
+mode = 1
+constant_value = 0.0
+
+[sub_resource type="Resource" id="Resource_wmnoj"]
+script = ExtResource("2_t6rfs")
+animation_name = &"fall"
+profile = SubResource("Resource_x3vc1")
 
 [sub_resource type="Curve" id="Curve_86sgf"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.22916667, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
@@ -37,8 +47,8 @@ animation_name = &"land"
 profile = SubResource("Resource_2e2ag")
 
 [sub_resource type="Curve" id="Curve_ywjl4"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.059523813, 0.5877863), -2.151194, -2.151194, 0, 0, Vector2(0.23511904, 0.18320614), -1.0259541, -1.0259541, 0, 0, Vector2(0.5833334, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 5
+_data = [Vector2(0, 0.8120806), 0.0, 0.0, 0, 0, Vector2(0.16223405, 0.19463092), -0.7117539, -0.7117539, 0, 0, Vector2(0.5026596, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
 
 [sub_resource type="Resource" id="Resource_qrwaw"]
 script = ExtResource("3_6cdbe")
@@ -50,32 +60,17 @@ script = ExtResource("2_t6rfs")
 animation_name = &"walk"
 profile = SubResource("Resource_qrwaw")
 
-[sub_resource type="Curve" id="Curve_nfrn4"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.1875, 0.51145047), 0.0, 0.0, 0, 0, Vector2(0.48511907, 0.29771), 0.0, 0.0, 0, 0, Vector2(0.7380953, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 5
-
 [sub_resource type="Resource" id="Resource_mvppv"]
 script = ExtResource("3_6cdbe")
 mode = 2
-curve = SubResource("Curve_nfrn4")
+curve = SubResource("Curve_ywjl4")
 
 [sub_resource type="Resource" id="Resource_eruow"]
 script = ExtResource("2_t6rfs")
 animation_name = &"run"
 profile = SubResource("Resource_mvppv")
 
-[sub_resource type="Resource" id="Resource_x3vc1"]
-script = ExtResource("3_6cdbe")
-mode = 1
-constant_value = 0.0
-
-[sub_resource type="Resource" id="Resource_wmnoj"]
-script = ExtResource("2_t6rfs")
-animation_name = &"fall"
-profile = SubResource("Resource_x3vc1")
-
 [resource]
 script = ExtResource("1_sjsre")
-animation_profiles = Array[ExtResource("2_t6rfs")]([SubResource("Resource_sriaj"), SubResource("Resource_p5wmo"), SubResource("Resource_5w6lr"), SubResource("Resource_xit0w"), SubResource("Resource_eruow"), SubResource("Resource_wmnoj")])
-front_ray_weight = 0.35
+animation_profiles = Array[ExtResource("2_t6rfs")]([SubResource("Resource_p5wmo"), SubResource("Resource_sriaj"), SubResource("Resource_wmnoj"), SubResource("Resource_5w6lr"), SubResource("Resource_xit0w"), SubResource("Resource_eruow")])
 ray_collision_mask = 1
