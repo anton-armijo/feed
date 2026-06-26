@@ -14,7 +14,16 @@
 [ext_resource type="Script" uid="uid://dfvwpuqfqf7jx" path="res://player/scripts/sounds/walk_sounds.gd" id="7_qrwaw"]
 [ext_resource type="Script" uid="uid://ccmgs38roty0x" path="res://player/scripts/data/player_config.gd" id="8_fb78d"]
 [ext_resource type="Script" uid="uid://c6eav4vo3xigm" path="res://player/scripts/data/stair_config.gd" id="9_q3vbh"]
+[ext_resource type="AudioStream" uid="uid://b7k8yk8t6lc5y" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_1.wav" id="17_ywjl4"]
+[ext_resource type="AudioStream" uid="uid://d1tudvre8j56l" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_2.wav" id="18_eruow"]
 [ext_resource type="Script" uid="uid://cudpm2c74g5kt" path="res://player/scripts/data/proximity_fade_config.gd" id="19_fade1"]
+[ext_resource type="AudioStream" uid="uid://dj3lrfhf584yk" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_3.wav" id="19_mvppv"]
+[ext_resource type="Script" uid="uid://b6o75ngo7tbcv" path="res://player/scripts/data/footstep_state_config.gd" id="20_fsc"]
+[ext_resource type="AudioStream" uid="uid://teuo482nmjgl" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_4.wav" id="20_nfrn4"]
+[ext_resource type="Script" uid="uid://cwtob0no6rmtf" path="res://player/scripts/data/footstep_surface.gd" id="21_fs"]
+[ext_resource type="AudioStream" uid="uid://dmn38jm2vndo0" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_5.wav" id="21_xgyl0"]
+[ext_resource type="AudioStream" uid="uid://cf44bqpuccrk8" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_6.wav" id="22_fphyj"]
+[ext_resource type="AudioStream" uid="uid://bqkmbakndhio8" path="res://sounds/sound_effects/FOOTSTEPS Sound Effects PACK/CONCRETE_Generic_Steps/CONCRETE_Generic_Step_7.wav" id="23_cjuxb"]
 
 [sub_resource type="Resource" id="Resource_1tmq0"]
 script = ExtResource("3_xgyl0")
@@ -46,6 +55,46 @@ probe = SubResource("Resource_qddpm")
 components = SubResource("Resource_pba5u")
 foot_ik = ExtResource("6_sriaj")
 extras = Array[Resource]([SubResource("Resource_nfrn4")])
+
+[sub_resource type="Resource" id="Resource_fsc_walk"]
+script = ExtResource("20_fsc")
+locomotion_state = &"Walk"
+sound_pool = Array[AudioStream]([ExtResource("17_ywjl4"), ExtResource("18_eruow"), ExtResource("19_mvppv"), ExtResource("20_nfrn4"), ExtResource("21_xgyl0"), ExtResource("22_fphyj"), ExtResource("23_cjuxb")])
+base_interval_ms = 480.0
+volume_db_base = -19.0
+
+[sub_resource type="Resource" id="Resource_fsc_run"]
+script = ExtResource("20_fsc")
+locomotion_state = &"Run"
+sound_pool = Array[AudioStream]([ExtResource("17_ywjl4"), ExtResource("18_eruow"), ExtResource("19_mvppv"), ExtResource("20_nfrn4"), ExtResource("21_xgyl0"), ExtResource("22_fphyj"), ExtResource("23_cjuxb")])
+base_interval_ms = 380.0
+pitch_range = Vector2(0.98, 1.08)
+volume_db_base = -15.0
+foot_bias_strength = 0.02
+groove_swing = 0.015
+
+[sub_resource type="Resource" id="Resource_fsc_land"]
+script = ExtResource("20_fsc")
+locomotion_state = &"Land"
+sound_pool = Array[AudioStream]([ExtResource("17_ywjl4"), ExtResource("18_eruow"), ExtResource("19_mvppv"), ExtResource("20_nfrn4"), ExtResource("21_xgyl0"), ExtResource("22_fphyj"), ExtResource("23_cjuxb")])
+pitch_range = Vector2(0.9, 1)
+volume_db_base = 0.0
+foot_bias_strength = 0.0
+groove_swing = 0.0
+
+[sub_resource type="Resource" id="Resource_fsc_jump"]
+script = ExtResource("20_fsc")
+locomotion_state = &"Jump"
+sound_pool = Array[AudioStream]([ExtResource("17_ywjl4"), ExtResource("18_eruow"), ExtResource("19_mvppv"), ExtResource("20_nfrn4"), ExtResource("21_xgyl0"), ExtResource("22_fphyj"), ExtResource("23_cjuxb")])
+pitch_range = Vector2(1, 1.1)
+foot_bias_strength = 0.0
+groove_swing = 0.0
+
+[sub_resource type="Resource" id="Resource_fs_default"]
+script = ExtResource("21_fs")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_p5wmo"]
+seed = 676941
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_dugmo"]
 properties/0/path = NodePath(".:position")
@@ -81,6 +130,9 @@ script = ExtResource("5_86sgf")
 
 [node name="WalkSounds" type="Node" parent="." index="8" unique_id=620034065]
 script = ExtResource("7_qrwaw")
+state_configs = Array[ExtResource("20_fsc")]([SubResource("Resource_fsc_walk"), SubResource("Resource_fsc_run"), SubResource("Resource_fsc_land"), SubResource("Resource_fsc_jump")])
+default_surface = SubResource("Resource_fs_default")
+noise = SubResource("FastNoiseLite_p5wmo")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="WalkSounds" index="0" unique_id=371003606]
 max_distance = 10.0

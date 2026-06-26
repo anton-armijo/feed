@@ -32,6 +32,7 @@ var _model_turn_speed: float
 @onready var model: ModelVisual = $Model
 @onready var presenter: CharacterPresenter = $Model/CharacterScene
 @onready var camera_rig: CameraRig = $CameraRig
+@onready var walk_sounds: WalkSounds = $WalkSounds
 
 var peer_id: int
 var _is_local := false
@@ -89,6 +90,9 @@ func _ready() -> void:
 		var ik_controller: FootIKController = _find_ik_controller()
 		if ik_controller != null:
 			model.set_ik_controller(ik_controller)
+
+	if assembler.is_enabled("WalkSounds") and walk_sounds != null:
+		walk_sounds.setup(blackboard, config.locomotion, _is_local)
 
 	if _is_local:
 		if assembler.is_enabled("CameraRig"):
